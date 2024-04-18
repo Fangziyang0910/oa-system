@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.whaler.oasys.model.entity.UserEntity;
+import com.whaler.oasys.model.entity.UserPermissionEntity;
 
 @Repository
 @Mapper
@@ -49,4 +50,7 @@ extends BaseMapper<UserEntity> {
      * @return 返回删除的实体数量。如果删除了1个或多个实体，返回它们的数量；如果没有找到匹配的实体，则返回0。
      */
     int deleteByName(String name);
+
+    UserPermissionEntity selecUserPermissionEntityByName(String name);
+
 }

@@ -2,10 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.whaler.oasys.mapper.ApproverMapper">
     <insert id="insertApproverEntity">
-        insert into approver(approver_id, process_instance_id) values (#{approverId}, #{processInstanceId})
+        insert into approver_processinstance(approver_id, processinstance_id) values (#{approverId}, #{processinstanceId})
     </insert>
 
-    <select id="selectByApproverId">
-        select * from approver where approver_id = #{approverId}
+    <delete id="deleteApproverEntity">
+        delete from approver_processinstance where approver_id = #{approverId} and processinstance_id = #{processinstanceId}
+    </delete>
+
+    <select id="selectByApproverId" resultType="com.whaler.oasys.model.entity.ApproverEntity">
+        select * from approver_processinstance where approver_id = #{approverId}
     </select>
 </mapper>

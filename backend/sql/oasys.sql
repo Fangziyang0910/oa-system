@@ -96,31 +96,31 @@ INSERT INTO `user` VALUES (26, 'user26', '123456', 'user26@163.com', '10086', '�
 -- ----------------------------
 -- Table structure for applicant_processInstance
 -- ----------------------------
-DROP TABLE IF EXISTS `applicant_processInstance`;
-CREATE Table `applicant_processInstance` (
+DROP TABLE IF EXISTS `applicant_processinstance`;
+CREATE Table `applicant_processinstance` (
   `applicant_id` BIGINT(20) NOT NULL COMMENT '申请人id',
-  `processInstance_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流程实例id',
-  PRIMARY KEY (`applicant_id`,`processInstance_id`)
+  `processinstance_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流程实例id',
+  PRIMARY KEY (`applicant_id`,`processinstance_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='申请人-流程实例' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for approver_processInstance
 -- ----------------------------
-DROP TABLE IF EXISTS `approver_processInstance`;
-CREATE Table `approver_processInstance` (
+DROP TABLE IF EXISTS `approver_processinstance`;
+CREATE Table `approver_processinstance` (
   `approver_id` BIGINT(20) NOT NULL COMMENT '审批人id',
-  `processInstance_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流程实例id',
-  PRIMARY KEY (`approver_id`,`processInstance_id`)
+  `processinstance_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流程实例id',
+  PRIMARY KEY (`approver_id`,`processinstance_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='审批人-流程实例' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for operator_processInstance
 -- ----------------------------
-DROP TABLE IF EXISTS `operator_processInstance`;
-CREATE Table `operator_processInstance` (
+DROP TABLE IF EXISTS `operator_processinstance`;
+CREATE Table `operator_processinstance` (
   `operator_id` BIGINT(20) NOT NULL COMMENT '操作人id',
-  `processInstance_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流程实例id',
-  PRIMARY KEY (`operator_id`,`processInstance_id`)
+  `processinstance_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流程实例id',
+  PRIMARY KEY (`operator_id`,`processinstance_id`)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='操作人-流程实例' ROW_FORMAT = Dynamic;
 
 -- ----------------------------

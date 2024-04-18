@@ -14,8 +14,8 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@TableName("applicant_processInstance")
+@TableName("applicant_processinstance")
 public class ApplicantEntity {
-    private Long operatorId; // 操作人ID
-    private String processInstanceId; // 流程实例ID
+    private Long applicantId; // 操作人ID
+    private String processinstanceId; // 流程实例ID
 }

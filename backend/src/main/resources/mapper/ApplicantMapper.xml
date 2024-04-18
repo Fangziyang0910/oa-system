@@ -2,10 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.whaler.oasys.mapper.ApplicantMapper">
     <insert id="insertApplicantEntity">
-        insert into applicant(operator_id, process_instance_id) values (#{operatorId}, #{processInstanceId})
+        insert into applicant_processinstance(applicant_id, processinstance_id) values (#{applicantId}, #{processinstanceId})
     </insert>
 
-    <select id="selectByApplicantId">
-        select * from applicant where operator_id = #{applicantId}
+    <delete id="deleteApplicantEntity">
+        delete from applicant_processinstance where applicant_id = #{applicantId} and processinstance_id = #{processinstanceId}
+    </delete>
+
+    <select id="selectByApplicantId" resultType="com.whaler.oasys.model.entity.ApplicantEntity">
+        select * from applicant_processinstance where applicant_id = #{applicantId}
     </select>
 </mapper>

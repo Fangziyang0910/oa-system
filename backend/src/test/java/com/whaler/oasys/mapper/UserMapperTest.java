@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.baomidou.mybatisplus.test.autoconfigure.MybatisPlusTest;
 import com.whaler.oasys.model.entity.UserEntity;
+import com.whaler.oasys.model.entity.UserPermissionEntity;
 
 @RunWith(SpringRunner.class) // 使用Spring的测试运行器
 @MybatisPlusTest // Mybatis Plus的测试类
@@ -20,7 +21,7 @@ public class UserMapperTest {
      * 测试UserMapper的基本功能，包括查询和增删操作。
      */
     @Test
-    public void test(){
+    public void testInsert(){
         // 查询用户名为"user1"的用户
         UserEntity userEntity = userMapper.selectByName("user1");
         System.out.println(userEntity);
@@ -29,5 +30,11 @@ public class UserMapperTest {
         userMapper.insertUserEntity("user33", "123456", "user33@163.com", "10086", "北京", 1L);
         // 删除刚刚插入的用户记录
         userMapper.deleteByName("user33");
+    }
+
+    @Test
+    public void testSelectUserPermissionEntityByName() {
+        UserPermissionEntity userPermissionEntity=userMapper.selecUserPermissionEntityByName("user1");
+        System.out.println(userPermissionEntity);
     }
 }

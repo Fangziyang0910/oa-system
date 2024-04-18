@@ -16,7 +16,8 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class UserPermissionEntity {
+public class UserPermissionEntity
+extends BaseEntity {
     private String name; // 用户名
     private String department; // 所属部门
     private String role; // 用户角色

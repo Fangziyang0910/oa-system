@@ -2,11 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.whaler.oasys.mapper.OperatorMapper">
     <insert id="insertOperatorEntity">
-        insert into operator(operator_id, process_instance_id) 
-        values (#{operatorId}, #{processInstanceId})
+        insert into operator_processinstance(operator_id, processinstance_id) 
+        values (#{operatorId}, #{processinstanceId})
     </insert>
+
+    <delete id="deleteOperatorEntity">
+        delete from operator_processinstance where operator_id = #{operatorId} and processinstance_id = #{processinstanceId}
+    </delete>
     
-    <select id="selectByOperatorId">
-        select * from operator where operator_id = #{operatorId}
+    <select id="selectByOperatorId" resultType="com.whaler.oasys.model.entity.OperatorEntity">
+        select * from operator_processinstance where operator_id = #{operatorId}
     </select>
 </mapper>

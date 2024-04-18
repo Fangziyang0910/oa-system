@@ -2,7 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.whaler.oasys.mapper.PermissionMapper">
     <insert id="insertPermissionEntity">
-        insert into permission(department, role, is_applicant, is_approver, is_operator) values (#{department}, #{role}, #{isApprover}, #{isApplicant}, #{isOperator})
+        insert into 
+        permission(department, role, is_applicant, is_approver, is_operator)
         values(#{department}, #{role}, #{isApplicant}, #{isApprover}, #{isOperator})
     </insert>
 

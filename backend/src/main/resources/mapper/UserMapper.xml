@@ -15,4 +15,10 @@
     <delete id="deleteByName">
         delete from user where name = #{name}
     </delete>
+
+    <select id="selecUserPermissionEntityByName" resultType="com.whaler.oasys.model.entity.UserPermissionEntity">
+        select user.id,user.name,department,role,is_applicant,is_approver,is_operator 
+        from user,permission 
+        where user.permission_id = permission.id and user.name = #{name}
+    </select>
 </mapper>

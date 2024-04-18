@@ -14,8 +14,8 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@TableName("approver_processInstance")
+@TableName("approver_processinstance")
 public class ApproverEntity {
     private String approverId; // 审批者ID
-    private String processInstanceId; // 流程实例ID
+    private String processinstanceId; // 流程实例ID
 }
