@@ -73,11 +73,12 @@ backend
     |   |   |       |__Main.java
     |   |   |__resource
     |   |       |__mapper
-    |   |       |__process
+    |   |       |__processes
     |   |       |__application.yml
     |   |__test
     |__target
     |__sql
+    |   |__oasys.sql
     |__pom.xml
 ```
 

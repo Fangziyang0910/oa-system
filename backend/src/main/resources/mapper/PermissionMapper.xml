@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.whaler.oasys.mapper.PermissionMapper">
+    <insert id="insertPermissionEntity">
+        insert into permission(department, role, is_applicant, is_approver, is_operator) values (#{department}, #{role}, #{isApprover}, #{isApplicant}, #{isOperator})
+        values(#{department}, #{role}, #{isApplicant}, #{isApprover}, #{isOperator})
+    </insert>
+
+    <delete id="deleteByDepartmentRole">
+        delete from permission where department = #{department} and role = #{role}
+    </delete>
+
+    <select id="selectByDepartment" resultType="com.whaler.oasys.model.entity.PermissionEntity">
+        select * from permission where department = #{department}
+    </select>
+
+    <select id="selectByRole" resultType="com.whaler.oasys.model.entity.PermissionEntity">
+        select * from permission where role = #{role}
+    </select>
+
+    <select id="selectByIsApplicant" resultType="com.whaler.oasys.model.entity.PermissionEntity">
+        select * from permission where is_applicant = #{isApplicant}
+    </select>
+
+    <select id="selectByIsApprover" resultType="com.whaler.oasys.model.entity.PermissionEntity">
+        select * from permission where is_approver = #{isApprover}
+    </select>
+
+    <select id="selectByIsOperator" resultType="com.whaler.oasys.model.entity.PermissionEntity">
+        select * from permission where is_operator = #{isOperator}
+    </select>
+
+</mapper>

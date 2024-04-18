@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.whaler.oasys.mapper.UserMapper">
+    <select id="selectByName" resultType="com.whaler.oasys.model.entity.UserEntity">
+        select * from user where name = #{name}
+    </select>
+
+    <insert id="insertUserEntity">
+        insert into
+        user(name, password, email, phone, city, permission_id)
+        values
+        (#{name}, #{password}, #{email}, #{phone}, #{city}, #{permissionId})
+    </insert>
+
+    <delete id="deleteByName">
+        delete from user where name = #{name}
+    </delete>
+</mapper>
