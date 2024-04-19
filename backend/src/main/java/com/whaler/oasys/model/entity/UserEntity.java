@@ -28,5 +28,5 @@ extends BaseEntity {
     private String email; // 电子邮件
     private String phone; // 电话号码
     private String city; // 所在城市
-    private String permissionId; // 权限标识符
+    private Long permissionId; // 权限标识符
 }

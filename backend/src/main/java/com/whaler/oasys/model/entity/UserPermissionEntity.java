@@ -21,7 +21,7 @@ extends BaseEntity {
     private String name; // 用户名
     private String department; // 所属部门
     private String role; // 用户角色
-    private String isApplicant; // 是否为申请人
-    private String isApprover; // 是否为审批人
-    private String isOperator; // 是否为操作人
+    private Boolean isApplicant; // 是否为申请人
+    private Boolean isApprover; // 是否为审批人
+    private Boolean isOperator; // 是否为操作人
 }
