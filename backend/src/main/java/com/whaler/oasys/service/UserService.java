@@ -12,5 +12,5 @@ extends IService<UserEntity> {
 
     void register(UserParam userParam);
 
-    
+    UserVo selectByUserId(Long userId);
 }

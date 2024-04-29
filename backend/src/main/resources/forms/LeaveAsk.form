@@ -1,0 +1,82 @@
+{
+    "key": "leaveAsk.form",
+    "name": "员工请假表",
+    "fields": [
+        {
+            "id": "applicantName",
+            "name": "员工姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantDepartment",
+            "name": "员工部门",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantRole",
+            "name": "员工职位",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantEmail",
+            "name": "员工邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantPhone",
+            "name": "员工电话",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "leaveDays",
+            "name": "请假天数",
+            "type": "integer",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "leaveReason",
+            "name": "请假原因",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "startTime",
+            "name": "开始时间",
+            "type": "date",
+            "required": true
+        },
+        {
+            "id": "endTime",
+            "name": "结束时间",
+            "type": "date",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "leader",
+            "name": "部门组长",
+            "type": "integer",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "manager",
+            "name": "部门经理",
+            "type": "integer",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

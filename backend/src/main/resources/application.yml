@@ -13,3 +13,28 @@ mybatis-plus:
 security:
   jwt:
     secretKey: whaler404
+
+myflowable:
+  datasource:
+    # url: jdbc:h2:./h2db/test
+    url: jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000
+    driver-class-name: org.h2.Driver
+    username:
+    password:
+
+# flowable:
+#   form:
+#     resource-suffixes: '***.form*'
+#     resource-location: classpath:forms/*
+
+
+management:
+  # 开启flowable端点
+  endpoint:
+    flowable:
+      enabled: true
+  # 暴露所有端点
+  endpoints:
+    web:
+      exposure:
+        include: "*"

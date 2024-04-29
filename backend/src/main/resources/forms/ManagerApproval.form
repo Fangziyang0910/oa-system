@@ -1,0 +1,34 @@
+{
+    "key": "managerApproval.form",
+    "name": "主管审批表",
+    "fields": [
+        {
+            "id": "managerName",
+            "name": "主管姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "managerEmail",
+            "name": "主管邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "managerOpinion",
+            "name": "主管意见",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isManagerApproval",
+            "name": "主管审批结果",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

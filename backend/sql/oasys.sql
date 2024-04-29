@@ -1,4 +1,5 @@
 -- Active: 1712216087041@@127.0.0.1@3306@oasys
+
 SET NAMES utf8;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -141,3 +142,132 @@ CREATE TABLE `administrator` (
 -- Record of administrator
 -- ----------------------------
 INSERT INTO `administrator` VALUES (1, 'admin1', '123456', 'admin1@163.com', '10086');
+
+-- ----------------------------
+-- Table structure for category
+-- ----------------------------
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE `category` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '分组名称',
+  `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '分组描述',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`name`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT ='分组' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Record of category
+-- ----------------------------
+INSERT INTO `category` VALUES (1, '研发部', '研发部');
+INSERT INTO `category` VALUES (2, '测试部', '测试部');
+INSERT INTO `category` VALUES (3, '运维部', '运维部');
+INSERT INTO `category` VALUES (4, '财务部', '财务部');
+INSERT INTO `category` VALUES (5, '行政部', '行政部');
+INSERT INTO `category` VALUES (6, '市场部', '市场部');
+INSERT INTO `category` VALUES (7, '申请人', '申请人');
+INSERT INTO `category` VALUES (8, '审批人', '审批人');
+INSERT INTO `category` VALUES (9, '操作人', '操作人');
+INSERT INTO `category` VALUES (10, '基层员工', '基层员工');
+INSERT INTO `category` VALUES (11, '部门组长', '部门组长');
+INSERT INTO `category` VALUES (12, '部门主管', '部门主管');
+
+-- ----------------------------
+-- Table structure for permission_category
+-- ----------------------------
+DROP TABLE IF EXISTS `permission_category`;
+CREATE TABLE `permission_category` (
+  `permission_id` bigint(20) NOT NULL COMMENT '权限id',
+  `category_id` bigint(20) NOT NULL COMMENT '分组id',
+  PRIMARY KEY (`permission_id`,`category_id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '权限-分组' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Record of permission_category
+-- ----------------------------
+INSERT INTO `permission_category` VALUES (1, 1);
+INSERT INTO `permission_category` VALUES (2, 1);
+INSERT INTO `permission_category` VALUES (3, 1);
+INSERT INTO `permission_category` VALUES (4, 1);
+INSERT INTO `permission_category` VALUES (5, 1);
+INSERT INTO `permission_category` VALUES (6, 1);
+INSERT INTO `permission_category` VALUES (7, 2);
+INSERT INTO `permission_category` VALUES (8, 2);
+INSERT INTO `permission_category` VALUES (9, 2);
+INSERT INTO `permission_category` VALUES (10, 2);
+INSERT INTO `permission_category` VALUES (11, 3);
+INSERT INTO `permission_category` VALUES (12, 3);
+INSERT INTO `permission_category` VALUES (13, 3);
+INSERT INTO `permission_category` VALUES (14, 3);
+INSERT INTO `permission_category` VALUES (15, 4);
+INSERT INTO `permission_category` VALUES (16, 4);
+INSERT INTO `permission_category` VALUES (17, 4);
+INSERT INTO `permission_category` VALUES (18, 4);
+INSERT INTO `permission_category` VALUES (19, 4);
+INSERT INTO `permission_category` VALUES (20, 5);
+INSERT INTO `permission_category` VALUES (21, 5);
+INSERT INTO `permission_category` VALUES (22, 5);
+INSERT INTO `permission_category` VALUES (23, 6);
+INSERT INTO `permission_category` VALUES (24, 6);
+INSERT INTO `permission_category` VALUES (25, 6);
+INSERT INTO `permission_category` VALUES (26, 6);
+
+INSERT INTO `permission_category` VALUES (5, 8);
+INSERT INTO `permission_category` VALUES (6, 8);
+INSERT INTO `permission_category` VALUES (9, 8);
+INSERT INTO `permission_category` VALUES (10, 8);
+INSERT INTO `permission_category` VALUES (12, 8);
+INSERT INTO `permission_category` VALUES (13, 8);
+INSERT INTO `permission_category` VALUES (14, 8);
+INSERT INTO `permission_category` VALUES (17, 8);
+INSERT INTO `permission_category` VALUES (18, 8);
+INSERT INTO `permission_category` VALUES (19, 8);
+INSERT INTO `permission_category` VALUES (21, 8);
+INSERT INTO `permission_category` VALUES (22, 8);
+INSERT INTO `permission_category` VALUES (24, 8);
+INSERT INTO `permission_category` VALUES (25, 8);
+INSERT INTO `permission_category` VALUES (26, 8);
+INSERT INTO `permission_category` VALUES (1, 9);
+INSERT INTO `permission_category` VALUES (2, 9);
+INSERT INTO `permission_category` VALUES (3, 9);
+INSERT INTO `permission_category` VALUES (4, 9);
+INSERT INTO `permission_category` VALUES (7, 9);
+INSERT INTO `permission_category` VALUES (8, 9);
+INSERT INTO `permission_category` VALUES (11, 9);
+INSERT INTO `permission_category` VALUES (12, 9);
+INSERT INTO `permission_category` VALUES (15, 9);
+INSERT INTO `permission_category` VALUES (16, 9);
+INSERT INTO `permission_category` VALUES (17, 9);
+INSERT INTO `permission_category` VALUES (20, 9);
+INSERT INTO `permission_category` VALUES (21, 9);
+INSERT INTO `permission_category` VALUES (23, 9);
+INSERT INTO `permission_category` VALUES (24, 9);
+INSERT INTO `permission_category` VALUES (25, 9);
+
+INSERT INTO `permission_category` VALUES (1, 10);
+INSERT INTO `permission_category` VALUES (2, 10);
+INSERT INTO `permission_category` VALUES (3, 10);
+INSERT INTO `permission_category` VALUES (7, 10);
+INSERT INTO `permission_category` VALUES (8, 10);
+INSERT INTO `permission_category` VALUES (11, 10);
+INSERT INTO `permission_category` VALUES (12, 10);
+INSERT INTO `permission_category` VALUES (15, 10);
+INSERT INTO `permission_category` VALUES (16, 10);
+INSERT INTO `permission_category` VALUES (17, 10);
+INSERT INTO `permission_category` VALUES (20, 10);
+INSERT INTO `permission_category` VALUES (23, 10);
+INSERT INTO `permission_category` VALUES (24, 10);
+
+INSERT INTO `permission_category` VALUES (5, 11);
+INSERT INTO `permission_category` VALUES (9, 11);
+INSERT INTO `permission_category` VALUES (13, 11);
+INSERT INTO `permission_category` VALUES (18, 11);
+INSERT INTO `permission_category` VALUES (21, 11);
+INSERT INTO `permission_category` VALUES (25, 11);
+
+INSERT INTO `permission_category` VALUES (6, 12);
+INSERT INTO `permission_category` VALUES (10, 12);
+INSERT INTO `permission_category` VALUES (14, 12);
+INSERT INTO `permission_category` VALUES (19, 12);
+INSERT INTO `permission_category` VALUES (22, 12);
+INSERT INTO `permission_category` VALUES (26, 12);
+

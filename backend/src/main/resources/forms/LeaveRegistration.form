@@ -1,0 +1,27 @@
+{
+    "key": "leaveRegistration.form",
+    "name": "请假申报回单",
+    "fields": [
+        {
+            "id": "operatorName",
+            "name": "执行人姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "operatorEmail",
+            "name": "执行人邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "leaveFile",
+            "name": "请假证明",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

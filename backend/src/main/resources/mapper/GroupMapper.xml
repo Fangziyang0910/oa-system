@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.whaler.oasys.mapper.CategoryMapper">
+    <insert id="insertCategoryEntity">
+        insert into category(name, description) 
+        values (#{name}, #{description});
+    </insert>
+
+    <delete id="deleteCategoryEntity">
+        delete from category where id = #{id};
+        <!-- delete from permission_category where category_id = #{id}; -->
+    </delete>
+
+    <select id="selectByCategoryName" resultType="com.whaler.oasys.model.entity.CategoryEntity">
+        select * from category where name = #{name}
+    </select>
+
+    <select id="selectPermissionsByCategoryId" resultType="java.lang.Long">
+        select permission_id 
+        from permission_category
+        where category_id = #{categoryId}
+    </select>
+
+    <select id="selectCategorysByPermissionId" resultType="java.lang.Long">
+        select category_id 
+        from permission_category
+        where permission_id = #{permissionId}
+    </select>
+
+    <insert id="insertMembership">
+        insert into permission_category(permission_id, category_id) 
+        values (#{permissionId}, #{categoryId});
+    </insert>
+
+    <delete id="deleteMymbership">
+        delete from permission_category where permission_id = #{permissionId} and category_id = #{categoryId};
+    </delete>
+</mapper>

@@ -1,0 +1,34 @@
+{
+    "key": "leaderApproval.form",
+    "name": "组长审批表",
+    "fields": [
+        {
+            "id": "leaderName",
+            "name": "组长姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "leaderEmail",
+            "name": "组长邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "leaderOpinion",
+            "name": "组长意见",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isLeaderApproval",
+            "name": "组长审批结果",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

@@ -17,9 +17,12 @@ import com.whaler.oasys.model.param.LoginParam;
 import com.whaler.oasys.model.param.UserParam;
 import com.whaler.oasys.model.vo.UserVo;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Main.class})
 @Rollback(true)
+@Slf4j
 public class UserServiceTest {
     @Autowired
     UserService userService;
@@ -84,5 +87,12 @@ public class UserServiceTest {
         for (UserEntity userEntity : userEntityList) {
             System.out.println(userEntity);
         }
+    }
+
+    @Test
+    @Transactional
+    public void testSelectByUserId(){
+        UserVo userVo=userService.selectByUserId(1L);
+        log.info("userVo:{}",userVo);
     }
 }

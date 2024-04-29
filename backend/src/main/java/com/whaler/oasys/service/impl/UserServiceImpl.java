@@ -13,6 +13,7 @@ import com.whaler.oasys.model.param.LoginParam;
 import com.whaler.oasys.model.param.UserParam;
 import com.whaler.oasys.model.vo.UserVo;
 import com.whaler.oasys.security.JwtManager;
+import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.UserService;
 
 @Service
@@ -38,7 +39,8 @@ implements UserService {
         UserPermissionEntity userPermissionEntity=this.baseMapper.selecUserPermissionEntityByName(userEntity.getName());
 
         UserVo userVo=new UserVo();
-        userVo.setName(userEntity.getName())
+        userVo.setUserId(userEntity.getId())
+            .setName(userEntity.getName())
             .setToken(token)
             .setEmail(userEntity.getEmail())
             .setPhone(userEntity.getPhone())
@@ -70,5 +72,27 @@ implements UserService {
             userParam.getPermissionId()
         );
         return;
+    }
+
+    @Override
+    public UserVo selectByUserId(Long userId) {
+        UserEntity userEntity=this.baseMapper.selectById(userId);
+        UserPermissionEntity userPermissionEntity=this.baseMapper.selecUserPermissionEntityByName(userEntity.getName());
+
+        UserVo userVo=new UserVo();
+        userVo.setUserId(userEntity.getId())
+            .setName(userEntity.getName())
+            .setToken(null)
+            .setEmail(userEntity.getEmail())
+            .setPhone(userEntity.getPhone())
+            .setCity(userEntity.getCity())
+            .setPermissionId(userEntity.getPermissionId())
+            .setDepartment(userPermissionEntity.getDepartment())
+            .setRole(userPermissionEntity.getRole())
+            .setIsApplicant(userPermissionEntity.getIsApplicant())
+            .setIsApprover(userPermissionEntity.getIsApprover())
+            .setIsOperator(userPermissionEntity.getIsOperator());
+        return userVo;
+
     }
 }
