@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
  * @param taskName 任务名称
  * @param executionId 执行ID
  * @param description 任务描述
+ * @param endTime 任务结束时间
  */
 @Data
 @Accessors(chain = true)
@@ -17,4 +18,5 @@ public class TaskVo {
     private String taskName; // 任务名称
     private String executionId; // 执行ID
     private String description; // 任务描述
+    private String endTime; // 任务结束时间
 }

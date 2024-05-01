@@ -1,0 +1,13 @@
+{
+    "key": "maintainerFeedback.form",
+    "name": "运维审批回单",
+    "fields": [
+        {
+            "id": "approvalFeedback",
+            "name": "审核处理反馈",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

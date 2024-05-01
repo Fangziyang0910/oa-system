@@ -1,26 +1,28 @@
 package com.whaler.oasys.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormInfo;
-import org.flowable.form.api.FormModel;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whaler.oasys.mapper.ApplicantMapper;
 import com.whaler.oasys.model.entity.ApplicantEntity;
@@ -30,13 +32,11 @@ import com.whaler.oasys.model.vo.FormVo;
 import com.whaler.oasys.model.vo.FormFieldVo;
 import com.whaler.oasys.model.vo.ProcessDefinitionVo;
 import com.whaler.oasys.model.vo.ProcessInstanceVo;
+import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.ApplicantService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class ApplicantServiceImpl
 extends ServiceImpl<ApplicantMapper,ApplicantEntity>
 implements ApplicantService {
@@ -48,6 +48,8 @@ implements ApplicantService {
     private FormService formService;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private HistoryService historyService;
 
     @Override
     public int insertApplicantEntity(Long applicantId, String processinstanceId) {
@@ -66,7 +68,7 @@ implements ApplicantService {
         applicantVo.setApplicantId(applicantId);
         applicantVo.setProcessinstanceIds(
             applicantEntities.stream().map(ApplicantEntity::getProcessinstanceId)
-            .collect(Collectors.toSet())
+            .collect(Collectors.toList())
         );
         return applicantVo;
     }
@@ -97,6 +99,8 @@ implements ApplicantService {
         }
         Map<String,Object>vars=new HashMap<>();
         vars.put("starter", starterId);
+        List<String> formList=new ArrayList<>();
+        vars.put("formList", JSON.toJSONString(formList));
         ProcessInstance pi=runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
         if (pi==null) {
             throw new ApiException("流程实例创建失败");
@@ -155,16 +159,114 @@ implements ApplicantService {
         if(starterTask==null){
             throw new ApiException("已提交申请表");
         }
+        
+        // 更新流程进度
+        String jsonString=(String)runtimeService.getVariable(starterTask.getExecutionId(), "formList");
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        formList.add(starterTask.getId());
+        jsonString=JSON.toJSONString(formList);
+        runtimeService.setVariable(starterTask.getExecutionId(), "formList", jsonString);
+
+        // 提交申请表单
         formService.submitTaskFormData(starterTask.getId(), startForm);
         runtimeService.setVariable(processInstanceId, "startFormTask", starterTask.getId());
     }
 
     @Override
-    public void getProcessInstanceProgress(String processInstanceId){
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId).singleResult();
+    public List<TaskVo> getProcessInstanceProgress(String processInstanceId){
+        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(processInstanceId)
+            .singleResult();
         if(pi==null){
             throw new ApiException("流程不存在");
         }
+        String jsonString=(String)historyService.createHistoricVariableInstanceQuery()
+            .processInstanceId(processInstanceId)
+            .variableName("formList")
+            .singleResult().getValue();
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        if (formList==null) {
+            throw new ApiException("formList 不存在");
+        }
+        List<TaskVo>taskVos=formList.stream().map(
+            taskId->{
+                HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+                return new TaskVo().setTaskId(task.getId())
+                    .setTaskName(task.getName())
+                    .setExecutionId(task.getExecutionId())
+                    .setDescription(task.getDescription())
+                    .setEndTime(task.getEndTime().toString());
+            }
+        ).collect(Collectors.toList());
+        return taskVos;
+    }
+
+    @Override
+    public FormVo getHistoricalForm(String taskId) {
+        HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery()
+            .taskId(taskId)
+            .singleResult();
+        if (task==null) {
+            throw new ApiException("历史任务不存在");
+        }
+        FormInfo formInfo=taskService.getTaskFormModel(taskId);
+        SimpleFormModel simpleFormModel=(SimpleFormModel)formInfo.getFormModel();
+        FormVo formVo=new FormVo();
+        formVo.setFormKey(formInfo.getKey());
+        formVo.setFormName(formInfo.getName());
+        formVo.setFormFields(simpleFormModel.getFields().stream().map(field->{
+            FormFieldVo formFieldVo=new FormFieldVo();
+            formFieldVo.setId(field.getId());
+            formFieldVo.setName(field.getName());
+            formFieldVo.setType(field.getType());
+            formFieldVo.setValue(field.getValue());
+            return formFieldVo;
+        }).collect(Collectors.toList()));
+        return formVo;
+    }
+
+    @Override
+    public ProcessInstanceVo getProcessInstance(String processInstanceId) {
+        HistoricProcessInstance pi=historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(processInstanceId).singleResult();
+        if (pi==null) {
+            throw new ApiException("流程实例不存在");
+        }
+        ProcessDefinition pd=repositoryService.createProcessDefinitionQuery()
+            .processDefinitionId(pi.getProcessDefinitionId()).singleResult();
+        List<TaskVo> progress=getProcessInstanceProgress(processInstanceId);
+        ProcessInstanceVo processInstanceVo=new ProcessInstanceVo();
+        processInstanceVo.setProcessInstanceId(pi.getId())
+            .setProcessDefinition(
+                new ProcessDefinitionVo()
+                    .setProcessDefinitionId(pd.getId())
+                    .setProcessDefinitionKey(pd.getKey())
+                    .setProcessDefinitionName(pd.getName())
+                    .setProcessDefinitionCategory(pd.getCategory())
+                    .setProcessDefinitionDescription(pd.getDescription())
+                    .setProcessDefinitionVersion(pd.getVersion())
+            )
+            .setStartTime(pi.getStartTime().toString())
+            .setProgress(progress);
+        if (pi.getEndTime()==null) {
+            processInstanceVo.setIsCompeleted(false);
+        }else{
+            processInstanceVo.setEndTime(pi.getEndTime().toString());
+            processInstanceVo.setIsCompeleted(true);
+        }
+        return processInstanceVo;
+    }
+
+    @Override
+    public void abortProcessInstance(String processInstanceId, String reason) {
+        HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId).singleResult();
+        if (pi==null) {
+            throw new ApiException("流程实例不存在");
+        }
+        if(pi.getEndTime()!=null){
+            throw new ApiException("流程实例已经结束");
+        }
+        runtimeService.deleteProcessInstance(processInstanceId, reason);
     }
 }

@@ -1,6 +1,6 @@
 package com.whaler.oasys.model.vo;
 
-import java.util.Set;
+import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -15,5 +15,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ApplicantVo {
     private Long applicantId; // 申请人ID，唯一标识一个申请人
-    private Set<String> processinstanceIds; // 相关流程实例ID集合，申请人可能关联多个流程实例
+    private List<String> processinstanceIds; // 相关流程实例ID集合，申请人可能关联多个流程实例
 }

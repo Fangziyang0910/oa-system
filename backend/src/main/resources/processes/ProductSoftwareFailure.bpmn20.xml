@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:flowable="http://flowable.org/bpmn"
+    typeLanguage="http://www.w3.org/2001/XMLSchema"
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="productSoftwareFailure" name="productSoftwareFailure" isExecutable="true">
+        <startEvent id="startEvent"></startEvent>
+        <userTask id="failureReport" name="故障报备" flowable:formKey="failureReport.form" flowable:formFieldValidation="true"
+        flowable:assignee="${starter}"></userTask>
+        <userTask id="maintainerApproval" name="运维审批" flowable:formKey="maintainerApproval.form" flowable:formFieldValidation="true"
+        flowable:assignee="11"></userTask>
+        <exclusiveGateway id="maintainerDecision" name="运维决策"/>
+        <inclusiveGateway id="fork" name="任务分派"/>
+        <userTask id="developerOperation" name="研发部门处理" flowable:formKey="developerOperation.form" flowable:formFieldValidation="true"
+        flowable:candidateGroups="1"></userTask>
+        <userTask id="testerOperation" name="测试部门处理" flowable:formKey="testerOperation.form" flowable:formFieldValidation="true"
+        flowable:candidateGroups="2"></userTask>
+        <userTask id="maintainerOperation" name="运维部门处理" flowable:formKey="maintainerOperation.form" flowable:formFieldValidation="true"
+        flowable:candidateGroups="3"></userTask>
+        <inclusiveGateway id="join" name="合并"/>
+        <userTask id="maintainerFeedback" name="运维部门回单" flowable:formKey="maintainerFeedback.form" flowable:formFieldValidation="true"
+        flowable:assignee="11"></userTask>
+        <endEvent id="endEvent" name="流程结束"></endEvent>
+
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="failureReport"></sequenceFlow>
+        <sequenceFlow id="flow2" sourceRef="failureReport" targetRef="maintainerApproval"></sequenceFlow>
+        <sequenceFlow id="flow14" sourceRef="maintainerApproval" targetRef="maintainerDecision"></sequenceFlow>
+        <sequenceFlow id="flow3" sourceRef="maintainerDecision" targetRef="fork">
+            <conditionExpression xsi:type="tFormalExpression" language="http://www.w3.org/1999/XPath">
+                <![CDATA[ 
+                    ${isMaintainerApproval==true}
+                ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow4" sourceRef="maintainerDecision" targetRef="maintainerFeedback">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[ 
+                    ${isMaintainerApproval!=true}
+                ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow5" sourceRef="fork" targetRef="developerOperation">
+            <conditionExpression xsi:type="tFormalExpression">${isDeveloperOperation == true}</conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow6" sourceRef="fork" targetRef="testerOperation">
+            <conditionExpression xsi:type="tFormalExpression">${isTesterOperation == true}</conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow7" sourceRef="fork" targetRef="maintainerOperation">
+            <conditionExpression xsi:type="tFormalExpression">${isMaintainerOperation == true}</conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow8" sourceRef="fork" targetRef="join"></sequenceFlow>
+
+        <sequenceFlow id="flow9" sourceRef="developerOperation" targetRef="join"></sequenceFlow>
+        <sequenceFlow id="flow10" sourceRef="testerOperation" targetRef="join"></sequenceFlow>
+        <sequenceFlow id="flow11" sourceRef="maintainerOperation" targetRef="join"></sequenceFlow>
+        <sequenceFlow id="flow12" sourceRef="join" targetRef="maintainerFeedback"></sequenceFlow>
+        <sequenceFlow id="flow13" sourceRef="maintainerFeedback" targetRef="endEvent"></sequenceFlow>
+
+    </process>
+
+</definitions>

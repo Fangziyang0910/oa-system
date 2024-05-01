@@ -1,7 +1,16 @@
 package com.whaler.oasys.service.impl;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +19,7 @@ import com.whaler.oasys.model.entity.AdministratorEntity;
 import com.whaler.oasys.model.param.AdministratorParam;
 import com.whaler.oasys.model.param.LoginParam;
 import com.whaler.oasys.model.vo.AdministratorVo;
+import com.whaler.oasys.model.vo.ProcessDefinitionVo;
 import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.service.AdministratorService;
 
@@ -17,6 +27,10 @@ import com.whaler.oasys.service.AdministratorService;
 public class AdministratorServiceImpl
 extends ServiceImpl<AdministratorMapper,AdministratorEntity>
 implements AdministratorService {
+    @Autowired
+    private RuntimeService runtimeService;
+    @Autowired
+    private RepositoryService repositoryService;
     @Autowired
     private JwtManager jwtManager;
     @Override
@@ -54,4 +68,35 @@ implements AdministratorService {
             administratorParam.getPhone()
         );
     }
+
+    @Override
+    public List<ProcessDefinitionVo> listProcessDefinitions() {
+        List<ProcessDefinitionVo>processDefinitionVoList=
+            repositoryService.createProcessDefinitionQuery().list()
+            .stream()
+            .map(processDefinition -> new ProcessDefinitionVo()
+                .setProcessDefinitionId(processDefinition.getId())
+                .setProcessDefinitionKey(processDefinition.getKey())
+                .setProcessDefinitionName(processDefinition.getName())
+                .setProcessDefinitionCategory(processDefinition.getCategory())
+                .setProcessDefinitionDescription(processDefinition.getDescription())
+                .setProcessDefinitionVersion(processDefinition.getVersion())
+            ).collect(Collectors.toList());
+
+        return processDefinitionVoList;
+    }
+
+    @Override
+    public void deployProcessDefinition(InputStream[] files, String[] fileNames) {
+        DeploymentBuilder deploymentBuilder=repositoryService.createDeployment();
+        try{
+            for (int i = 0; i < files.length; i++) {
+                deploymentBuilder.addInputStream(fileNames[i], files[i]);
+            }
+        }catch(Exception e){
+            throw new ApiException("文件上传失败");
+        }
+        deploymentBuilder.deploy();
+    }
+
 }

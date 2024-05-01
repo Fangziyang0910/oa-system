@@ -11,12 +11,18 @@ import com.whaler.oasys.security.LoginInterceptor;
 public class WebConfig
 implements WebMvcConfigurer {
     private static final String[] EXCLUDE_PATH = {"/user/login", "/user/register", "/admin/login", "/admin/login"};
-    private static final String API_PTTERN= "/user/**";
+    private static final String API_PTTERN= "/user";
     
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor())
-        .addPathPatterns(API_PTTERN)
+        .addPathPatterns(
+            "/user/**",
+            "/administrator/**",
+            "/operator/**",
+            "/approver/**",
+            "/applicant/**"
+        )
         .excludePathPatterns(EXCLUDE_PATH);
     }
 

@@ -1,0 +1,48 @@
+{
+    "key": "maintainerOperation.form",
+    "name": "运维人员操作回单",
+    "fields": [
+        {
+            "id": "maintainerId",
+            "name": "运维人员账户Id",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "maintainerName",
+            "name": "运维人员姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "maintainerRole",
+            "name": "运维人员职位",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "maintainerEmail",
+            "name": "运维人员邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "maintainerOperation",
+            "name": "运维人员操作",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "maintainerFeedback",
+            "name": "运维人员反馈",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

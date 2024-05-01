@@ -1,0 +1,48 @@
+{
+    "key": "developerOperation.form",
+    "name": "研发人员操作回单",
+    "fields": [
+        {
+            "id": "developerId",
+            "name": "研发人员账户Id",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "developerName",
+            "name": "研发人员姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "developerRole",
+            "name": "研发人员职位",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "developerEmail",
+            "name": "研发人员邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "developerOperation",
+            "name": "研发人员操作",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "developerFeedback",
+            "name": "研发人员反馈",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

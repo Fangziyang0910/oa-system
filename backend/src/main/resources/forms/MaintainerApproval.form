@@ -1,0 +1,62 @@
+{
+    "key": "maintainerApproval.form",
+    "name": "运维审批表",
+    "fields": [
+        {
+            "id": "approverId",
+            "name": "审核账户Id",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "approverName",
+            "name": "审核姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "approverEmail",
+            "name": "审核邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "failureAnalysis",
+            "name": "故障初步分析",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isMaintainerApproval",
+            "name": "是否派单处理",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isDeveloperOperation",
+            "name": "是否派单研发部门",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isTesterOperation",
+            "name": "是否派单测试部门",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isMaintainerOperation",
+            "name": "是否派单运维部门",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

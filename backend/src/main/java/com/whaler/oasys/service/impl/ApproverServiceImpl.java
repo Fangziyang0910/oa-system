@@ -22,6 +22,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whaler.oasys.mapper.ApproverMapper;
 import com.whaler.oasys.model.entity.ApproverEntity;
@@ -165,6 +166,14 @@ implements ApproverService {
         if (task == null) {
             throw new RuntimeException("任务不存在");
         }
+
+        // 更新流程进度
+        String jsonString=(String)runtimeService.getVariable(task.getExecutionId(), "formList");
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        formList.add(taskId);
+        jsonString=JSON.toJSONString(formList);
+        runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
+
         formService.submitTaskFormData(taskId, form);
     }
 
