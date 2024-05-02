@@ -6,19 +6,13 @@ import java.util.stream.Collectors;
 
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.form.TaskFormData;
-import org.flowable.engine.impl.form.FormData;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +30,7 @@ import com.whaler.oasys.service.ApproverService;
 import com.whaler.oasys.service.CategoryService;
 import com.whaler.oasys.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class ApproverServiceImpl
 extends ServiceImpl<ApproverMapper,ApproverEntity>
 implements ApproverService {
@@ -74,7 +65,7 @@ implements ApproverService {
         approverVo.setProcessinstanceIds(
             approverEntities.stream()
             .map(ApproverEntity::getProcessinstanceId)
-            .collect(Collectors.toSet())
+            .collect(Collectors.toList())
         );
         return approverVo;
     }
@@ -175,6 +166,22 @@ implements ApproverService {
         runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
 
         formService.submitTaskFormData(taskId, form);
+        insertApproverEntity(UserContext.getCurrentUserId(), taskId);
     }
 
+    @Override
+    public TaskVo getHistoricalDetails(String taskId) {
+        HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery()
+            .taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        TaskVo taskVo=new TaskVo();
+        taskVo.setTaskId(task.getId())
+            .setTaskName(task.getName())
+            .setExecutionId(task.getExecutionId())
+            .setDescription(task.getDescription())
+            .setEndTime(task.getEndTime().toString());
+        return taskVo;
+    }
 }

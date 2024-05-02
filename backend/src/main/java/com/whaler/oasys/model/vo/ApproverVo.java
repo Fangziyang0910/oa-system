@@ -1,6 +1,6 @@
 package com.whaler.oasys.model.vo;
 
-import java.util.Set;
+import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,5 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ApproverVo {
     private Long approverId;
-    private Set<String> processinstanceIds;
+    private List<String> processinstanceIds;
 }

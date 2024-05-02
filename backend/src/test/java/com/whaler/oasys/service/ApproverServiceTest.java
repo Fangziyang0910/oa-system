@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.whaler.oasys.Main;
+import com.whaler.oasys.model.entity.ApproverEntity;
 import com.whaler.oasys.model.vo.ApproverVo;
 import com.whaler.oasys.model.vo.FormVo;
 import com.whaler.oasys.model.vo.ProcessInstanceVo;
@@ -112,6 +113,23 @@ public class ApproverServiceTest {
         Map<String, String> form = new HashMap<>();
         form.put("isLeaderApproval","true");
         approverService.finishApprovalTask(taskVo.getTaskId(), form);
+    }
+
+    @Test
+    @Transactional
+    public void testGetHistoricalDetails(){
+        predo();
+        UserContext.setCurrentUserId(5L);
+        List<String>taskIds=approverService.selectByApproverId(5L).getProcessinstanceIds();
+        log.info("taskIds:{}",taskIds);
+        // 测试leader审批任务查询
+        TaskVo taskVo = approverService.listApprovalTasks().get(0);
+        Map<String, String> form = new HashMap<>();
+        form.put("isLeaderApproval","true");
+        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+
+        taskIds=approverService.selectByApproverId(5L).getProcessinstanceIds();
+        log.info("taskIds:{}",taskIds);
     }
 
     private void predo(){

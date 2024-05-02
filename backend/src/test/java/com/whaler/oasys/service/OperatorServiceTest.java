@@ -6,10 +6,8 @@ import java.util.Map;
 
 import org.flowable.engine.FormService;
 import org.flowable.engine.TaskService;
-import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
-import org.flowable.task.api.Task;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

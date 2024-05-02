@@ -3,8 +3,6 @@ package com.whaler.oasys.service;
 import java.io.InputStream;
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.whaler.oasys.model.entity.AdministratorEntity;
 import com.whaler.oasys.model.param.AdministratorParam;
@@ -19,8 +17,6 @@ extends IService<AdministratorEntity> {
     void register(AdministratorParam administratorParam);
 
     List<ProcessDefinitionVo> listProcessDefinitions();
-    // void listProcessDefinitions();
 
     void deployProcessDefinition(InputStream[] files, String[] fileNames);
-    // void deployProcessDefinition();
 }

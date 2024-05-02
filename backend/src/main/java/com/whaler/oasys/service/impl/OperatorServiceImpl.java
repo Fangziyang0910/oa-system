@@ -5,12 +5,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.flowable.engine.FormService;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,8 @@ implements OperatorService {
     @Autowired
     private FormService formService;
     @Autowired
+    private HistoryService historyService;
+    @Autowired
     private UserService userService;
     @Autowired
     private CategoryService categoryService;
@@ -61,7 +65,7 @@ implements OperatorService {
         operatorVo.setProcessinstanceIds(
             operatorEntities.stream()
             .map(OperatorEntity::getProcessinstanceId)
-            .collect(Collectors.toSet())
+            .collect(Collectors.toList())
         );
         return operatorVo;
     }
@@ -162,5 +166,22 @@ implements OperatorService {
         runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
 
         formService.submitTaskFormData(taskId, form);
+        insertOperatorEntity(UserContext.getCurrentUserId(), taskId);
+    }
+
+    @Override
+    public TaskVo getHistoricalDetails(String taskId) {
+        HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery()
+            .taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        TaskVo taskVo=new TaskVo();
+        taskVo.setTaskId(task.getId())
+            .setTaskName(task.getName())
+            .setExecutionId(task.getExecutionId())
+            .setDescription(task.getDescription())
+            .setEndTime(task.getEndTime().toString());
+        return taskVo;
     }
 }

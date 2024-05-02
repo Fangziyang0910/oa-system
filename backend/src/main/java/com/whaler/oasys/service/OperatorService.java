@@ -25,6 +25,5 @@ extends IService<OperatorEntity> {
 
     void finishOperatorTask(String taskId, Map<String, String> form);
 
-    
-    // void getHistoricalDetails();
+    TaskVo getHistoricalDetails(String taskId);
 }

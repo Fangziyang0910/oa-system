@@ -25,5 +25,5 @@ extends IService<ApproverEntity> {
 
     void finishApprovalTask(String taskId, Map<String, String> form);
 
-    // void getHistoricalDetails();
+    TaskVo getHistoricalDetails(String taskId);
 }
