@@ -20,23 +20,30 @@ import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.ApplicantService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/applicant")
+@Api(description = "申请人权限")
 public class ApplicantController {
     @Autowired
     private ApplicantService applicantService;
 
+    @ApiOperation("申请人查询发起的流程实例")
     @GetMapping("/listProcessInstances")
     public ApplicantVo lisApplicantVo(){
         Long applicantId=UserContext.getCurrentUserId();
         return applicantService.selectByApplicantId(applicantId);
     }
 
+    @ApiOperation("申请人查询所有的流程定义")
     @GetMapping("/listProcessDefinitions")
     public List<ProcessDefinitionVo> listProcessDefinitions(){
         return applicantService.listProcessDefinitions();
     }
 
+    @ApiOperation("申请人创建流程实例")
     @GetMapping("/createProcessInstance/{processDefinitionKey}")
     public ProcessInstanceVo createProcessInstance(
         @PathVariable(value = "processDefinitionKey") String processDefinitionKey
@@ -44,6 +51,7 @@ public class ApplicantController {
         return applicantService.createProcessInstance(processDefinitionKey);
     }
 
+    @ApiOperation("申请人查询提交的工单模板")
     @GetMapping("/getStartForm/{processInstanceId}")
     public FormVo getStartForm(
         @PathVariable(value = "processInstanceId") String processInstanceId
@@ -51,6 +59,7 @@ public class ApplicantController {
         return applicantService.getStartForm(processInstanceId);
     }
 
+    @ApiOperation("申请人提交填写完的工单")
     @PostMapping("/submitStartForm")
     public void submitStartForm(
         @RequestBody @Validated StartFormParam formParam
@@ -58,6 +67,7 @@ public class ApplicantController {
         applicantService.submitStartForm(formParam.getProcessInstanceId(), formParam.getForm());
     }
 
+    @ApiOperation("申请人查询流程实例的进度")
     @GetMapping("/getProcessInstanceProgress/{processInstanceId}")
     public List<TaskVo> getProcessInstanceProgress(
         @PathVariable(value = "processInstanceId") String processInstanceId
@@ -65,6 +75,7 @@ public class ApplicantController {
         return applicantService.getProcessInstanceProgress(processInstanceId);
     }
 
+    @ApiOperation("申请人查询流程任务节点的详细情况")
     @GetMapping("/getHistoricalForm/{taskId}")
     public FormVo getHistoricalForm(
         @PathVariable(value = "taskId") String taskId
@@ -72,6 +83,7 @@ public class ApplicantController {
         return applicantService.getHistoricalForm(taskId);
     }
 
+    @ApiOperation("申请人查询流程实例的详细情况")
     @GetMapping("/getProcessInstance/{processInstanceId}")
     public ProcessInstanceVo getProcessInstance(
         @PathVariable(value = "processInstanceId") String processInstanceId
@@ -79,6 +91,7 @@ public class ApplicantController {
         return applicantService.getProcessInstance(processInstanceId);
     }
 
+    @ApiOperation("申请人终止流程实例")
     @PostMapping("/abortProcessInstance")
     public void abortProcessInstance(
         @RequestBody @Validated String processInstanceId,
