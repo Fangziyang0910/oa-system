@@ -1,5 +1,6 @@
 // ignore_for_file: use_super_parameters, library_private_types_in_public_api, prefer_const_constructors
 
+import 'package:fixflow/component/pdlist_dialog.dart';
 import 'package:flutter/material.dart';
 
 class ApplicationPage extends StatefulWidget {
@@ -29,7 +30,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return _buildAddDialog(context);
+                    return PDListDialog();
                   },
                 );
               },

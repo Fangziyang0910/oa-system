@@ -46,6 +46,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
   void _logout() async {
     // 清空存储在硬盘的用户信息
     await (await SharedPreferences.getInstance()).remove('userData');
+    await (await SharedPreferences.getInstance()).remove('token');
     // 跳转到登录界面
    // 登录成功后跳转到主页面
       Navigator.pushReplacement(
