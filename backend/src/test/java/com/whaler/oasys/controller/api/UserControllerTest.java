@@ -86,4 +86,17 @@ public class UserControllerTest {
         )
             .andDo(MockMvcResultHandlers.print());
     }
+
+    @Test
+    @Transactional
+    public void testValidateToken()throws Exception {
+        System.out.println("---------------testValidateToken---------------");
+        ResultActions resultActions=
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/user/validateToken")
+                .header("Authorization", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxODAxMzE1ODgzLCJpYXQiOjE3MTUwMDIyODN9.vE59AqHjYEVh92ZPTLj4aQE9xunop_EmGoOD_jk7jbHrsaAV3_9u1UaA_IS_BoRrMrvgzZOXKG-ehr9XPI6vnQa")
+        );
+        doResultActions(resultActions);
+        System.out.println("---------------testValidateToken---------------");
+    }
 }

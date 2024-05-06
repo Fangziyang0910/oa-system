@@ -13,7 +13,7 @@ import com.whaler.oasys.security.LoginInterceptor;
 @Configuration
 public class WebConfig
 implements WebMvcConfigurer {
-    private static final String[] EXCLUDE_PATH = {"/user/login", "/user/register", "/admin/login", "/admin/login"};
+    private static final String[] EXCLUDE_PATH = {"/user/login", "/user/register","/user/validateToken" ,"/admin/login", "/admin/login", "/admin/validateToken"};
     private static final String API_PTTERN= "/user";
 
     @Bean
