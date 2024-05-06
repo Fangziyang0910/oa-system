@@ -79,10 +79,14 @@ implements ApproverService {
         List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
             .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
         
-        List<Task>approvalCandidateTasks=taskService.createTaskQuery()
+        List<Task>approvalCandidateGroupTasks=taskService.createTaskQuery()
             .taskCandidateGroupIn(categoryIds).list();
 
-        approvalAssignedTasks.addAll(approvalCandidateTasks);
+        List<Task>approvalCandidateUserTasks=taskService.createTaskQuery()
+        .taskCandidateUser(Long.toString(permissionId)).list();
+
+        approvalAssignedTasks.addAll(approvalCandidateGroupTasks);
+        approvalAssignedTasks.addAll(approvalCandidateUserTasks);
         List<TaskVo>taskVos=approvalAssignedTasks.stream()
             .map(task->{
                 TaskVo taskVo=new TaskVo();

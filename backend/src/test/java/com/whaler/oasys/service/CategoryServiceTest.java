@@ -56,7 +56,7 @@ public class CategoryServiceTest {
     @Test
     @Transactional
     public void testSelectCategoryIdsByPermissionId() {
-        List<Long> categoryIds = categoryService.selectCategoryIdsByPermissionId(1L);
+        List<Long> categoryIds = categoryService.selectCategoryIdsByPermissionId(5L);
         log.info("categoryIds: {}", categoryIds);
     }
 }
