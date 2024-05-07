@@ -3,9 +3,11 @@
 import 'dart:convert';
 
 import 'package:fixflow/config/api_url.dart';
+import 'package:fixflow/config/user_token_provider.dart';
 import 'package:fixflow/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // the login pages
@@ -56,6 +58,9 @@ class _LoginWidgetState extends State<LoginWidget> {
 
       int code = responseData['code'] ?? -1;
       if (code == 0) {
+        final token = responseData['data']['token'];
+        // Set token using UserTokenProvider
+        Provider.of<UserTokenProvider>(context, listen: false).setToken(token);
         // 将 responseData['data'] 存储到 SharedPreferences
         String userDataJson = jsonEncode(responseData['data']);
         await (await SharedPreferences.getInstance())
