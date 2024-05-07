@@ -1,5 +1,6 @@
 package com.whaler.oasys.service;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -103,4 +104,7 @@ extends IService<ApplicantEntity> {
      */
     void abortProcessInstance(String processInstanceId, String reason);
 
+    InputStream getOriginalProcessDiagram(String processDefinitionKey);
+
+    InputStream getProcessInstanceDiagram(String processInstanceId);
 }

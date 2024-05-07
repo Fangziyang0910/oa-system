@@ -1,8 +1,14 @@
 package com.whaler.oasys.controller.api;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.whaler.oasys.model.exception.ApiException;
 import com.whaler.oasys.model.param.StartFormParam;
 import com.whaler.oasys.model.vo.ApplicantVo;
 import com.whaler.oasys.model.vo.FormVo;
@@ -98,5 +105,39 @@ public class ApplicantController {
         @RequestBody @Validated String reason
     ){ 
         applicantService.abortProcessInstance(processInstanceId, reason);
+    }
+
+    @ApiOperation("申请人查询流程实例的原始流程图")
+    @GetMapping(value = "/getOriginalProcessDiagram/{processDefinitionKey}",
+        produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getOriginalProcessDiagram(
+        @PathVariable(value = "processDefinitionKey") String processDefinitionKey
+    ){ 
+        InputStream inputStream = applicantService.getOriginalProcessDiagram(processDefinitionKey);
+        byte[] bytes;
+        try {
+            bytes=new byte[inputStream.available()];
+            inputStream.read(bytes, 0, inputStream.available());
+        } catch (Exception e) {
+            throw new ApiException("获取流程图失败");
+        }
+        return bytes;
+    }
+
+    @ApiOperation("申请人查询流程实例的流程图")
+    @GetMapping(value = "/getProcessInstanceDiagram/{processInstanceId}",
+        produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getProcessInstanceDiagram(
+        @PathVariable(value = "processInstanceId") String processInstanceId
+    ){ 
+        InputStream inputStream = applicantService.getProcessInstanceDiagram(processInstanceId);
+        byte[] bytes;
+        try {
+            bytes=new byte[inputStream.available()];
+            inputStream.read(bytes, 0, inputStream.available());
+        } catch (Exception e) {
+            throw new ApiException("获取流程图失败");
+        }
+        return bytes;
     }
 }

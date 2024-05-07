@@ -1,9 +1,13 @@
 package com.whaler.oasys.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,12 +167,48 @@ public class ApplicantServiceTest {
         log.info("processInstanceVo:{}",processInstanceVo);
     }
 
+    @Test
+    @Transactional
+    public void testGetOriginalProcessDiagram() throws Exception{
+        InputStream diagram=applicantService.getOriginalProcessDiagram("leaveProcess");
+        String imagePath = "./img/leaveProcessOriginal.png";
+        File outputFile = new File(imagePath);
+        FileOutputStream outputStream = new FileOutputStream(outputFile);
+        // 将输入流的数据复制到输出流
+        IOUtils.copy(diagram, outputStream);
+        System.out.println("流程图已保存为：" + outputFile.getAbsolutePath());
+
+    }
+    
+    @Test
+    @Transactional
+    public void testGetProcessInstanceDiagram() throws Exception{
+        doManagerTask();
+        // doManagerTask();
+        UserContext.setCurrentUserId(1L);
+        List<String>processInstances=applicantService.selectByApplicantId(1L).getProcessinstanceIds();
+        log.info("processInstances:{}",processInstances);
+        
+        ProcessInstanceVo piVo=applicantService.getProcessInstance(processInstances.get(0));
+        log.info("ProcessInstanceVo:{}",piVo);
+
+        InputStream diagram=applicantService.getProcessInstanceDiagram(piVo.getProcessInstanceId());
+        String imagePath = "./img/leaveProcessInstance.png";
+        File outputFile = new File(imagePath);
+        FileOutputStream outputStream = new FileOutputStream(outputFile);
+        // 将输入流的数据复制到输出流
+        IOUtils.copy(diagram, outputStream);
+        System.out.println("流程图已保存为：" + outputFile.getAbsolutePath());
+
+    }
+
     private void doStarterTask() {
         UserContext.setCurrentUserId(1L);
         ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");
         Map<String,String> startForm=new HashMap<>();
-        startForm.put("leader","5");
-        startForm.put("manager","6");
+        startForm.put("applicantDepartment","研发部");
+        // startForm.put("leader","5");
+        // startForm.put("manager","6");
         applicantService.submitStartForm(processInstanceVo.getProcessInstanceId(), startForm);
     }
 

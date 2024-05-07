@@ -1,11 +1,20 @@
 package com.whaler.oasys.service.impl;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.Gateway;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -35,6 +44,7 @@ import com.whaler.oasys.model.vo.ProcessInstanceVo;
 import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.ApplicantService;
+import com.whaler.oasys.tool.MyDefaultProcessDiagramGenerator;
 
 @Service
 public class ApplicantServiceImpl
@@ -50,6 +60,8 @@ implements ApplicantService {
     private TaskService taskService;
     @Autowired
     private HistoryService historyService;
+    @Autowired
+    private MyDefaultProcessDiagramGenerator myDefaultProcessDiagramGenerator;
 
     @Override
     public int insertApplicantEntity(Long applicantId, String processinstanceId) {
@@ -101,6 +113,8 @@ implements ApplicantService {
         vars.put("starter", starterId);
         List<String> formList=new ArrayList<>();
         vars.put("formList", JSON.toJSONString(formList));
+        List<String> serviceList=new ArrayList<>();
+        vars.put("serviceList", JSON.toJSONString(serviceList));
         ProcessInstance pi=runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
         if (pi==null) {
             throw new ApiException("流程实例创建失败");
@@ -268,5 +282,135 @@ implements ApplicantService {
             throw new ApiException("流程实例已经结束");
         }
         runtimeService.deleteProcessInstance(processInstanceId, reason);
+    }
+
+    @Override
+    public InputStream getOriginalProcessDiagram(String processDefinitionKey) {
+        ProcessDefinition processDefinition=repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey(processDefinitionKey)
+            .singleResult();
+        if (processDefinition==null) {
+            throw new ApiException("流程定义不存在");
+        }
+        
+        BpmnModel bpmnModel=repositoryService.getBpmnModel(processDefinition.getId());
+        setBpmnModel(bpmnModel);
+
+        String IMAGE_TYPE = "png";
+        String activityFontName = "宋体";
+        String annotationFontName = "宋体";
+        String labelFontName = "宋体";
+        
+        InputStream diagram=myDefaultProcessDiagramGenerator.generateDiagram(
+            bpmnModel, IMAGE_TYPE, activityFontName, labelFontName, annotationFontName,
+        null, 1.0d, false);
+        if (diagram==null) {
+            throw new ApiException("流程图生成失败");
+        }
+        return diagram;
+    }
+
+    @Override
+    public InputStream getProcessInstanceDiagram(String processInstanceId) {
+        // 获取流程实例
+        HistoricProcessInstance historicProcessInstance=historyService.createHistoricProcessInstanceQuery()
+            .processInstanceId(processInstanceId).singleResult();
+        if (historicProcessInstance==null) {
+            throw new ApiException("流程实例不存在");
+        }
+        ProcessDefinition processDefinition=repositoryService.createProcessDefinitionQuery().processDefinitionKey(
+            historicProcessInstance.getProcessDefinitionKey()
+        ).singleResult();
+        // 获取流程模型
+        BpmnModel bpmnModel=repositoryService.getBpmnModel(processDefinition.getId());
+        setBpmnModel(bpmnModel);
+
+        List<TaskVo>tasks=getProcessInstanceProgress(processInstanceId);
+        String jsonString=(String)historyService.createHistoricVariableInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .variableName("serviceList").singleResult().getValue();
+        List<String>serviceList=JSON.parseArray(jsonString, String.class);
+        
+        List<String>highLightedActivities=new ArrayList<>();
+        Set<String>activitySet=new HashSet<>();
+        for (TaskVo task : tasks) {
+            HistoricTaskInstance taskInstance=historyService.createHistoricTaskInstanceQuery()
+                .taskId(task.getTaskId()).singleResult();
+            highLightedActivities.add(taskInstance.getTaskDefinitionKey());
+            activitySet.add(taskInstance.getTaskDefinitionKey());
+        }
+        for (String service : serviceList) {
+            highLightedActivities.add(service);
+            activitySet.add(service);
+        }
+        List<String>highLightedFlows=new ArrayList<>();
+
+        for (String highLightedActivity : highLightedActivities) {
+            FlowNode flowNode= (FlowNode)bpmnModel.getFlowElement(highLightedActivity);
+            List<SequenceFlow>incomingFlows=flowNode.getIncomingFlows();
+            for (SequenceFlow sequenceFlow : incomingFlows) {
+                String sourceRef=sequenceFlow.getSourceRef();
+                if(bpmnModel.getFlowElement(sourceRef)
+                    .getClass().getSuperclass().equals(Event.class)
+                    || bpmnModel.getFlowElement(sourceRef)
+                    .getClass().getSuperclass().equals(Gateway.class)){
+                    highLightedFlows.add(sequenceFlow.getId());
+                }
+                else if (activitySet.contains(sourceRef)) {
+                    highLightedFlows.add(sequenceFlow.getId());
+                }
+            }
+            List<SequenceFlow>outgoingFlows=flowNode.getOutgoingFlows();
+            for (SequenceFlow sequenceFlow : outgoingFlows) {
+                String targetRef=sequenceFlow.getTargetRef();
+                if(bpmnModel.getFlowElement(targetRef)
+                    .getClass().getSuperclass().equals(Event.class)
+                    || bpmnModel.getFlowElement(targetRef)
+                    .getClass().getSuperclass().equals(Gateway.class)){
+                    highLightedFlows.add(sequenceFlow.getId());
+                }
+            }
+        }
+
+        String IMAGE_TYPE = "png";
+        String activityFontName = "宋体";
+        String annotationFontName = "宋体";
+        String labelFontName = "宋体";
+        InputStream diagram=myDefaultProcessDiagramGenerator.generateDiagram(bpmnModel, IMAGE_TYPE, highLightedActivities,
+        highLightedFlows, activityFontName, labelFontName, annotationFontName,
+        null, 1.0d, false);
+
+        if (diagram==null) {
+            throw new ApiException("流程图生成失败");
+        }
+        return diagram;
+    }
+
+    private void setBpmnModel(BpmnModel bpmnModel){
+        Double scale = 2.0d;
+        Map<String, GraphicInfo> locationMap = bpmnModel.getLocationMap();
+        for (String key : locationMap.keySet()) {
+            locationMap.get(key).setX(locationMap.get(key).getX()*scale);
+            locationMap.get(key).setY(locationMap.get(key).getY()*scale);
+            locationMap.get(key).setWidth(locationMap.get(key).getWidth()*scale);
+            locationMap.get(key).setHeight(locationMap.get(key).getHeight()*scale);   
+        }
+        Map<String, GraphicInfo> labelLocationMap = bpmnModel.getLabelLocationMap();
+        for (String key : labelLocationMap.keySet()) {
+            locationMap.get(key).setX(locationMap.get(key).getX()*scale);
+            locationMap.get(key).setY(locationMap.get(key).getY()*scale);
+            locationMap.get(key).setWidth(locationMap.get(key).getWidth()*scale);
+            locationMap.get(key).setHeight(locationMap.get(key).getHeight()*scale);   
+        }
+        Map<String, List<GraphicInfo>>flowLocationMap = bpmnModel.getFlowLocationMap();
+        for (String key : flowLocationMap.keySet()) {
+            List<GraphicInfo> graphicInfos = flowLocationMap.get(key);
+            for (GraphicInfo graphicInfo : graphicInfos) {
+                graphicInfo.setX(graphicInfo.getX()*scale);
+                graphicInfo.setY(graphicInfo.getY()*scale);
+                graphicInfo.setWidth(graphicInfo.getWidth()*scale);
+                graphicInfo.setHeight(graphicInfo.getHeight()*scale);
+            }
+        }
     }
 }

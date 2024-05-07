@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import com.whaler.oasys.model.vo.ProcessDefinitionVo;
 import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.AdministratorService;
+import com.whaler.oasys.service.ApplicantService;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
@@ -36,6 +38,8 @@ import io.swagger.annotations.ApiOperation;
 public class AdministratorController {
     @Autowired
     private AdministratorService administratorService;
+    @Autowired
+    private ApplicantService applicantService;
     @Autowired
     private JwtManager jwtManager;
 
@@ -111,5 +115,22 @@ public class AdministratorController {
         }
         administratorService.deployProcessDefinition(files, fileNames);
         return "部署成功";
+    }
+
+    @ApiOperation("管理员查看流程图")
+    @GetMapping(value = "/getProcessDiagram/{processDefinitionKey}",
+        produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getProcessDiagram(
+        @PathVariable(value = "processDefinitionKey") String processDefinitionKey
+    ) {
+        InputStream inputStream = applicantService.getOriginalProcessDiagram(processDefinitionKey);
+        byte[] bytes;
+        try {
+            bytes=new byte[inputStream.available()];
+            inputStream.read(bytes, 0, inputStream.available());
+        } catch (Exception e) {
+            throw new ApiException("获取流程图失败");
+        }
+        return bytes;
     }
 }

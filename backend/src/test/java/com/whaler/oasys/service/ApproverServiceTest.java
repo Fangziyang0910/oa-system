@@ -138,8 +138,9 @@ public class ApproverServiceTest {
         ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");
         Map<String,String> startForm=new HashMap<>();
         startForm.put("applicantName","大傻春");
-        startForm.put("leader","5");
-        startForm.put("manager","6");
+        startForm.put("applicantDepartment","研发部");
+        // startForm.put("leader","5");
+        // startForm.put("manager","6");
         applicantService.submitStartForm(processInstanceVo.getProcessInstanceId(), startForm);
     }
 }

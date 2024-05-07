@@ -1,20 +1,32 @@
 package com.whaler.oasys.controller.api;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -40,7 +52,19 @@ public class ApplicantControllerTest {
     @Autowired
     private ApplicantService applicantService;
 
-    String token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzk5ODIyNjQxLCJpYXQiOjE3MTM1MDkwNDF9.ttlfCi9hrQrTldggyN_pimihfnOvnFsJv9DyL59_9hwgVKUXfrWrs0T96pTtV5jZ8-2d7RiiRbFLUfEv_GCHbQ";
+    // private static final ResultHandler resultHandler = new ResultHandler() {
+    //     @Override
+    //     public void handle(MvcResult result) throws Exception {
+    //         result.getResponse().setCharacterEncoding("UTF-8");
+    //         MockHttpServletResponse contentRespon = result.getResponse();
+    //         ByteArrayInputStream bais = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
+    //         BufferedImage image = ImageIO.read(bais);
+    //         File file=new File("./img/mvcGet.png");
+    //         ImageIO.write(image, "PNG", file);
+    //     }
+    // };
+
+    private static final String token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzk5ODIyNjQxLCJpYXQiOjE3MTM1MDkwNDF9.ttlfCi9hrQrTldggyN_pimihfnOvnFsJv9DyL59_9hwgVKUXfrWrs0T96pTtV5jZ8-2d7RiiRbFLUfEv_GCHbQ";
 
     @Before
     public void setup()throws Exception {
@@ -91,8 +115,9 @@ public class ApplicantControllerTest {
         StartFormParam userParam=new StartFormParam();
         userParam.setProcessInstanceId(processInstanceVo.getProcessInstanceId());
         Map<String,String> startForm=new HashMap<>();
-        startForm.put("leader","5");
-        startForm.put("manager","6");
+        startForm.put("applicantDepartment","研发部");
+        // startForm.put("leader","5");
+        // startForm.put("manager","6");
         userParam.setForm(startForm);
 
         ResultActions resultActions=mockMvc.perform(
@@ -105,6 +130,17 @@ public class ApplicantControllerTest {
     }
 
 
+    @Test
+    @Transactional
+    public void testGetOriginalProcessDiagram()throws Exception{
+        
+        ResultActions resultActions=mockMvc.perform(
+            MockMvcRequestBuilders.get("/applicant/getOriginalProcessDiagram/leaveProcess")
+                .header("Authorization", token)
+        );
+        doResultActions(resultActions);
+        // resultActions.andDo(resultHandler);
+    }
 
     private void doResultActions(ResultActions resultActions)throws Exception{
         resultActions.andReturn()

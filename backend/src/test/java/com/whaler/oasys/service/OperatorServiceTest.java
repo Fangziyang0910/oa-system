@@ -121,8 +121,9 @@ public class OperatorServiceTest {
         UserContext.setCurrentUserId(1L);
         ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");
         Map<String,String> form=new HashMap<>();
-        form.put("leader","5");
-        form.put("manager","6");
+        form.put("applicantDepartment","研发部");
+        // form.put("leader","5");
+        // form.put("manager","6");
         applicantService.submitStartForm(processInstanceVo.getProcessInstanceId(), form);
 
         UserContext.setCurrentUserId(5L);
