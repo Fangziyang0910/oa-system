@@ -1,5 +1,8 @@
 package com.whaler.oasys.controller.api;
 
+import java.io.InputStream;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,12 +20,18 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSONObject;
 import com.whaler.oasys.Main;
 import com.whaler.oasys.model.param.AdministratorParam;
 import com.whaler.oasys.model.param.LoginParam;
+import com.whaler.oasys.model.vo.ProcessDefinitionVo;
+import com.whaler.oasys.service.AdministratorService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Main.class})
 @AutoConfigureMockMvc
@@ -29,6 +39,8 @@ import com.whaler.oasys.model.param.LoginParam;
 public class AdministratorControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private AdministratorService administratorService;
 
     @Before
     public void setup()throws Exception {
@@ -89,6 +101,29 @@ public class AdministratorControllerTest {
         );
         doResultActions(resultActions);
         System.out.println("---------------testValidateToken---------------");
+    }
+
+    @Test
+    @Transactional
+    public void testDeployProcess() throws Exception{
+        System.out.println("---------------testDeployProcess---------------");
+        InputStream file= this.getClass().getClassLoader().getResourceAsStream("upload/LeaveProcess1.bpmn20.xml");
+        InputStream form= this.getClass().getClassLoader().getResourceAsStream("upload/LeaveAsk.form");
+        String fileName="LeaveProcess1.bpmn20.xml";
+        String formName="LeaveAsk.form";
+        MockMultipartFile multipartFile=new MockMultipartFile("files", fileName, "multipart/form-data",file);
+        MockMultipartFile formFile=new MockMultipartFile("files", formName, "multipart/form-data",form);
+        ResultActions resultActions=
+            mockMvc.perform(
+                MockMvcRequestBuilders.multipart("/admin/deployProcess")
+                .file(multipartFile)
+                .file(formFile)
+        );
+        doResultActions(resultActions);
+
+        List<ProcessDefinitionVo> processDefinitionVos = administratorService.listProcessDefinitions();
+        log.info("processDefinitionVos:{}",processDefinitionVos);
+        System.out.println("---------------testDeployProcess---------------");
     }
 
     private void doResultActions(ResultActions resultActions)throws Exception{

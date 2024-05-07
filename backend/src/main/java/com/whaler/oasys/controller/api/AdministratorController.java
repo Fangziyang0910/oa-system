@@ -6,11 +6,13 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -89,5 +91,25 @@ public class AdministratorController {
             throw new ApiException(ResultCode.UNAUTHORIZED);
         }
         return "验证通过"; // 表示请求通过验证，可以继续处理
+    }
+
+    @ApiOperation("部署流程")
+    @PostMapping(value = "/deployProcess", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String deployProcess(
+        @RequestParam(value = "files", required = true) 
+        List<MultipartFile> multipartFile 
+        ) {
+        InputStream [] files = new InputStream[multipartFile.size()];
+        String [] fileNames = new String[multipartFile.size()];
+        for(int i=0;i<multipartFile.size();i++){
+            try{
+                files[i] = multipartFile.get(i).getInputStream();
+                fileNames[i] = multipartFile.get(i).getOriginalFilename();
+            }catch(Exception e){
+                throw new ApiException("文件上传失败");
+            }
+        }
+        administratorService.deployProcessDefinition(files, fileNames);
+        return "部署成功";
     }
 }

@@ -79,10 +79,14 @@ implements OperatorService {
         List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
             .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
         
-        List<Task>operateCandidateTasks=taskService.createTaskQuery()
+        List<Task>operateCandidateGroupTasks=taskService.createTaskQuery()
             .taskCandidateGroupIn(categoryIds).list();
 
-        operateAssignedTasks.addAll(operateCandidateTasks);
+        List<Task>operateCandidateUserTasks=taskService.createTaskQuery()
+            .taskCandidateUser(Long.toString(permissionId)).list();
+
+        operateAssignedTasks.addAll(operateCandidateGroupTasks);
+        operateAssignedTasks.addAll(operateCandidateUserTasks);
         List<TaskVo>taskVos=operateAssignedTasks.stream()
             .map(task->{
                 TaskVo taskVo=new TaskVo();
