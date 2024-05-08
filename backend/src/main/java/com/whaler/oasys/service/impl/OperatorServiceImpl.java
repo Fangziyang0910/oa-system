@@ -72,22 +72,18 @@ implements OperatorService {
 
     @Override
     public List<TaskVo> listOperatorTasks() {
+        Long userId=UserContext.getCurrentUserId();
         Long permissionId=userService.getById(UserContext.getCurrentUserId()).getPermissionId();
-        List<Task>operateAssignedTasks=taskService.createTaskQuery()
-            .taskAssignee(Long.toString(permissionId)).list();
-        
         List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
             .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
-        
-        List<Task>operateCandidateGroupTasks=taskService.createTaskQuery()
-            .taskCandidateGroupIn(categoryIds).list();
 
-        List<Task>operateCandidateUserTasks=taskService.createTaskQuery()
-            .taskCandidateUser(Long.toString(permissionId)).list();
+        List<Task>operateTasks=taskService.createTaskQuery().or()
+            .taskAssignee(Long.toString(userId))
+            .taskCandidateUser(Long.toString(permissionId))
+            .taskCandidateGroupIn(categoryIds).endOr()
+            .list();
 
-        operateAssignedTasks.addAll(operateCandidateGroupTasks);
-        operateAssignedTasks.addAll(operateCandidateUserTasks);
-        List<TaskVo>taskVos=operateAssignedTasks.stream()
+        List<TaskVo>taskVos=operateTasks.stream()
             .map(task->{
                 TaskVo taskVo=new TaskVo();
                 taskVo.setTaskId(task.getId());

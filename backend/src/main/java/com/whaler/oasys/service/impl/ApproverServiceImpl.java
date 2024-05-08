@@ -72,22 +72,18 @@ implements ApproverService {
 
     @Override
     public List<TaskVo> listApprovalTasks() {
+        Long userId=UserContext.getCurrentUserId();
         Long permissionId=userService.getById(UserContext.getCurrentUserId()).getPermissionId();
-        List<Task>approvalAssignedTasks=taskService.createTaskQuery()
-            .taskAssignee(Long.toString(permissionId)).list();
-        
         List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
             .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
-        
-        List<Task>approvalCandidateGroupTasks=taskService.createTaskQuery()
-            .taskCandidateGroupIn(categoryIds).list();
 
-        List<Task>approvalCandidateUserTasks=taskService.createTaskQuery()
-        .taskCandidateUser(Long.toString(permissionId)).list();
+        List<Task>approvalTasks=taskService.createTaskQuery().or()
+            .taskAssignee(Long.toString(userId))
+            .taskCandidateUser(Long.toString(permissionId))
+            .taskCandidateGroupIn(categoryIds).endOr()
+            .list();
 
-        approvalAssignedTasks.addAll(approvalCandidateGroupTasks);
-        approvalAssignedTasks.addAll(approvalCandidateUserTasks);
-        List<TaskVo>taskVos=approvalAssignedTasks.stream()
+        List<TaskVo>taskVos=approvalTasks.stream()
             .map(task->{
                 TaskVo taskVo=new TaskVo();
                 taskVo.setTaskId(task.getId());

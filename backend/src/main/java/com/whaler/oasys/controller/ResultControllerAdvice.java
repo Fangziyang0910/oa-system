@@ -64,6 +64,9 @@ implements ResponseBodyAdvice<Object> {
             }
         }
         // 对于非String类型的返回值，直接封装成ResultVo<T>格式
+        else if(returnType.getParameterType().equals(byte[].class)){
+            return body;
+        }
         return new ResultVo<>(body);
     }
 }

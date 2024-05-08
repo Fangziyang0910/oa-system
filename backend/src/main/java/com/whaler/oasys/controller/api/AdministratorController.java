@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.whaler.oasys.model.entity.ReportEntity;
 import com.whaler.oasys.model.enums.ResultCode;
 import com.whaler.oasys.model.exception.ApiException;
 import com.whaler.oasys.model.param.AdministratorParam;
@@ -132,5 +133,11 @@ public class AdministratorController {
             throw new ApiException("获取流程图失败");
         }
         return bytes;
+    }
+
+    @ApiOperation("查询工单流转情况")
+    @GetMapping("/listReports")
+    public List<ReportEntity> listReports() {
+        return administratorService.listReports();
     }
 }

@@ -1,7 +1,9 @@
 package com.whaler.oasys.service;
 
 public interface ScheduleService {
-    // void dailyScheduledTask();
+    void dailyScheduledTask();
 
-    // void weeklyScheduledTask();
+    void weeklyScheduledTask();
+
+    void dueWarningTask();
 }
