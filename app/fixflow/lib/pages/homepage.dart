@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 import 'package:fixflow/module/applicationpage.dart';
+import 'package:fixflow/module/approvalpage.dart';
+import 'package:fixflow/module/operationpage.dart';
 import 'package:fixflow/module/personalinfopage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,7 +59,7 @@ class _HomePageState extends State<HomePage> {
           label: '我的审批', // Label for "My Approvals"
         ),
       );
-      _widgetOptions.add(Text('Body for "我的审批"')); // Widget for "我的审批"
+      _widgetOptions.add(ApprovalPage()); // Widget for "我的审批"
     }
 
     if (isOperator) {
@@ -67,7 +69,7 @@ class _HomePageState extends State<HomePage> {
           label: '我的运维', // Label for "My Operations"
         ),
       );
-      _widgetOptions.add(Text('Body for "我的运维"')); // Widget for "我的运维"
+      _widgetOptions.add(OperatorPage()); // Widget for "我的运维"
     }
 
     bottomNavBarItems.add(

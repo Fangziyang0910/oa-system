@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:fixflow/component/error_snackbar.dart';
 import 'package:fixflow/config/api_url.dart';
 import 'package:fixflow/config/user_token_provider.dart';
 import 'package:fixflow/pages/homepage.dart';
@@ -33,7 +34,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   // Interact with the backend to complete the login
   void _login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
-      _showErrorDialog('用户名或密码不能为空');
+      ErrorSnackbar.showSnackBar(context, "用户名或密码不能为空");
       return;
     }
 
@@ -41,8 +42,8 @@ class _LoginWidgetState extends State<LoginWidget> {
       'name': username,
       'password': password,
     };
-
-    final http.Response response = await http.post(
+    try {
+      final http.Response response = await http.post(
       Uri.parse(ApiUrls.userLogin),
       headers: {
         'Content-Type': 'application/json',
@@ -73,37 +74,19 @@ class _LoginWidgetState extends State<LoginWidget> {
         );
       } else if (code == 1004) {
         // 用户名或密码错误，弹出提示框
-        _showErrorDialog('用户名或密码错误');
+        ErrorSnackbar.showSnackBar(context, "用户名或密码错误");
       } else {
         // 其他错误，弹出提示框
-        _showErrorDialog('登录失败，请稍后重试');
+        ErrorSnackbar.showSnackBar(context, "登录失败，请稍后重试");
       }
     } else {
-      print('Failed to login: ${response.statusCode}');
-      // 弹出提示框
-      _showErrorDialog('登录失败，请稍后重试');
+      ErrorSnackbar.showSnackBar(context, "登录失败，请稍后重试");
     }
-  }
 
-  // 弹出错误提示框
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('登录失败'),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('确定'),
-            ),
-          ],
-        );
-      },
-    );
+    } catch (e) {
+      ErrorSnackbar.showSnackBar(context, "登录失败，请检查网络");
+    }
+    
   }
 
   @override

@@ -28,18 +28,24 @@ class UserTokenProvider extends ChangeNotifier {
   }
 
   Future<bool> _validateToken(String token) async {
-    final response = await http.get(
-      Uri.parse(ApiUrls.tokenCheck),
-      headers: {
-        'Authorization': token,
-        'Accept': 'application/json',
-      },
-    );
+    try {
+      final response = await http.get(
+        Uri.parse(ApiUrls.tokenCheck),
+        headers: {
+          'Authorization': token,
+          'Accept': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      return responseData['code'] == 0;
-    } else {
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData['code'] == 0;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      // Assuming the token is not valid if there's an exception (e.g., no network)
+      print('Token validation failed: $e');
       return false;
     }
   }

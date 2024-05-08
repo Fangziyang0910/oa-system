@@ -1,22 +1,21 @@
-// ignore_for_file: prefer_const_constructors, use_super_parameters, library_private_types_in_public_api
+// ignore_for_file: use_super_parameters, library_private_types_in_public_api, prefer_const_constructors
 
-import 'package:fixflow/component/applicationpage/current_applicationlist.dart';
-import 'package:fixflow/component/applicationpage/history_applicationlist.dart';
+import 'package:fixflow/component/approvalpage/current_approvallist.dart';
+import 'package:fixflow/component/approvalpage/history_approvallist.dart';
 import 'package:flutter/material.dart';
-import 'package:fixflow/component/applicationpage/pdlist_dialog.dart';
 
-class ApplicationPage extends StatefulWidget {
-  const ApplicationPage({Key? key}) : super(key: key);
+class ApprovalPage extends StatefulWidget {
+  const ApprovalPage({Key? key}) : super(key: key);
 
   @override
-  _ApplicationPageState createState() => _ApplicationPageState();
+  _ApprovalPageState createState() => _ApprovalPageState();
 }
 
-class _ApplicationPageState extends State<ApplicationPage> {
+class _ApprovalPageState extends State<ApprovalPage> {
   int _selectedIndex = 0; // 默认选中第一个选项
 
   // 选项名称
-  final List<String> _options = ['当前申请', '历史申请'];
+  final List<String> _options = ['当前审批', '历史审批'];
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +36,11 @@ class _ApplicationPageState extends State<ApplicationPage> {
               items: [
                 PopupMenuItem<int>(
                   value: 0,
-                  child: Text('当前申请'),
+                  child: Text('当前审批'),
                 ),
                 PopupMenuItem<int>(
                   value: 1,
-                  child: Text('历史申请'),
+                  child: Text('历史审批'),
                 ),
               ],
             ).then((value) {
@@ -54,19 +53,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
           },
         ),
       ),
-      body: _selectedIndex == 0 ? CurrentApplicationListWidget() : HistoryApplicationListWidget(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show dialog
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return PDListDialog();
-            },
-          );
-        },
-        child: Icon(Icons.add),
-      ),
+      body: _selectedIndex == 0 ? CurrentApprovalListWidget() : HistoryApprovalListWidget(),
     );
   }
 }
