@@ -52,17 +52,17 @@ public class ApplicantControllerTest {
     @Autowired
     private ApplicantService applicantService;
 
-    // private static final ResultHandler resultHandler = new ResultHandler() {
-    //     @Override
-    //     public void handle(MvcResult result) throws Exception {
-    //         result.getResponse().setCharacterEncoding("UTF-8");
-    //         MockHttpServletResponse contentRespon = result.getResponse();
-    //         ByteArrayInputStream bais = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
-    //         BufferedImage image = ImageIO.read(bais);
-    //         File file=new File("./img/mvcGet.png");
-    //         ImageIO.write(image, "PNG", file);
-    //     }
-    // };
+    private static final ResultHandler resultHandler = new ResultHandler() {
+        @Override
+        public void handle(MvcResult result) throws Exception {
+            result.getResponse().setCharacterEncoding("UTF-8");
+            MockHttpServletResponse contentRespon = result.getResponse();
+            ByteArrayInputStream bais = new ByteArrayInputStream(contentRespon.getContentAsByteArray());
+            BufferedImage image = ImageIO.read(bais);
+            File file=new File("./img/mvcGet.png");
+            ImageIO.write(image, "PNG", file);
+        }
+    };
 
     private static final String token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzk5ODIyNjQxLCJpYXQiOjE3MTM1MDkwNDF9.ttlfCi9hrQrTldggyN_pimihfnOvnFsJv9DyL59_9hwgVKUXfrWrs0T96pTtV5jZ8-2d7RiiRbFLUfEv_GCHbQ";
 
@@ -138,8 +138,8 @@ public class ApplicantControllerTest {
             MockMvcRequestBuilders.get("/applicant/getOriginalProcessDiagram/leaveProcess")
                 .header("Authorization", token)
         );
-        doResultActions(resultActions);
-        // resultActions.andDo(resultHandler);
+        // doResultActions(resultActions);
+        resultActions.andDo(resultHandler);
     }
 
     private void doResultActions(ResultActions resultActions)throws Exception{

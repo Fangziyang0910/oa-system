@@ -12,16 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whaler.oasys.mapper.AdministratorMapper;
 import com.whaler.oasys.model.entity.AdministratorEntity;
+import com.whaler.oasys.model.entity.ReportEntity;
 import com.whaler.oasys.model.param.AdministratorParam;
 import com.whaler.oasys.model.param.LoginParam;
 import com.whaler.oasys.model.vo.AdministratorVo;
 import com.whaler.oasys.model.vo.ProcessDefinitionVo;
 import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.service.AdministratorService;
+import com.whaler.oasys.service.ReportService;
 
 @Service
 public class AdministratorServiceImpl
@@ -31,6 +34,8 @@ implements AdministratorService {
     private RuntimeService runtimeService;
     @Autowired
     private RepositoryService repositoryService;
+    @Autowired
+    private ReportService reportService;
     @Autowired
     private JwtManager jwtManager;
     @Override
@@ -99,4 +104,10 @@ implements AdministratorService {
         deploymentBuilder.deploy();
     }
 
+    @Override
+    public List<ReportEntity> listReports() {
+        LambdaQueryWrapper<ReportEntity>lambdaQueryWrapper=new LambdaQueryWrapper<>();
+        List<ReportEntity>reportEntities=reportService.getBaseMapper().selectList(lambdaQueryWrapper);
+        return reportEntities;
+    }
 }
