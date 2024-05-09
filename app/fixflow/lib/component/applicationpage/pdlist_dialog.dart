@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters, library_private_types_in_public_api, use_build_context_synchronously, prefer_const_constructors
+
 import 'package:fixflow/component/applicationpage/applicationform.dart';
 import 'package:fixflow/component/error_snackbar.dart';
 import 'package:fixflow/config/api_url.dart';
@@ -87,6 +89,8 @@ class _PDListDialogState extends State<PDListDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      // ClipRect 用于限制 Dialog 的形状和大小
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
@@ -96,16 +100,16 @@ class _PDListDialogState extends State<PDListDialog> {
         padding: EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(16.0),
         ),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width *
-              0.8, // Limit the max width to 80% of the screen width
+          maxWidth:
+              MediaQuery.of(context).size.width * 0.8, // Limit the max width
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: <Widget>[
             Text(
               '请选择申请流程',
               style: TextStyle(
@@ -114,6 +118,7 @@ class _PDListDialogState extends State<PDListDialog> {
               ),
             ),
             SizedBox(height: 16.0),
+            // 使用 FutureBuilder 来异步获取流程定义数据
             FutureBuilder<List<Map<String, dynamic>>>(
               future: _fetchProcessDefinitions,
               builder: (context, snapshot) {
@@ -125,38 +130,39 @@ class _PDListDialogState extends State<PDListDialog> {
                   final List<Map<String, dynamic>> processDefinitions =
                       snapshot.data ?? [];
                   return ListView.builder(
-                    shrinkWrap: true,
+                    shrinkWrap: true, // 使用 shrinkWrap 使得 ListView 只包裹其子Widget
                     itemCount: processDefinitions.length,
                     itemBuilder: (context, index) {
                       final processDefinition = processDefinitions[index];
                       return GestureDetector(
                         onTap: () {
-                          // 获取所点击的流程定义
-                          final processDefinition = processDefinitions[index];
-                          // 导航到新的小部件，并传递processDefinitionKey作为参数
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ApplicationForm(
-                                  processDefinitionKey: processDefinition[
-                                      'processDefinitionKey']),
+                                processDefinitionKey:
+                                    processDefinition['processDefinitionKey'],
+                              ),
                             ),
                           );
                         },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(vertical: 4.0),
-                          padding: EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200], // Default color
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: ListTile(
-                            title: Text(
+                        child: Card(
+                          child: Container(
+                            padding: EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: ListTile(
+                              title: Text(
                                 processDefinition['processDefinitionName'] ??
-                                    ''),
-                            subtitle: Text(
+                                    'Unnamed Process',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
                                 processDefinition['processDefinitionKey'] ??
-                                    ''),
+                                    'No Key',
+                              ),
+                            ),
                           ),
                         ),
                       );
