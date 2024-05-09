@@ -95,7 +95,7 @@ public class OperatorServiceTest {
 
         UserContext.setCurrentUserId(20L);
         TaskVo taskVo = operatorService.listOperatorTasks().get(0);
-        FormVo formVo = operatorService.getTaskForm(taskVo.getTaskId());
+        String formVo = operatorService.getTaskForm(taskVo.getTaskId());
         log.info("formVo:{}",formVo);
     }
 

@@ -21,7 +21,7 @@ extends IService<OperatorEntity> {
 
     FormVo getStartForm(String taskId);
 
-    FormVo getTaskForm(String taskId);
+    String getTaskForm(String taskId);
 
     void finishOperatorTask(String taskId, Map<String, String> form);
 

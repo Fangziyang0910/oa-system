@@ -44,7 +44,7 @@ public class ApproverController {
 
     @ApiOperation("申请人查询审批工单模板")
     @GetMapping("/getTaskForm/{taskId}")
-    public FormVo getTaskForm(
+    public String getTaskForm(
         @PathVariable(value = "taskId") String taskId
     ){
         return approverService.getTaskForm(taskId);

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,13 @@ public class ApplicantController {
 
     @ApiOperation("申请人查询发起的流程实例")
     @GetMapping("/listProcessInstances")
-    public ApplicantVo lisApplicantVo(){
+    public List<ProcessInstanceVo> lisApplicantVo(){
         Long applicantId=UserContext.getCurrentUserId();
-        return applicantService.selectByApplicantId(applicantId);
+        ApplicantVo applicantVo = applicantService.selectByApplicantId(applicantId);
+        List<ProcessInstanceVo> processInstanceVos = applicantVo.getProcessinstanceIds().stream()
+            .map(processInstanceId -> applicantService.getProcessInstance(processInstanceId))
+            .collect(Collectors.toList());
+        return processInstanceVos;
     }
 
     @ApiOperation("申请人查询所有的流程定义")
@@ -60,7 +65,7 @@ public class ApplicantController {
 
     @ApiOperation("申请人查询提交的工单模板")
     @GetMapping("/getStartForm/{processInstanceId}")
-    public FormVo getStartForm(
+    public String getStartForm(
         @PathVariable(value = "processInstanceId") String processInstanceId
     ){
         return applicantService.getStartForm(processInstanceId);

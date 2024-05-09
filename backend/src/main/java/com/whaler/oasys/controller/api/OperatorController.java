@@ -44,7 +44,7 @@ public class OperatorController {
 
     @ApiOperation("操作人查询审批工单模板")
     @GetMapping("/getTaskForm/{taskId}")
-    public FormVo getTaskForm(
+    public String getTaskForm(
         @PathVariable(value = "taskId") String taskId
     ) {
         return operatorService.getTaskForm(taskId);

@@ -16,6 +16,9 @@ import com.whaler.oasys.Main;
 import com.whaler.oasys.model.entity.PermissionEntity;
 import com.whaler.oasys.model.param.PermissionParam;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Main.class})
 @Rollback(true)
@@ -54,5 +57,12 @@ public class PermissionServiceTest {
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
+    }
+
+    @Test
+    @Transactional
+    public void testGetDepartmentRoles(){
+        String departmentRoles=permissionService.getDepartmentRoles();
+        log.info("departmentRoles:{}",departmentRoles);
     }
 }

@@ -86,8 +86,8 @@ public class ApplicantServiceTest {
     @Transactional
     public void testGetStartForm() {
         UserContext.setCurrentUserId(1L);
-        ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");
-        FormVo formVo= applicantService.getStartForm(processInstanceVo.getProcessInstanceId());
+        // ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");
+        String formVo= applicantService.getStartForm("leaveProcess");
         log.info("form:{}",formVo);
     }
 

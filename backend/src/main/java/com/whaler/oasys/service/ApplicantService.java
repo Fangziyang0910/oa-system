@@ -61,7 +61,7 @@ extends IService<ApplicantEntity> {
      * @param processInstanceId 流程实例的ID，用于标识特定的流程实例。
      * @return FormVo 返回表单的视图对象，包含表单的相关信息。
      */
-    FormVo getStartForm(String processInstanceId);
+    String getStartForm(String processDefinitionKey);
 
     /**
      * 提交开始表单的函数。

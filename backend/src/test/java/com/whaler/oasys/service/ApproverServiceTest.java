@@ -98,7 +98,7 @@ public class ApproverServiceTest {
         UserContext.setCurrentUserId(5L);
         TaskVo taskVo = approverService.listApprovalTasks().get(0);
 
-        FormVo formVo = approverService.getTaskForm(taskVo.getTaskId());
+        String formVo = approverService.getTaskForm(taskVo.getTaskId());
         log.info("formVo:{}",formVo);
     }
 

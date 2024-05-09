@@ -31,4 +31,8 @@
         select * from permission where is_operator = #{isOperator}
     </select>
 
+    <select id="selectAllDepartments" resultType="java.lang.String">
+        select distinct department from permission
+    </select>
+
 </mapper>

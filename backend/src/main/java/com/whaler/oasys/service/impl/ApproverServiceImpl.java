@@ -1,9 +1,11 @@
 package com.whaler.oasys.service.impl;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
@@ -14,6 +16,7 @@ import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -125,30 +128,27 @@ implements ApproverService {
     }
 
     @Override
-    public FormVo getTaskForm(String taskId) {
+    public String getTaskForm(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new ApiException("任务不存在");
         }
-        FormInfo formInfo = taskService.getTaskFormModel(task.getId());
-        if(formInfo==null){
+
+        String formKey=task.getFormKey();
+        if (formKey==null) {
             throw new ApiException("表单不存在");
         }
-        FormVo formVo=new FormVo();
-        formVo.setFormKey(formInfo.getKey());
-        formVo.setFormName(formInfo.getName());
-        List<FormField>formFields=((SimpleFormModel)formInfo.getFormModel()).getFields();
-        List<FormFieldVo>formFieldVos=formFields.stream().map(formField -> 
-                new FormFieldVo()
-                .setId(formField.getId())
-                .setName(formField.getName())
-                .setType(formField.getType())
-                .setValue(formField.getValue())
-                .setReadOnly(formField.isReadOnly())
-                .setRequired(formField.isRequired())
-            ).collect(Collectors.toList());
-        formVo.setFormFields(formFieldVos);
-        return formVo;
+        String path="/forms/"+formKey;
+        ClassPathResource classPathResource = new ClassPathResource(path);
+        InputStream inputStream=null;
+        String taskForm=null;
+        try{
+            inputStream= classPathResource.getInputStream();
+            taskForm = IOUtils.toString(inputStream, "UTF-8");
+        }catch(Exception e){
+            throw new ApiException("表单不存在");
+        }
+        return taskForm;
     }
 
     @Override

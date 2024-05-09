@@ -14,14 +14,14 @@
             "name": "员工部门",
             "type": "string",
             "required": true,
-            "placeholder": "empty"
+            "placeholder": "/permission/getDepartmentRoles"
         },
         {
             "id": "applicantRole",
             "name": "员工职位",
             "type": "string",
             "required": true,
-            "placeholder": "empty"
+            "placeholder": "/permission/getDepartmentRoles"
         },
         {
             "id": "applicantEmail",

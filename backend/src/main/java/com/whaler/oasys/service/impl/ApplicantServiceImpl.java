@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -29,6 +31,7 @@ import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -135,33 +138,28 @@ implements ApplicantService {
     }
 
     @Override
-    public FormVo getStartForm(String processInstanceId) {
-        String starterId = Long.toString(UserContext.getCurrentUserId());
-        Task starterTask=taskService.createTaskQuery()
-            .processInstanceId(processInstanceId)
-            .taskAssignee(starterId).singleResult();
-        if(starterTask==null){
-            throw new ApiException("已提交申请表");
+    public String getStartForm(String processDefinitionKey) {
+        ProcessDefinition pd=repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).singleResult();
+        if (pd==null) {
+            throw new ApiException("流程定义不存在");
         }
-        FormInfo startFormInfo = taskService.getTaskFormModel(starterTask.getId());
-        if(startFormInfo==null){
+        BpmnModel bpmnModel=repositoryService.getBpmnModel(pd.getId());
+        StartEvent startEvent=(StartEvent)bpmnModel.getMainProcess().getFlowElement("startEvent");
+        String formKey=startEvent.getFormKey();
+        if (formKey==null) {
             throw new ApiException("表单不存在");
         }
-        FormVo formVo=new FormVo();
-        formVo.setFormKey(startFormInfo.getKey());
-        formVo.setFormName(startFormInfo.getName());
-        List<FormField>formFields=((SimpleFormModel)startFormInfo.getFormModel()).getFields();
-        List<FormFieldVo>formFieldVos=formFields.stream().map(formField -> 
-                new FormFieldVo()
-                .setId(formField.getId())
-                .setName(formField.getName())
-                .setType(formField.getType())
-                .setValue(formField.getValue())
-                .setReadOnly(formField.isReadOnly())
-                .setRequired(formField.isRequired())
-            ).collect(Collectors.toList());
-        formVo.setFormFields(formFieldVos);
-        return formVo;
+        String path="/forms/"+formKey;
+        ClassPathResource classPathResource = new ClassPathResource(path);
+        InputStream inputStream=null;
+        String startForm=null;
+        try{
+            inputStream= classPathResource.getInputStream();
+            startForm = IOUtils.toString(inputStream, "UTF-8");
+        }catch(Exception e){
+            throw new ApiException("表单不存在");
+        }
+        return startForm;
     }
 
     @Override

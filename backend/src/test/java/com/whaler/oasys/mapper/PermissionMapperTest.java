@@ -64,4 +64,12 @@ public class PermissionMapperTest {
             System.out.println(permissionEntity);
         }
     }
+
+    @Test
+    public void testSelectAllDepartments(){
+        List<String>departments=permissionMapper.selectAllDepartments();
+        for (String department : departments) {
+            System.out.println(department);
+        }
+    }
 }

@@ -75,4 +75,6 @@ extends BaseMapper<PermissionEntity> {
      * @return 返回一个权限实体列表，这些实体根据指定的是否为操作员条件进行筛选。
      */
     List<PermissionEntity> selectByIsOperator(Boolean isOperator);
+
+    List<String> selectAllDepartments();
 }

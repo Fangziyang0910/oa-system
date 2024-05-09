@@ -21,7 +21,7 @@ extends IService<ApproverEntity> {
 
     FormVo getStartForm(String taskId);
 
-    FormVo getTaskForm(String taskId);
+    String getTaskForm(String taskId);
 
     void finishApprovalTask(String taskId, Map<String, String> form);
 
