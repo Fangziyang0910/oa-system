@@ -11,4 +11,6 @@ extends IService<PermissionEntity> {
     void insertPermissionEntity(PermissionParam permissionParam);
 
     String getDepartmentRoles();
+
+    String getDepartments();
 }

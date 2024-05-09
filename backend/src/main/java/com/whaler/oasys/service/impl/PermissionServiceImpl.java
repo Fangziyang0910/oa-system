@@ -58,4 +58,10 @@ implements PermissionService {
         String str=JSONObject.toJSONString(departmentRoles);
         return str;
     }
+
+    @Override
+    public String getDepartments() {
+        List<String>departments=this.baseMapper.selectAllDepartments();
+        return JSONObject.toJSONString(departments);
+    }
 }

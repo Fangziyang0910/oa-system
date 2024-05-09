@@ -14,14 +14,7 @@
             "name": "员工部门",
             "type": "string",
             "required": true,
-            "placeholder": "/permission/getDepartmentRoles"
-        },
-        {
-            "id": "applicantRole",
-            "name": "员工职位",
-            "type": "string",
-            "required": true,
-            "placeholder": "/permission/getDepartmentRoles"
+            "placeholder": "/permission/getDepartments"
         },
         {
             "id": "applicantEmail",
@@ -61,20 +54,6 @@
             "id": "endTime",
             "name": "结束时间",
             "type": "date",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
-            "id": "leader",
-            "name": "部门组长",
-            "type": "integer",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
-            "id": "manager",
-            "name": "部门经理",
-            "type": "integer",
             "required": true,
             "placeholder": "empty"
         }

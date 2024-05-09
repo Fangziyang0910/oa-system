@@ -20,4 +20,10 @@ public class PermissionController {
     public String getDepartmentRoles() {
         return permissionService.getDepartmentRoles();
     }
+
+    @ApiOperation("获取部门列表")
+    @GetMapping("/getDepartments")
+    public String getDepartments() {
+        return permissionService.getDepartments();
+    }
 }
