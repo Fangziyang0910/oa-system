@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:fixflow/component/applicationpage/current_applicationlist.dart';
-import 'package:fixflow/component/applicationpage/history_applicationlist.dart';
 import 'package:fixflow/component/operationpage/current_operationlist.dart';
 import 'package:fixflow/component/operationpage/history_operationlist.dart';
 import 'package:flutter/material.dart';

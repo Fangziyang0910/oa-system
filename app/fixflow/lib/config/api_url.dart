@@ -6,6 +6,13 @@ class ApiUrls {
   static const String userLogin = '$baseUrl/user/login';
   // token check
   static const String tokenCheck = '$baseUrl/user/validateToken';
+
+  /*-------------- applicant api ---------*/
   // get ProcessDefinitions list
   static const String listProcessDefinitions = '$baseUrl/applicant/listProcessDefinitions';
+  // get ProcessInstances list
+  static const String listProcessInstances = '$baseUrl/applicant/listProcessInstances';
+  //get ProcessDefinitionForm
+  static const String getStartForm = '$baseUrl/applicant/getStartForm';
+
 }
