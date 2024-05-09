@@ -64,11 +64,11 @@ public class ApplicantController {
     }
 
     @ApiOperation("申请人查询提交的工单模板")
-    @GetMapping("/getStartForm/{processInstanceId}")
+    @GetMapping("/getStartForm/{processDefinitionKey}")
     public String getStartForm(
-        @PathVariable(value = "processInstanceId") String processInstanceId
+        @PathVariable(value = "processDefinitionKey") String processDefinitionKey
     ){
-        return applicantService.getStartForm(processInstanceId);
+        return applicantService.getStartForm(processDefinitionKey);
     }
 
     @ApiOperation("申请人提交填写完的工单")

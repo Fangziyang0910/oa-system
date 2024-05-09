@@ -35,6 +35,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whaler.oasys.mapper.ApplicantMapper;
 import com.whaler.oasys.model.entity.ApplicantEntity;
@@ -147,7 +148,7 @@ implements ApplicantService {
         StartEvent startEvent=(StartEvent)bpmnModel.getMainProcess().getFlowElement("startEvent");
         String formKey=startEvent.getFormKey();
         if (formKey==null) {
-            throw new ApiException("表单不存在");
+            throw new ApiException("表单key不存在");
         }
         String path="/forms/"+formKey;
         ClassPathResource classPathResource = new ClassPathResource(path);
@@ -156,8 +157,10 @@ implements ApplicantService {
         try{
             inputStream= classPathResource.getInputStream();
             startForm = IOUtils.toString(inputStream, "UTF-8");
+            JSONObject jsonobject = JSON.parseObject(startForm);
+            startForm = jsonobject.toJSONString();
         }catch(Exception e){
-            throw new ApiException("表单不存在");
+            throw new ApiException("表单文件不存在");
         }
         return startForm;
     }

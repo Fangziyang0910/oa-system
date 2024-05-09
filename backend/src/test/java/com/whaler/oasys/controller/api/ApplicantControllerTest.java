@@ -108,6 +108,16 @@ public class ApplicantControllerTest {
 
     @Test
     @Transactional
+    public void testGetStartForm()throws Exception{
+        ResultActions resultActions=mockMvc.perform(
+            MockMvcRequestBuilders.get("/applicant/getStartForm/leaveProcess")
+                .header("Authorization", token)
+        );
+        doResultActions(resultActions);
+    }
+
+    @Test
+    @Transactional
     public void testSubmitStartForm() throws Exception {
         UserContext.setCurrentUserId(1L);
         ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");

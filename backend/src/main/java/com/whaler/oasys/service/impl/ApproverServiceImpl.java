@@ -20,6 +20,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whaler.oasys.mapper.ApproverMapper;
 import com.whaler.oasys.model.entity.ApproverEntity;
@@ -145,6 +146,8 @@ implements ApproverService {
         try{
             inputStream= classPathResource.getInputStream();
             taskForm = IOUtils.toString(inputStream, "UTF-8");
+            JSONObject jsonobject = JSON.parseObject(taskForm);
+            taskForm = jsonobject.toJSONString();
         }catch(Exception e){
             throw new ApiException("表单不存在");
         }

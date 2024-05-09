@@ -14,6 +14,9 @@ implements EngineConfigurationConfigurer<SpringProcessEngineConfiguration> {
 
     @Override
     public void configure(SpringProcessEngineConfiguration engineConfiguration) {
+        engineConfiguration.setActivityFontName("宋体");
+        engineConfiguration.setLabelFontName("宋体");
+        engineConfiguration.setAnnotationFontName("宋体");
         engineConfiguration.addConfigurator(datasourceConfigurator);
         engineConfiguration.setDeploymentMode("single-resource");
     }
