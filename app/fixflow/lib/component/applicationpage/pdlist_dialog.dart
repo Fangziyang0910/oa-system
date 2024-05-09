@@ -38,8 +38,10 @@ class _PDListDialogState extends State<PDListDialog> {
       );
 
       if (response.statusCode == 200) {
+        // 解码响应数据并处理中文乱码
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        Map<String, dynamic> responseData = jsonDecode(decodedResponse);
         // 解析响应数据
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
         final int code = responseData['code'];
         if (code == 0000) {
           final List<dynamic> dataList = responseData['data'];
