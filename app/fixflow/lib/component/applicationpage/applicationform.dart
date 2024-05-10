@@ -12,7 +12,8 @@ import 'package:provider/provider.dart';
 class ApplicationForm extends StatefulWidget {
   final String? processDefinitionKey;
 
-  const ApplicationForm({Key? key, this.processDefinitionKey}) : super(key: key);
+  const ApplicationForm({Key? key, this.processDefinitionKey})
+      : super(key: key);
 
   @override
   State<ApplicationForm> createState() => _ApplicationFormState();
@@ -36,8 +37,7 @@ class _ApplicationFormState extends State<ApplicationForm>
   }
 
   Future<Uint8List?> _fetchImageData() async {
-    final token =
-        Provider.of<UserTokenProvider>(context, listen: false).token;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     final String imageUrl =
         ApiUrls.getOriginalProcessDiagram + '/' + widget.processDefinitionKey!;
     print(imageUrl);
@@ -66,8 +66,7 @@ class _ApplicationFormState extends State<ApplicationForm>
   }
 
   Future<List<Map<String, dynamic>>> _fetchDataForm() async {
-    final token =
-        Provider.of<UserTokenProvider>(context, listen: false).token;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     final String url =
         ApiUrls.getStartForm + '/' + widget.processDefinitionKey!;
     try {
@@ -133,8 +132,7 @@ class _ApplicationFormState extends State<ApplicationForm>
 
   Future<List<String>> _fetchUrlList(String url) async {
     print(url);
-    final token =
-        Provider.of<UserTokenProvider>(context, listen: false).token;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -168,6 +166,19 @@ class _ApplicationFormState extends State<ApplicationForm>
       ),
       body: CustomScrollView(
         slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '申请流程图',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           // SliverToBoxAdapter for displaying image
           SliverToBoxAdapter(
             child: FutureBuilder<Uint8List?>(
@@ -192,6 +203,31 @@ class _ApplicationFormState extends State<ApplicationForm>
               },
             ),
           ),
+
+          // 添加分割线和间距
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Divider(
+                height: 16,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                '申请表单',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           // SliverToBoxAdapter for displaying form
           SliverToBoxAdapter(
             child: FutureBuilder<List<Map<String, dynamic>>>(
@@ -214,11 +250,14 @@ class _ApplicationFormState extends State<ApplicationForm>
                               .map((field) => _buildField(field))
                               .toList(),
                           SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () {
-                              _submitForm();
-                            },
-                            child: Text('提交表单'),
+                          SizedBox(
+                            width: double.infinity, // 让SizedBox占据整个屏幕的宽度
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _submitForm();
+                              },
+                              child: Text('提交表单'),
+                            ),
                           ),
                         ],
                       ),
@@ -440,8 +479,7 @@ class _ApplicationFormState extends State<ApplicationForm>
     final String createurl =
         ApiUrls.createProcessInstance + '/' + widget.processDefinitionKey!;
     final String submiturl = ApiUrls.submitStartForm;
-    final token =
-        Provider.of<UserTokenProvider>(context, listen: false).token;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     String? processInstanceId;
 
     try {

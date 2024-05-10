@@ -1,4 +1,4 @@
-import 'package:fixflow/component/applicationpage/processInstanceDetial.dart';
+import 'package:fixflow/component/applicationpage/processInstanceDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:fixflow/component/error_snackbar.dart';
 import 'package:fixflow/config/api_url.dart';
@@ -6,7 +6,7 @@ import 'package:fixflow/config/user_token_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+import 'package:fixflow/config/function.dart';
 
 class CurrentApplicationListWidget extends StatefulWidget {
   const CurrentApplicationListWidget({Key? key}) : super(key: key);
@@ -19,12 +19,6 @@ class _CurrentApplicationListWidgetState extends State<CurrentApplicationListWid
   List<Map<String, dynamic>> _processInstances = [];
   bool _isLoading = false;
 
-  String parseDateFormat(String originalDate) {
-    final DateFormat inputFormat = DateFormat("EEE MMM dd HH:mm:ss 'CST' yyyy");
-    final DateTime date = inputFormat.parse(originalDate);
-    final DateFormat outputFormat = DateFormat("yyyy-MM-dd");
-    return outputFormat.format(date);
-  }
 
   Future<void> _fetchData({bool refresh = false}) async {
     if (!refresh) {
