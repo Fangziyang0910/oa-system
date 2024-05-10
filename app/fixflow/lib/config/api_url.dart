@@ -18,5 +18,7 @@ class ApiUrls {
   static const String createProcessInstance = '$baseUrl/applicant/createProcessInstance';
   //submit the startform
   static const String submitStartForm = '$baseUrl/applicant/submitStartForm';
+  // get origin processdiagram
+  static const String getOriginalProcessDiagram = '$baseUrl/applicant/getOriginalProcessDiagram';
 
 }
