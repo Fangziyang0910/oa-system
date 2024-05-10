@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +27,7 @@ import com.whaler.oasys.model.vo.ProcessDefinitionVo;
 import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.service.AdministratorService;
 import com.whaler.oasys.service.ReportService;
+import com.whaler.oasys.tool.MyBpmnModelModifier;
 
 @Service
 public class AdministratorServiceImpl
@@ -38,6 +41,9 @@ implements AdministratorService {
     private ReportService reportService;
     @Autowired
     private JwtManager jwtManager;
+    @Autowired
+    private MyBpmnModelModifier myBpmnModelModifier;
+
     @Override
     public AdministratorVo login(LoginParam loginParam){
         AdministratorEntity administratorEntity=
@@ -101,7 +107,14 @@ implements AdministratorService {
         }catch(Exception e){
             throw new ApiException("文件上传失败");
         }
-        deploymentBuilder.deploy();
+        Deployment deployment=deploymentBuilder.deploy();
+        String deploymentId=deployment.getId();
+        ProcessDefinition pd=repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
+        if (pd==null) {
+            throw new ApiException("部署失败");
+        }
+        BpmnModel bpmnModel=repositoryService.getBpmnModel(pd.getId());
+        myBpmnModelModifier.setBpmnModel(bpmnModel);
     }
 
     @Override

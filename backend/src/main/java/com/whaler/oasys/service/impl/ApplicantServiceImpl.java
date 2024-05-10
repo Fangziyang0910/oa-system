@@ -14,7 +14,6 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Gateway;
-import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.FormService;
@@ -26,7 +25,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormInfo;
-import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -295,7 +293,6 @@ implements ApplicantService {
         }
         
         BpmnModel bpmnModel=repositoryService.getBpmnModel(processDefinition.getId());
-        setBpmnModel(bpmnModel);
 
         String IMAGE_TYPE = "png";
         String activityFontName = "宋体";
@@ -324,7 +321,6 @@ implements ApplicantService {
         ).singleResult();
         // 获取流程模型
         BpmnModel bpmnModel=repositoryService.getBpmnModel(processDefinition.getId());
-        setBpmnModel(bpmnModel);
 
         List<TaskVo>tasks=getProcessInstanceProgress(processInstanceId);
         String jsonString=(String)historyService.createHistoricVariableInstanceQuery()
@@ -387,31 +383,4 @@ implements ApplicantService {
         return diagram;
     }
 
-    private void setBpmnModel(BpmnModel bpmnModel){
-        Double scale = 2.0d;
-        Map<String, GraphicInfo> locationMap = bpmnModel.getLocationMap();
-        for (String key : locationMap.keySet()) {
-            locationMap.get(key).setX(locationMap.get(key).getX()*scale);
-            locationMap.get(key).setY(locationMap.get(key).getY()*scale);
-            locationMap.get(key).setWidth(locationMap.get(key).getWidth()*scale);
-            locationMap.get(key).setHeight(locationMap.get(key).getHeight()*scale);   
-        }
-        Map<String, GraphicInfo> labelLocationMap = bpmnModel.getLabelLocationMap();
-        for (String key : labelLocationMap.keySet()) {
-            locationMap.get(key).setX(locationMap.get(key).getX()*scale);
-            locationMap.get(key).setY(locationMap.get(key).getY()*scale);
-            locationMap.get(key).setWidth(locationMap.get(key).getWidth()*scale);
-            locationMap.get(key).setHeight(locationMap.get(key).getHeight()*scale);   
-        }
-        Map<String, List<GraphicInfo>>flowLocationMap = bpmnModel.getFlowLocationMap();
-        for (String key : flowLocationMap.keySet()) {
-            List<GraphicInfo> graphicInfos = flowLocationMap.get(key);
-            for (GraphicInfo graphicInfo : graphicInfos) {
-                graphicInfo.setX(graphicInfo.getX()*scale);
-                graphicInfo.setY(graphicInfo.getY()*scale);
-                graphicInfo.setWidth(graphicInfo.getWidth()*scale);
-                graphicInfo.setHeight(graphicInfo.getHeight()*scale);
-            }
-        }
-    }
 }

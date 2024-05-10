@@ -73,6 +73,7 @@ public class AdministratorController {
             for(int i=0;i<multipartFiles.length;i++){
                 files[i] = multipartFiles[i].getInputStream();
                 filenames[i] = multipartFiles[i].getOriginalFilename();
+                files[i].close();
             }
         }catch(Exception e){
             throw new ApiException(e.getMessage());
@@ -129,6 +130,7 @@ public class AdministratorController {
         try {
             bytes=new byte[inputStream.available()];
             inputStream.read(bytes, 0, inputStream.available());
+            inputStream.close();
         } catch (Exception e) {
             throw new ApiException("获取流程图失败");
         }

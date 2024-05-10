@@ -123,6 +123,7 @@ public class ApplicantController {
         try {
             bytes=new byte[inputStream.available()];
             inputStream.read(bytes, 0, inputStream.available());
+            inputStream.close();
         } catch (Exception e) {
             throw new ApiException("获取流程图失败");
         }
@@ -140,6 +141,7 @@ public class ApplicantController {
         try {
             bytes=new byte[inputStream.available()];
             inputStream.read(bytes, 0, inputStream.available());
+            inputStream.close();
         } catch (Exception e) {
             throw new ApiException("获取流程图失败");
         }
