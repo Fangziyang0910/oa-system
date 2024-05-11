@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:fixflow/component/applicationpage/historyForm.dart';
 import 'package:fixflow/config/api_url.dart';
 import 'package:fixflow/config/classDefinition.dart';
 import 'package:fixflow/config/function.dart';
@@ -130,98 +131,64 @@ class _ProcessInstanceDetailWidgetState
     );
   }
 
-  /// 创建时间轴项的UI表示
-  Widget _buildTimelineTile(
-      Progress progress, bool isFirstItem, bool isLastItem) {
-    return TimelineTile(
-      alignment: TimelineAlign.manual,
-      lineXY: 0.1, // 这定义了线条和内容的相对位置
-      isFirst: isFirstItem,
-      isLast: isLastItem,
-      indicatorStyle: IndicatorStyle(
-        width: 20,
-        color: Colors.blue,
-        padding: EdgeInsets.all(6),
+  Widget _buildTimelineTile(Progress progress, bool isFirstItem, bool isLastItem) {
+  return TimelineTile(
+    alignment: TimelineAlign.manual,
+    lineXY: 0.1, // 定义线条和内容的相对位置
+    isFirst: isFirstItem,
+    isLast: isLastItem,
+    indicatorStyle: IndicatorStyle(
+      width: 20,
+      color: Colors.blue,
+      padding: EdgeInsets.all(6),
+    ),
+    endChild: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(progress.taskName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                SizedBox(height: 4),
+                Text(parseDateFormat(progress.endTime), style: TextStyle(fontSize: 14, color: Colors.grey)),
+                SizedBox(height: 4),
+                Text(progress.description ?? '无描述', style: TextStyle(fontSize: 14)),
+              ],
+            ),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              _handleMenuItemClick(value, progress.taskId, context);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'ViewForm',
+                child: Text('查看表单'),
+              ),
+            ],
+            icon: Icon(Icons.more_vert),
+          ),
+        ],
       ),
-      endChild: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(progress.taskName,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
-            Text(parseDateFormat(progress.endTime),
-                style: TextStyle(fontSize: 14, color: Colors.grey)),
-            SizedBox(height: 4),
-            Text(progress.description ?? '无描述', style: TextStyle(fontSize: 14)),
-          ],
-        ),
-      ),
+    ),
+  );
+}
+
+void _handleMenuItemClick(String value, String taskId, BuildContext context) {
+  if (value == 'ViewForm') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FormPage(taskId: taskId)),
     );
   }
+}
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('流程实例详情'),
-  //     ),
-  //     body: FutureBuilder<ProcessInstanceDetail>(
-  //       future: _processInstanceDetail,
-  //       builder: (context, snapshot) {
-  //         if (snapshot.connectionState == ConnectionState.waiting) {
-  //           return Center(child: CircularProgressIndicator());
-  //         } else if (snapshot.hasError) {
-  //           return Center(child: Text('Error: ${snapshot.error}'));
-  //         } else {
-  //           final processInstanceDetail = snapshot.data!;
-  //           final progressList = processInstanceDetail.progress;
 
-  //           return SingleChildScrollView(
-  //             // 使用 SingleChildScrollView 来使整个页面都能滚动
-  //             child: Column(
-  //               children: [
-  //                 ListView(
-  //                   shrinkWrap: true, // 使用shrinkWrap来让ListView只占用其内容的大小
-  //                   physics: NeverScrollableScrollPhysics(), // 禁止ListView本身滚动
-  //                   padding: EdgeInsets.all(16.0),
-  //                   children: [
-  //                     _buildDetailItem(
-  //                         '流程名称',
-  //                         processInstanceDetail
-  //                             .processDefinition.processDefinitionName),
-  //                     _buildDetailItem(
-  //                         '流程ID', processInstanceDetail.processInstanceId),
-  //                     _buildDetailItem('开始时间',
-  //                         parseDateFormat(processInstanceDetail.startTime)),
-  //                     _buildDetailItem(
-  //                         '结束时间',
-  //                         processInstanceDetail.endTime != null
-  //                             ? parseDateFormat(processInstanceDetail.endTime!)
-  //                             : '暂无'),
-  //                     _buildDetailItem('是否完成',
-  //                         processInstanceDetail.isCompleted ? '是' : '否'),
-  //                   ],
-  //                 ),
-  //                 ListView.builder(
-  //                   shrinkWrap: true,
-  //                   physics: NeverScrollableScrollPhysics(),
-  //                   itemCount: progressList.length,
-  //                   itemBuilder: (context, index) {
-  //                     final progress = progressList[index];
-  //                     return _buildTimelineTile(progress, index == 0,
-  //                         index == progressList.length - 1);
-  //                   },
-  //                 ),
-  //               ],
-  //             ),
-  //           );
-  //         }
-  //       },
-  //     ),
-  //   );
-  // }
+
+  
 
  @override
 Widget build(BuildContext context) {
@@ -303,7 +270,7 @@ Widget build(BuildContext context) {
                 },
               );
             },
-            childCount: 1, // We expect a single child in this build delegate
+            childCount: 1,
           ),
         ),
         SliverToBoxAdapter(
@@ -331,28 +298,116 @@ Widget build(BuildContext context) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     final detail = snapshot.data!;
-                    return Column(
-                      children: [
-                        _buildDetailItem('流程名称', detail.processDefinition.processDefinitionName),
-                        _buildDetailItem('流程ID', detail.processInstanceId),
-                        _buildDetailItem('开始时间', parseDateFormat(detail.startTime)),
-                        _buildDetailItem('结束时间', detail.endTime != null ? parseDateFormat(detail.endTime!) : '暂无'),
-                        _buildDetailItem('是否完成', detail.isCompleted ? '是' : '否'),
-                      ],
-                    );
+                    List<Widget> widgets = [
+                      _buildDetailItem('流程名称', detail.processDefinition.processDefinitionName),
+                      _buildDetailItem('流程ID', detail.processInstanceId),
+                      _buildDetailItem('开始时间', parseDateFormat(detail.startTime)),
+                      _buildDetailItem('结束时间', detail.endTime != null ? parseDateFormat(detail.endTime!) : '暂无'),
+                      _buildDetailItem('是否完成', detail.isCompleted ? '是' : '否'),
+                    ];
+                    
+                    if (!detail.isCompleted) {
+                      widgets.add(SizedBox(height: 16));  // 添加空间
+                      widgets.add(ElevatedButton(
+                        onPressed: () => _confirmCancellation(context),
+                        child: Text('撤销流程'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red, // 设置按钮颜色为红色
+                        ),
+                      ));
+                    }
+
+                    return Column(children: widgets);
                   } else {
                     return SizedBox.shrink();
                   }
                 },
               );
             },
-            childCount: 1, // We expect a single child in this build delegate
+            childCount: 1,
           ),
         ),
       ],
     ),
   );
 }
+
+void _confirmCancellation(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('确认'),
+        content: Text('是否确定终止正在执行的流程？'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+              _promptCancellationReason(context); // Prompt for cancellation reason
+            },
+            child: Text('是'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Just close the dialog
+            },
+            child: Text('否'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _promptCancellationReason(BuildContext context) {
+  TextEditingController _reasonController = TextEditingController(); // Controller for text field
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('撤销原因'),
+        content: TextField(
+          controller: _reasonController,
+          decoration: InputDecoration(
+            hintText: '请输入撤销原因',
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              String reason = _reasonController.text;
+              Navigator.of(context).pop(); // Close the dialog
+              _showCancellationSubmitted(context, reason); // Show submitted reason
+            },
+            child: Text('提交'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _showCancellationSubmitted(BuildContext context, String reason) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('撤销已提交'),
+        content: Text('撤销原因: $reason'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: Text('确定'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
 
 }
 
