@@ -22,5 +22,7 @@ class ApiUrls {
   static const String getOriginalProcessDiagram = '$baseUrl/applicant/getOriginalProcessDiagram';
   // get ProcessInstance
   static const String getProcessInstance = '$baseUrl/applicant/getProcessInstance';
+  //get processInstanceDiagram
+  static const String getProcessInstanceDiagram = '$baseUrl/applicant/getProcessInstanceDiagram';
 
 }
