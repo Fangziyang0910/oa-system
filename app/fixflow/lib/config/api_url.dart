@@ -11,7 +11,7 @@ class ApiUrls {
   // get ProcessDefinitions list
   static const String listProcessDefinitions = '$baseUrl/applicant/listProcessDefinitions';
   // get ProcessInstances list
-  static const String listProcessInstances = '$baseUrl/applicant/listProcessInstances';
+  static const String listProcessInstances = '$baseUrl/applicant/listProcessInstancesNotCompleted';
   //get ProcessDefinitionForm
   static const String getStartForm = '$baseUrl/applicant/getStartForm';
   // create a process instance
@@ -28,5 +28,18 @@ class ApiUrls {
   static const String abortProcessInstance = '$baseUrl/applicant/abortProcessInstance';
   //get HistoricalForm
   static const String getHistoricalForm = '$baseUrl/applicant/getHistoricalForm';
+  //list ProcessInstancesCompleted
+  static const String listProcessInstancesCompleted = '$baseUrl/applicant/listProcessInstancesCompleted';
 
+  /* --------------approval-------------- api */
+  //list ApprovalTasksNotCompleted
+  static const String listApprovalTasksNotCompleted = '$baseUrl/approver/listApprovalTasksNotCompleted';
+  //get TaskStartForm
+  static const String getTaskStartForm = '$baseUrl/approver/getStartForm';
+  //get TaskForm
+  static const String getTaskForm = '$baseUrl/approver/getTaskForm';
+  //get ProcessProgress
+  static const String getProcessProgress = '$baseUrl/approver/getProcessProgress';
+
+  static const String completeApprovalTask = '$baseUrl/approver/completeApprovalTask';
 }

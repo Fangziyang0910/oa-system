@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 import 'package:fixflow/config/api_url.dart';
+import 'package:fixflow/config/classDefinition.dart';
 import 'package:fixflow/config/user_token_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +19,7 @@ class FormPage extends StatefulWidget {
 }
 
 class _FormPageState extends State<FormPage> {
-  late Future<List<FormField>> _formFields;
+  late Future<List<myFormField>> _formFields;
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _FormPageState extends State<FormPage> {
     _formFields = fetchFormFields(widget.taskId);
   }
 
-  Future<List<FormField>> fetchFormFields(String taskId) async {
+  Future<List<myFormField>> fetchFormFields(String taskId) async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     final String url =
         ApiUrls.getHistoricalForm + '/' + widget.taskId;
@@ -46,7 +47,7 @@ class _FormPageState extends State<FormPage> {
       
       if (code == 0) {
         List<dynamic> fields = responseData['data']['formFields'];
-        return fields.map((field) => FormField.fromJson(field)).toList();
+        return fields.map((field) => myFormField.fromJson(field)).toList();
       } else {
         throw Exception('Failed to load form data: ${responseData['msg']}');
       }
@@ -64,7 +65,7 @@ class _FormPageState extends State<FormPage> {
       appBar: AppBar(
         title: Text("查看表单"),
       ),
-      body: FutureBuilder<List<FormField>>(
+      body: FutureBuilder<List<myFormField>>(
         future: _formFields,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -97,25 +98,3 @@ class _FormPageState extends State<FormPage> {
   }
 }
 
-class FormField {
-  final String id;
-  final String name;
-  final String type;
-  final dynamic value;
-
-  FormField({
-    required this.id,
-    required this.name,
-    required this.type,
-    this.value,
-  });
-
-  factory FormField.fromJson(Map<String, dynamic> json) {
-    return FormField(
-      id: json['id'],
-      name: json['name'],
-      type: json['type'],
-      value: json['value'].toString(),
-    );
-  }
-}

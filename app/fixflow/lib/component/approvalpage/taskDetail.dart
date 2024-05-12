@@ -1,74 +1,105 @@
-import 'dart:convert';
-import 'dart:typed_data';
+// ignore_for_file: prefer_interpolation_to_compose_strings, unused_field, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:convert';
+
+import 'package:fixflow/component/applicationpage/historyForm.dart';
 import 'package:fixflow/component/error_snackbar.dart';
 import 'package:fixflow/config/api_url.dart';
+import 'package:fixflow/config/function.dart';
 import 'package:fixflow/config/user_token_provider.dart';
-import 'package:fixflow/pages/homepage.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:fixflow/config/classDefinition.dart';
+import 'package:timeline_tile/timeline_tile.dart';
 
-class ApplicationForm extends StatefulWidget {
-  final String? processDefinitionKey;
+class TaskDetailWidget extends StatefulWidget {
+  final String taskId;
 
-  const ApplicationForm({Key? key, this.processDefinitionKey})
-      : super(key: key);
+  const TaskDetailWidget({super.key, required this.taskId});
 
   @override
-  State<ApplicationForm> createState() => _ApplicationFormState();
+  State<TaskDetailWidget> createState() => _TaskDetailWidgetState();
 }
 
-class _ApplicationFormState extends State<ApplicationForm>
-     {
+class _TaskDetailWidgetState extends State<TaskDetailWidget> {
+  late Future<List<myFormField>> _startform;
   late Future<List<Map<String, dynamic>>> _dataForm;
   final Map<String, dynamic> _formState = {};
   final Map<String, TextEditingController> _controllers = {};
-  String _formName = '';
   final _formKey = GlobalKey<FormState>();
-  late Future<Uint8List?> _imageData;
+  String _formName = '';
   Map<String, List<String>> _dropdownCache = {};
+  late Future<List<Progress>> _progress;
 
-  @override
-  void initState() {
-    super.initState();
-    _dataForm = _fetchDataForm();
-    _imageData = _fetchImageData();
-  }
-
-  Future<Uint8List?> _fetchImageData() async {
+  Future<List<myFormField>> fetchStartForm(String taskId) async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
-    final String imageUrl =
-        ApiUrls.getOriginalProcessDiagram + '/' + widget.processDefinitionKey!;
-    print(imageUrl);
-
+    final String url = ApiUrls.getTaskStartForm + '/' + widget.taskId;
     try {
       final response = await http.get(
-        Uri.parse(imageUrl),
+        Uri.parse(url),
         headers: {
-          'Accept': 'image/png',
+          'Accept': 'application/json',
           'Authorization': token ?? '',
         },
       );
 
-      print(response);
-      print(response.statusCode);
-
       if (response.statusCode == 200) {
-        return response.bodyBytes;
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        final responseData = jsonDecode(decodedResponse);
+        final int code = responseData['code'];
+
+        if (code == 0) {
+          List<dynamic> fields = responseData['data']['formFields'];
+          return fields.map((field) => myFormField.fromJson(field)).toList();
+        } else {
+          throw Exception('Failed to load form data: ${responseData['msg']}');
+        }
       } else {
-        print(response.statusCode);
-        return null; // Return null if image request fails
+        throw Exception(
+            'Failed to load form data with status code: ${response.statusCode}');
       }
     } catch (e) {
-      return null; // Return null if there is a network error
+      throw Exception('Failed to connect to the server: $e');
+    }
+  }
+
+  Future<List<Progress>> _fetchProcessProgress() async {
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
+    final String url = ApiUrls.getProcessProgress + '/' + widget.taskId;
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': '*/*',
+          'Authorization': token ?? '',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        final responseData = jsonDecode(decodedResponse);
+        final int code = responseData['code'];
+        if (code == 0) {
+          List<Progress> progressList = (responseData['data'] as List)
+              .map((data) => Progress.fromJson(data))
+              .toList();
+          return progressList;
+        } else {
+          throw Exception('Failed to load process instance detail');
+        }
+      } else {
+        throw Exception('Failed to load process instance detail');
+      }
+    } catch (e) {
+      throw Exception('Failed to connect to the server');
     }
   }
 
   Future<List<Map<String, dynamic>>> _fetchDataForm() async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
-    final String url =
-        ApiUrls.getStartForm + '/' + widget.processDefinitionKey!;
+    final String url = ApiUrls.getTaskForm + '/' + widget.taskId;
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -158,6 +189,14 @@ class _ApplicationFormState extends State<ApplicationForm>
   }
 
   @override
+  void initState() {
+    super.initState();
+    _startform = fetchStartForm(widget.taskId);
+    _progress = _fetchProcessProgress();
+    _dataForm = _fetchDataForm();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -166,51 +205,81 @@ class _ApplicationFormState extends State<ApplicationForm>
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                '申请流程图',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          // SliverToBoxAdapter for displaying image
-          SliverToBoxAdapter(
-            child: FutureBuilder<Uint8List?>(
-              future: _imageData,
+            child: FutureBuilder<List<myFormField>>(
+              future:
+                  _startform, // 这里假设 _startform 是你的 Future<List<myFormField>>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.hasData) {
+                  return ExpansionTile(
+                    title: Text("申请信息",
+                        style: TextStyle(
+                            fontSize: 20.0, fontWeight: FontWeight.bold)),
+                    initiallyExpanded: true,
+                    children: snapshot.data!.map((field) {
+                      return ListTile(
+                        title: Text('${field.name}:',
+                            style: TextStyle(fontSize: 18.0)),
+                        trailing: Text('${field.value}',
+                            style: TextStyle(fontSize: 18.0)),
+                      );
+                    }).toList(),
+                  );
                 } else {
-                  final Uint8List? imageBytes = snapshot.data;
-                  if (imageBytes != null) {
-                    return Image.memory(
-                      imageBytes,
-                      fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width,
-                    );
-                  } else {
-                    return Center(child: Text('Failed to load image'));
-                  }
+                  return Center(child: Text('No data available'));
                 }
               },
             ),
           ),
 
-          // 添加分割线和间距
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Divider(
-                height: 16,
-                color: Colors.grey,
+            child: SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0, horizontal: 8.0), // 增加垂直方向的间距
+                child: Text(
+                  '流程进度记录',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
+            ),
+          ),
+
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return FutureBuilder<List<Progress>>(
+                  future: _progress,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      final progressList = snapshot.data!;
+                      return Column(
+                        children: progressList
+                            .map((progress) => _buildTimelineTile(
+                                progress,
+                                progress == progressList.first,
+                                progress == progressList.last))
+                            .toList(),
+                      );
+                    } else {
+                      return SizedBox.shrink();
+                    }
+                  },
+                );
+              },
+              childCount: 1,
             ),
           ),
 
@@ -218,7 +287,7 @@ class _ApplicationFormState extends State<ApplicationForm>
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                '申请表单',
+                '审批表单',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20,
@@ -227,6 +296,7 @@ class _ApplicationFormState extends State<ApplicationForm>
               ),
             ),
           ),
+
           // SliverToBoxAdapter for displaying form
           SliverToBoxAdapter(
             child: FutureBuilder<List<Map<String, dynamic>>>(
@@ -269,6 +339,66 @@ class _ApplicationFormState extends State<ApplicationForm>
         ],
       ),
     );
+  }
+
+  Widget _buildTimelineTile(
+      Progress progress, bool isFirstItem, bool isLastItem) {
+    return TimelineTile(
+      alignment: TimelineAlign.manual,
+      lineXY: 0.1, // 定义线条和内容的相对位置
+      isFirst: isFirstItem,
+      isLast: isLastItem,
+      indicatorStyle: IndicatorStyle(
+        width: 20,
+        color: Colors.blue,
+        padding: EdgeInsets.all(6),
+      ),
+      endChild: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(progress.taskName,
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 4),
+                  Text(parseDateFormat(progress.endTime),
+                      style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  SizedBox(height: 4),
+                  Text("执行人：" + (progress.assigneeName ?? '未指定'),
+                      style: TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
+            PopupMenuButton<String>(
+              onSelected: (String value) {
+                _handleMenuItemClick(value, progress.taskId, context);
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'ViewForm',
+                  child: Text('查看表单'),
+                ),
+              ],
+              icon: Icon(Icons.more_vert),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleMenuItemClick(String value, String taskId, BuildContext context) {
+    if (value == 'ViewForm') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => FormPage(taskId: taskId)),
+      );
+    }
   }
 
   Widget _buildField(Map<String, dynamic> field) {
@@ -350,8 +480,7 @@ class _ApplicationFormState extends State<ApplicationForm>
         );
       }
     } else {
-      // Other input types based on fieldType
-    switch (fieldType) {
+      switch (fieldType) {
       case 'integer':
         inputWidget = TextFormField(
           controller: _controllers[fieldid],
@@ -420,19 +549,35 @@ class _ApplicationFormState extends State<ApplicationForm>
         );
         break;
       case 'boolean':
-        inputWidget = Row(
-          children: [
-            Expanded(child: Text('否', textAlign: TextAlign.end)),
-            Switch(
-              value: _formState[fieldid] ?? false,
-              onChanged: (bool value) {
-                setState(() {
-                  _formState[fieldid] = value;
-                });
-              },
+        // Boolean dropdown input
+        inputWidget = DropdownButtonFormField<bool>(
+          value: _formState[fieldid],
+          onChanged: (value) {
+            setState(() {
+              _formState[fieldid] = value;
+            });
+          },
+          items: [
+            DropdownMenuItem<bool>(
+              value: true,
+              child: Text('是'),
             ),
-            Expanded(child: Text('是', textAlign: TextAlign.start)),
+            DropdownMenuItem<bool>(
+              value: false,
+              child: Text('否'),
+            ),
           ],
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+          validator: (value) {
+            if (required && value == null) {
+              return '请选择' + fieldName!;
+            }
+            return null;
+          },
         );
         break;
       default:
@@ -486,76 +631,17 @@ class _ApplicationFormState extends State<ApplicationForm>
     }
   }
 
-  @override
-  void dispose() {
-    _controllers.values.forEach((controller) => controller.dispose());
-    super.dispose();
-  }
-
   Future<void> createProcessInstance() async {
-    final String createurl =
-        ApiUrls.createProcessInstance + '/' + widget.processDefinitionKey!;
-    final String submiturl = ApiUrls.submitStartForm;
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
-    String? processInstanceId;
-
-    try {
-      final response = await http.get(
-        Uri.parse(createurl),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': token ?? '',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final decodedResponse = utf8.decode(response.bodyBytes);
-        final responseData = jsonDecode(decodedResponse);
-        final int code = responseData['code'];
-        if (code == 0) {
-          processInstanceId = responseData['data']['processInstanceId'];
-        } else {
-          String message;
-          switch (code) {
-            case 1001:
-              message = "您的登录状态已过期，请重新登陆";
-              break;
-            case 1002:
-              message = "您没有相关权限";
-              break;
-            case 1003:
-              message = "参数校验失败";
-              break;
-            case 1004:
-              message = "接口异常";
-              break;
-            case 5000:
-              message = "未知错误";
-              break;
-            default:
-              message = "未知错误";
-          }
-          ErrorSnackbar.showSnackBar(context, message);
-        }
-      } else {
-        ErrorSnackbar.showSnackBar(context, '创建流程失败');
-      }
-    } catch (e) {
-      ErrorSnackbar.showSnackBar(context, '请检查网络');
-    }
-
-    if (processInstanceId == null) {
-      return;
-    }
 
     final Map<String, dynamic> formData = {
       "form": _formState,  // Directly using the _formState map.
-      "processInstanceId": processInstanceId
+      "taskId": widget.taskId
     };
 
     try {
       final response = await http.post(
-        Uri.parse(submiturl),
+        Uri.parse(ApiUrls.completeApprovalTask),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -569,12 +655,7 @@ class _ApplicationFormState extends State<ApplicationForm>
         final responseData = jsonDecode(decodedResponse);
         final int code = responseData['code'];
         if (code == 0) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(),
-            ),
-          );
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('提交成功')),
           );
@@ -609,5 +690,4 @@ class _ApplicationFormState extends State<ApplicationForm>
     }
     return;
   }
-
 }

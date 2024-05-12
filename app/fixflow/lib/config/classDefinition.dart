@@ -62,43 +62,55 @@ class Progress {
   final String taskId;
   final String taskName;
   final String executionId;
+  final String? starterName;
+  final String? assigneeName;
+  final String? processDefinitionName;
   final String? description;
+  final String? dueTime;
   final String endTime;
 
   Progress({
     required this.taskId,
     required this.taskName,
     required this.executionId,
+    this.starterName,
+    this.assigneeName,
+    this.processDefinitionName,
     this.description,
+    this.dueTime,
     required this.endTime,
   });
 
   factory Progress.fromJson(Map<String, dynamic> json) {
     return Progress(
-      taskId: json['taskId'],
-      taskName: json['taskName'],
-      executionId: json['executionId'],
-      description: json['description'],
-      endTime: json['endTime'],
+      taskId: json['taskId'] as String,
+      taskName: json['taskName'] as String,
+      executionId: json['executionId'] as String,
+      starterName: json['starterName'] as String?,
+      assigneeName: json['assigneeName'] as String?,
+      processDefinitionName: json['processDefinitionName'] as String?,
+      description: json['description'] as String?,
+      dueTime: json['dueTime'] as String?,
+      endTime: json['endTime'] as String,
     );
   }
 }
 
-class FormField {
+class myFormField {
   final String id;
   final String name;
   final String type;
   final dynamic value;
 
-  FormField({
+  myFormField({
     required this.id,
     required this.name,
     required this.type,
     this.value,
   });
 
-  factory FormField.fromJson(Map<String, dynamic> json) {
-    return FormField(
+  factory myFormField.fromJson(Map<String, dynamic> json) {
+    return myFormField(
       id: json['id'],
       name: json['name'],
       type: json['type'],

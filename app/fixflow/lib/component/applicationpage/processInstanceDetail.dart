@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:fixflow/component/applicationpage/historyForm.dart';
+import 'package:fixflow/component/error_snackbar.dart';
 import 'package:fixflow/config/api_url.dart';
 import 'package:fixflow/config/classDefinition.dart';
 import 'package:fixflow/config/function.dart';
@@ -155,7 +156,7 @@ class _ProcessInstanceDetailWidgetState
                 SizedBox(height: 4),
                 Text(parseDateFormat(progress.endTime), style: TextStyle(fontSize: 14, color: Colors.grey)),
                 SizedBox(height: 4),
-                Text(progress.description ?? '无描述', style: TextStyle(fontSize: 14)),
+                Text("执行人：" + (progress.assigneeName ?? '未指定'), style: TextStyle(fontSize: 14)),
               ],
             ),
           ),
@@ -377,7 +378,7 @@ void _promptCancellationReason(BuildContext context) {
             onPressed: () {
               String reason = _reasonController.text;
               Navigator.of(context).pop(); // Close the dialog
-              _showCancellationSubmitted(context, reason); // Show submitted reason
+              _submitCancellation(reason, context); // Perform the cancellation
             },
             child: Text('提交'),
           ),
@@ -387,24 +388,51 @@ void _promptCancellationReason(BuildContext context) {
   );
 }
 
-void _showCancellationSubmitted(BuildContext context, String reason) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('撤销已提交'),
-        content: Text('撤销原因: $reason'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text('确定'),
-          ),
-        ],
-      );
-    },
-  );
+void _submitCancellation(String reason, BuildContext context) async {
+  final token = Provider.of<UserTokenProvider>(context, listen: false).token;
+  final String url = ApiUrls.abortProcessInstance;
+  final String processInstanceId = widget.processInstanceId;  // Assuming the process instance ID is available in widget.
+
+  try {
+    final response = await http.post(
+      Uri.parse('$url?processInstanceId=$processInstanceId&reason=$reason'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': token ?? '',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      final int code = responseData['code'];
+      if (code == 0) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('撤销成功'),
+              content: Text('流程已成功撤销。'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close success dialog
+                    Navigator.of(context).pop(); // Navigate back
+                  },
+                  child: Text('确定'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        ErrorSnackbar.showSnackBar(context, '撤销失败，请稍后重试。');
+      }
+    } else {
+      ErrorSnackbar.showSnackBar(context,'请求失败，请检查网络连接并重试。');
+    }
+  } catch (e) {
+    ErrorSnackbar.showSnackBar(context,'请求异常，无法完成撤销。错误详情: $e');
+  }
 }
 
 
