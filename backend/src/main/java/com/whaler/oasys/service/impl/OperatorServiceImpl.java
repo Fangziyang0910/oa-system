@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.form.api.FormInfo;
@@ -47,6 +48,8 @@ implements OperatorService {
     @Autowired
     private HistoryService historyService;
     @Autowired
+    private RepositoryService repositoryService;
+    @Autowired
     private UserService userService;
     @Autowired
     private CategoryService categoryService;
@@ -66,7 +69,7 @@ implements OperatorService {
         List<OperatorEntity> operatorEntities = this.baseMapper.selectByOperatorId(operatorId);
         OperatorVo operatorVo=new OperatorVo();
         operatorVo.setOperatorId(operatorId);
-        operatorVo.setProcessinstanceIds(
+        operatorVo.setTaskIds(
             operatorEntities.stream()
             .map(OperatorEntity::getProcessinstanceId)
             .collect(Collectors.toList())
@@ -93,7 +96,16 @@ implements OperatorService {
                 taskVo.setTaskId(task.getId());
                 taskVo.setTaskName(task.getName());
                 taskVo.setExecutionId(task.getExecutionId());
+                String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+                String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+                taskVo.setStarterName(starter);
+                String processDefinitionName=repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
+                taskVo.setProcessDefinitionName(processDefinitionName);
                 taskVo.setDescription(task.getDescription());
+                if (task.getDueDate() != null) {
+                    taskVo.setDueTime(task.getDueDate().toString());   
+                }
                 return taskVo;
             }).collect(Collectors.toList());
         return taskVos;
@@ -155,7 +167,7 @@ implements OperatorService {
     }
 
     @Override
-    public void finishOperatorTask(String taskId, Map<String, String> form) {
+    public void completeOperatorTask(String taskId, Map<String, String> form) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new RuntimeException("任务不存在");
@@ -167,6 +179,8 @@ implements OperatorService {
         formList.add(taskId);
         jsonString=JSON.toJSONString(formList);
         runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
+        String userName=userService.selectByUserId(UserContext.getCurrentUserId()).getName();
+        runtimeService.setVariable(task.getExecutionId(), taskId, userName);
 
         formService.submitTaskFormData(taskId, form);
         insertOperatorEntity(UserContext.getCurrentUserId(), taskId);
@@ -180,11 +194,28 @@ implements OperatorService {
             throw new ApiException("任务不存在");
         }
         TaskVo taskVo=new TaskVo();
+
+        String starterId=(String)historyService.createHistoricVariableInstanceQuery()
+            .processInstanceId(task.getProcessInstanceId()).variableName("starter").singleResult()
+            .getValue();
+        String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+        String processDefinitionName=repositoryService.createProcessDefinitionQuery().processDefinitionId(
+            task.getProcessDefinitionId()
+        ).singleResult().getName();
+        String userName=(String)historyService.createHistoricVariableInstanceQuery()
+            .processInstanceId(task.getProcessInstanceId()).variableName(taskId)
+            .singleResult().getValue();
         taskVo.setTaskId(task.getId())
             .setTaskName(task.getName())
             .setExecutionId(task.getExecutionId())
-            .setDescription(task.getDescription())
-            .setEndTime(task.getEndTime().toString());
+            .setStarterName(starter)
+            .setAssigneeName(userName)
+            .setProcessDefinitionName(processDefinitionName)
+            .setDescription(task.getDescription());
+        if (task.getDueDate() != null) {
+            taskVo.setDueTime(task.getDueDate().toString());   
+        }
+        taskVo.setEndTime(task.getEndTime().toString());
         return taskVo;
     }
 }

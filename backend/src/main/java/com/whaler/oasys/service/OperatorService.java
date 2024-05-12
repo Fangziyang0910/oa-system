@@ -23,7 +23,7 @@ extends IService<OperatorEntity> {
 
     String getTaskForm(String taskId);
 
-    void finishOperatorTask(String taskId, Map<String, String> form);
+    void completeOperatorTask(String taskId, Map<String, String> form);
 
     TaskVo getHistoricalDetails(String taskId);
 }

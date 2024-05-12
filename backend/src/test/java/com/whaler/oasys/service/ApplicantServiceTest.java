@@ -118,6 +118,7 @@ public class ApplicantServiceTest {
         // doManagerTask();
         UserContext.setCurrentUserId(1L);
         List<String>processInstances=applicantService.selectByApplicantId(1L).getProcessinstanceIds();
+        log.info("processInstances:{}",processInstances);
 
         List<TaskVo> taskVos=applicantService.getProcessInstanceProgress(processInstances.get(0));
         log.info("taskVos:{}",taskVos);
@@ -154,8 +155,8 @@ public class ApplicantServiceTest {
     @Test
     @Transactional
     public void testAbortProcessInstance() {
-        // doOperatorTask();
-        doManagerTask();
+        doOperatorTask();
+        // doManagerTask();
         UserContext.setCurrentUserId(1L);
         List<String>processInstances=applicantService.selectByApplicantId(1L).getProcessinstanceIds();
         log.info("processInstances:{}",processInstances);
@@ -219,7 +220,7 @@ public class ApplicantServiceTest {
         Map<String,String> form=new HashMap<>();
         form.put("isLeaderApproval", "true");
         TaskVo taskVo = approverService.listApprovalTasks().get(0);
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
     }
 
     private void doManagerTask(){
@@ -228,7 +229,7 @@ public class ApplicantServiceTest {
         Map<String,String> form=new HashMap<>();
         form.put("isManagerApproval", "true");
         TaskVo taskVo = approverService.listApprovalTasks().get(0);
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
     }
 
     private void doOperatorTask(){
@@ -238,6 +239,6 @@ public class ApplicantServiceTest {
         form.put("operatorName","马冬梅");
         form.put("leaveFile","人事部同意大傻春的请假申请");
         TaskVo taskVo = operatorService.listOperatorTasks().get(0);
-        operatorService.finishOperatorTask(taskVo.getTaskId(),form);
+        operatorService.completeOperatorTask(taskVo.getTaskId(),form);
     }
 }

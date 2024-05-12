@@ -89,7 +89,7 @@ public class ProductSoftwareFailureTest {
         vars.put("isDeveloperOperation", Boolean.toString(true));
         vars.put("isTesterOperation", Boolean.toString(false));
         vars.put("isMaintainerOperation", Boolean.toString(true));
-        approverService.finishApprovalTask(taskId, vars);
+        approverService.completeApprovalTask(taskId, vars);
     }
 
     private void doMaintainerApproval2(){
@@ -98,7 +98,7 @@ public class ProductSoftwareFailureTest {
         Map<String,String>vars=new HashMap<>();
         vars.put("approverId", Long.toString(UserContext.getCurrentUserId()));
         vars.put("isMaintainerApproval", Boolean.toString(false));
-        approverService.finishApprovalTask(taskId, vars);
+        approverService.completeApprovalTask(taskId, vars);
     }
 
     private void doDeveloperOperation(){
@@ -106,21 +106,21 @@ public class ProductSoftwareFailureTest {
         String taskId=operatorService.listOperatorTasks().get(0).getTaskId();
         Map<String,String>vars=new HashMap<>();
         vars.put("developerId", Long.toString(UserContext.getCurrentUserId()));
-        operatorService.finishOperatorTask(taskId, vars);
+        operatorService.completeOperatorTask(taskId, vars);
     }
     private void doTesterOperation(){
         UserContext.setCurrentUserId(7L);
         String taskId=operatorService.listOperatorTasks().get(0).getTaskId();
         Map<String,String>vars=new HashMap<>();
         vars.put("testerId", Long.toString(UserContext.getCurrentUserId()));
-        operatorService.finishOperatorTask(taskId, vars);
+        operatorService.completeOperatorTask(taskId, vars);
     }
     private void doMaintainerOperation(){
         UserContext.setCurrentUserId(12L);
         String taskId=operatorService.listOperatorTasks().get(0).getTaskId();
         Map<String,String>vars=new HashMap<>();
         vars.put("maintainerId", Long.toString(UserContext.getCurrentUserId()));
-        operatorService.finishOperatorTask(taskId, vars);
+        operatorService.completeOperatorTask(taskId, vars);
     }
 
     private void doMaintainerFeedback(){
@@ -128,7 +128,7 @@ public class ProductSoftwareFailureTest {
         String taskId=operatorService.listOperatorTasks().get(0).getTaskId();
         Map<String,String>vars=new HashMap<>();
         vars.put("maintainerId", Long.toString(UserContext.getCurrentUserId()));
-        operatorService.finishOperatorTask(taskId, vars);
+        operatorService.completeOperatorTask(taskId, vars);
     }
 
     private void getProcessProgress(){

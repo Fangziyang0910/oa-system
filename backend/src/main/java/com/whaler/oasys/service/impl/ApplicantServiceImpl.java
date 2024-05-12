@@ -46,6 +46,7 @@ import com.whaler.oasys.model.vo.ProcessInstanceVo;
 import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.ApplicantService;
+import com.whaler.oasys.service.UserService;
 import com.whaler.oasys.tool.MyDefaultProcessDiagramGenerator;
 
 @Service
@@ -64,6 +65,8 @@ implements ApplicantService {
     private HistoryService historyService;
     @Autowired
     private MyDefaultProcessDiagramGenerator myDefaultProcessDiagramGenerator;
+    @Autowired
+    private UserService userService;
 
     @Override
     public int insertApplicantEntity(Long applicantId, String processinstanceId) {
@@ -85,6 +88,15 @@ implements ApplicantService {
             .collect(Collectors.toList())
         );
         return applicantVo;
+    }
+
+    @Override
+    public List<ProcessInstanceVo> listProcessInstances(Long applicantId) {
+        ApplicantVo applicantVo = this.selectByApplicantId(applicantId);
+        List<ProcessInstanceVo> processInstanceVos = applicantVo.getProcessinstanceIds().stream()
+            .map(processInstanceId -> this.getProcessInstance(processInstanceId))
+            .collect(Collectors.toList());
+        return processInstanceVos;
     }
 
     @Override
@@ -179,6 +191,8 @@ implements ApplicantService {
         formList.add(starterTask.getId());
         jsonString=JSON.toJSONString(formList);
         runtimeService.setVariable(starterTask.getExecutionId(), "formList", jsonString);
+        String userName=userService.selectByUserId(UserContext.getCurrentUserId()).getName();
+        runtimeService.setVariable(starterTask.getExecutionId(), starterTask.getId(), userName);
 
         // 提交申请表单
         formService.submitTaskFormData(starterTask.getId(), startForm);
@@ -204,11 +218,19 @@ implements ApplicantService {
         List<TaskVo>taskVos=formList.stream().map(
             taskId->{
                 HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-                return new TaskVo().setTaskId(task.getId())
+                String userName=(String)historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId()).variableName(taskId)
+                    .singleResult().getValue();
+                TaskVo taskVo = new TaskVo().setTaskId(task.getId())
                     .setTaskName(task.getName())
                     .setExecutionId(task.getExecutionId())
+                    .setAssigneeName(userName)
                     .setDescription(task.getDescription())
                     .setEndTime(task.getEndTime().toString());
+                if (task.getDueDate() != null) {
+                    taskVo.setDueTime(task.getDueDate().toString());
+                }
+                return taskVo;
             }
         ).collect(Collectors.toList());
         return taskVos;
@@ -265,6 +287,7 @@ implements ApplicantService {
             processInstanceVo.setIsCompeleted(false);
         }else{
             processInstanceVo.setEndTime(pi.getEndTime().toString());
+            processInstanceVo.setAbortReason(pi.getDeleteReason());
             processInstanceVo.setIsCompeleted(true);
         }
         return processInstanceVo;

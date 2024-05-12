@@ -10,5 +10,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class OperatorVo {
     private Long operatorId;
-    private List<String> processinstanceIds;
+    private List<String> taskIds;
 }

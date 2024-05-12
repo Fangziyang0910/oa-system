@@ -9,5 +9,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ApproverVo {
     private Long approverId;
-    private List<String> processinstanceIds;
+    private List<String> taskIds;
 }

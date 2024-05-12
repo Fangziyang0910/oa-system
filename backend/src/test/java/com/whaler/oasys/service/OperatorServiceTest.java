@@ -109,7 +109,7 @@ public class OperatorServiceTest {
         Map<String,String> form = new HashMap<>();
         form.put("operatorName","马冬梅");
         form.put("leaveFile","人事部同意大傻春的请假申请");
-        operatorService.finishOperatorTask(taskVo.getTaskId(),form);
+        operatorService.completeOperatorTask(taskVo.getTaskId(),form);
         SimpleFormModel formFields=(SimpleFormModel)taskService.getTaskFormModel(taskVo.getTaskId()).getFormModel();
         for(FormField formField:formFields.getFields()){
             log.info(formField.getId()+" "+formField.getName()+" "+formField.getValue());
@@ -130,13 +130,13 @@ public class OperatorServiceTest {
         form.clear();
         form.put("isLeaderApproval", "true");
         TaskVo taskVo = approverService.listApprovalTasks().get(0);
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
 
         UserContext.setCurrentUserId(6L);
         form.clear();
         form.put("isManagerApproval", "true");
         taskVo = approverService.listApprovalTasks().get(0);
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
         
 
     }

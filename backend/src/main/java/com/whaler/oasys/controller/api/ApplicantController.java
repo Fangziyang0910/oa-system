@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.whaler.oasys.model.exception.ApiException;
@@ -40,13 +41,34 @@ public class ApplicantController {
 
     @ApiOperation("申请人查询发起的流程实例")
     @GetMapping("/listProcessInstances")
-    public List<ProcessInstanceVo> lisApplicantVo(){
+    public List<ProcessInstanceVo> listProcessInstances(){
         Long applicantId=UserContext.getCurrentUserId();
-        ApplicantVo applicantVo = applicantService.selectByApplicantId(applicantId);
-        List<ProcessInstanceVo> processInstanceVos = applicantVo.getProcessinstanceIds().stream()
-            .map(processInstanceId -> applicantService.getProcessInstance(processInstanceId))
-            .collect(Collectors.toList());
+        List<ProcessInstanceVo> processInstanceVos = applicantService.listProcessInstances(applicantId);
         return processInstanceVos;
+    }
+
+    @ApiOperation("申请人查询未结束的流程实例")
+    @GetMapping("/listProcessInstancesNotCompleted")
+    public List<ProcessInstanceVo> listProcessInstancesNotCompleted(){
+        Long applicantId=UserContext.getCurrentUserId();
+        List<ProcessInstanceVo> processInstanceVos = applicantService.listProcessInstances(applicantId);
+        List<ProcessInstanceVo> processInstanceVosNotCompleted = processInstanceVos.stream()
+            .filter(processInstanceVo -> {
+                return !processInstanceVo.getIsCompeleted();
+            }).collect(Collectors.toList());
+        return processInstanceVosNotCompleted;
+    }
+
+    @ApiOperation("申请人查询已结束的流程实例")
+    @GetMapping("/listProcessInstancesCompleted")
+    public List<ProcessInstanceVo> listProcessInstancesCompleted(){
+        Long applicantId=UserContext.getCurrentUserId();
+        List<ProcessInstanceVo> processInstanceVos = applicantService.listProcessInstances(applicantId);
+        List<ProcessInstanceVo> processInstanceVosCompleted = processInstanceVos.stream()
+            .filter(processInstanceVo -> {
+                return processInstanceVo.getIsCompeleted();
+            }).collect(Collectors.toList());
+        return processInstanceVosCompleted;
     }
 
     @ApiOperation("申请人查询所有的流程定义")
@@ -106,8 +128,8 @@ public class ApplicantController {
     @ApiOperation("申请人终止流程实例")
     @PostMapping("/abortProcessInstance")
     public void abortProcessInstance(
-        @RequestBody @Validated String processInstanceId,
-        @RequestBody @Validated String reason
+        @RequestParam(value = "processInstanceId") String processInstanceId,
+        @RequestParam(value = "reason") String reason
     ){ 
         applicantService.abortProcessInstance(processInstanceId, reason);
     }

@@ -41,6 +41,14 @@ extends IService<ApplicantEntity> {
     ApplicantVo selectByApplicantId(Long applicantId);
 
     /**
+     * 查询指定申请人的所有流程实例
+     * 
+     * @param applicantId 申请人ID，用于筛选流程实例的发起人
+     * @return 返回一个包含所有符合条件的流程实例的列表
+     */
+    List<ProcessInstanceVo> listProcessInstances(Long applicantId);
+
+    /**
      * 获取流程定义列表
      * 
      * @return List<ProcessDefinitionVo> 返回流程定义的列表，列表中每个元素都代表一个流程的定义信息

@@ -1,7 +1,10 @@
 package com.whaler.oasys.controller.api;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.flowable.engine.HistoryService;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.whaler.oasys.model.exception.ApiException;
 import com.whaler.oasys.model.param.FormParam;
 import com.whaler.oasys.model.vo.FormVo;
 import com.whaler.oasys.model.vo.OperatorVo;
 import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
+import com.whaler.oasys.service.ApplicantService;
 import com.whaler.oasys.service.OperatorService;
 
 import io.swagger.annotations.Api;
@@ -27,10 +32,14 @@ import io.swagger.annotations.ApiOperation;
 public class OperatorController {
     @Autowired
     private OperatorService operatorService;
+    @Autowired
+    private ApplicantService applicantService;
+    @Autowired
+    private HistoryService historyService;
     
-    @ApiOperation("操作人查询所有操作任务")
-    @GetMapping("/listOperatorTasks")
-    public List<TaskVo> listOperatorTasks() {
+    @ApiOperation("操作人查询未完成的审批任务")
+    @GetMapping("/listOperatorTasksNotCompleted")
+    public List<TaskVo> listOperatorTasksNotCompleted() {
         return operatorService.listOperatorTasks();
     }
 
@@ -55,21 +64,50 @@ public class OperatorController {
     public void completeOperatorTask(
         @RequestBody @Validated FormParam form
     ) { 
-        operatorService.finishOperatorTask(form.getTaskId(), form.getForm());
+        operatorService.completeOperatorTask(form.getTaskId(), form.getForm());
     }
 
-    @ApiOperation("操作人查询历史审批任务")
-    @GetMapping("/listHistoricalTasks")
-    public OperatorVo listHistoricalTasks() {
+    @ApiOperation("操作人查询已完成的审批任务")
+    @GetMapping("/listOperatorTasksCompleted")
+    public List<TaskVo> listOperatorTasksCompleted() {
         Long operatorId = UserContext.getCurrentUserId();
-        return operatorService.selectByOperatorId(operatorId);
+        OperatorVo operatorVo = operatorService.selectByOperatorId(operatorId);
+        List<TaskVo>taskVos= operatorVo.getTaskIds().stream().map(taskId -> {
+            return operatorService.getHistoricalDetails(taskId);
+        }).collect(Collectors.toList());
+        return taskVos;
     }
 
-    @ApiOperation("操作人查询历史审批工单详情")
-    @GetMapping("/getHistoricalDetails/{taskId}")
-    public TaskVo getHistoricalDetails(
+    @ApiOperation("操作人查询已完成的单个任务")
+    @GetMapping("/getTaskCompleted/{taskId}")
+    public TaskVo getTaskCompleted(
         @PathVariable(value = "taskId") String taskId
     ) { 
         return operatorService.getHistoricalDetails(taskId);
+    }
+
+    @ApiOperation("操作人查询已提交的任务表单")
+    @GetMapping("/getHistoricalForm/{taskId}")
+    public FormVo getHistoricalForm(
+        @PathVariable(value = "taskId") String taskId
+    ){ 
+        FormVo formVo = applicantService.getHistoricalForm(taskId);
+        return formVo;
+    }
+
+    @ApiOperation("操作人查询任务的流程进度")
+    @GetMapping("/getProcessProgress/{taskId}")
+    public List<TaskVo> getProcessInstance(
+        @PathVariable(value = "taskId") String taskId
+    ){ 
+        HistoricTaskInstance task= historyService.createHistoricTaskInstanceQuery()
+                .taskId(taskId)
+                .singleResult();
+        if (task == null) {
+            throw new ApiException("任务不存在");
+        }
+        String processInstanceId = task.getProcessInstanceId();
+        List<TaskVo>taskVos=applicantService.getProcessInstanceProgress(processInstanceId);
+        return taskVos;
     }
 }

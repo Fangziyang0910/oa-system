@@ -19,5 +19,6 @@ public class ProcessInstanceVo {
     private String startTime; // 流程实例的开始时间
     private String endTime; // 流程实例的结束时间
     private Boolean isCompeleted; // 流程实例是否已经完成
+    private String abortReason; // 流程实例终止的原因
     private List<TaskVo> progress;
 }

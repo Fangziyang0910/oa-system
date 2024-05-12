@@ -112,7 +112,7 @@ public class ApproverServiceTest {
 
         Map<String, String> form = new HashMap<>();
         form.put("isLeaderApproval","true");
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
     }
 
     @Test
@@ -120,16 +120,18 @@ public class ApproverServiceTest {
     public void testGetHistoricalDetails(){
         predo();
         UserContext.setCurrentUserId(5L);
-        List<String>taskIds=approverService.selectByApproverId(5L).getProcessinstanceIds();
+        List<String>taskIds=approverService.selectByApproverId(5L).getTaskIds();
         log.info("taskIds:{}",taskIds);
         // 测试leader审批任务查询
         TaskVo taskVo = approverService.listApprovalTasks().get(0);
         Map<String, String> form = new HashMap<>();
         form.put("isLeaderApproval","true");
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
 
-        taskIds=approverService.selectByApproverId(5L).getProcessinstanceIds();
+        taskIds=approverService.selectByApproverId(5L).getTaskIds();
         log.info("taskIds:{}",taskIds);
+        taskVo=approverService.getHistoricalDetails(taskIds.get(0));
+        log.info("taskVo:{}",taskVo);
     }
 
     private void predo(){

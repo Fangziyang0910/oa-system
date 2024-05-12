@@ -54,7 +54,7 @@ public class LeaveProcess2Test {
 
         Map<String, String> form = new HashMap<>();
         form.put("isLeaderApproval","true");
-        approverService.finishApprovalTask(taskVo.getTaskId(), form);
+        approverService.completeApprovalTask(taskVo.getTaskId(), form);
     }
 
     private void predo(){
