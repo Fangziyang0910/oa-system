@@ -24,5 +24,9 @@ class ApiUrls {
   static const String getProcessInstance = '$baseUrl/applicant/getProcessInstance';
   //get processInstanceDiagram
   static const String getProcessInstanceDiagram = '$baseUrl/applicant/getProcessInstanceDiagram';
+  //abort processInstance
+  static const String abortProcessInstance = '$baseUrl/applicant/abortProcessInstance';
+  //get HistoricalForm
+  static const String getHistoricalForm = '$baseUrl/applicant/getHistoricalForm';
 
 }

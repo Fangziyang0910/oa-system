@@ -83,3 +83,26 @@ class Progress {
     );
   }
 }
+
+class FormField {
+  final String id;
+  final String name;
+  final String type;
+  final dynamic value;
+
+  FormField({
+    required this.id,
+    required this.name,
+    required this.type,
+    this.value,
+  });
+
+  factory FormField.fromJson(Map<String, dynamic> json) {
+    return FormField(
+      id: json['id'],
+      name: json['name'],
+      type: json['type'],
+      value: json['value'].toString(),
+    );
+  }
+}
