@@ -31,15 +31,37 @@ class ApiUrls {
   //list ProcessInstancesCompleted
   static const String listProcessInstancesCompleted = '$baseUrl/applicant/listProcessInstancesCompleted';
 
-  /* --------------approval-------------- api */
+  /* --------------approval api--------------  */
   //list ApprovalTasksNotCompleted
   static const String listApprovalTasksNotCompleted = '$baseUrl/approver/listApprovalTasksNotCompleted';
+  //list ApprovalTasksCompleted
+  static const String listApprovalTasksCompleted = '$baseUrl/approver/listApprovalTasksCompleted';
   //get TaskStartForm
   static const String getTaskStartForm = '$baseUrl/approver/getStartForm';
   //get TaskForm
   static const String getTaskForm = '$baseUrl/approver/getTaskForm';
   //get ProcessProgress
   static const String getProcessProgress = '$baseUrl/approver/getProcessProgress';
-
+  //submit taskForm
   static const String completeApprovalTask = '$baseUrl/approver/completeApprovalTask';
+  //get Histotical Form
+  static const String getHistoricalTaskForm = '$baseUrl/approver/getHistoricalForm';
+
+  /* -------------operator api ----------------*/
+  //list OperatorTasksCompleted
+  static const String listOperatorTasksCompleted = '$baseUrl/operator/listOperatorTasksCompleted';
+  //list OperatorTasksNotCompleted
+  static const String listOperatorTasksNotCompleted = '$baseUrl/operator/listOperatorTasksNotCompleted';
+  //get OperationForm
+  static const String getOperationForm = '$baseUrl/operator/getTaskForm';
+  //get OperationStartForm
+  static const String getOperationStartForm = '$baseUrl/operator/getStartForm';
+  //get OperationProcessProgress
+  static const String getOperationProcessProgress = '$baseUrl/operator/getProcessProgress';
+  //submit OperationForm
+  static const String completeOperatorTask = '$baseUrl/operator/completeOperatorTask';
+  //get HistoricalOperationForm
+  static const String getHistoricalOperationForm = '$baseUrl/operator/getHistoricalForm';
+
+
 }
