@@ -19,5 +19,6 @@ implements EngineConfigurationConfigurer<SpringProcessEngineConfiguration> {
         engineConfiguration.setAnnotationFontName("宋体");
         engineConfiguration.addConfigurator(datasourceConfigurator);
         engineConfiguration.setDeploymentMode("single-resource");
+        engineConfiguration.setAsyncExecutorActivate(true);
     }
 }

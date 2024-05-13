@@ -205,7 +205,7 @@ public class ApplicantServiceTest {
 
     private void doStarterTask() {
         UserContext.setCurrentUserId(1L);
-        ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess");
+        ProcessInstanceVo processInstanceVo= applicantService.createProcessInstance("leaveProcess2");
         Map<String,String> startForm=new HashMap<>();
         startForm.put("applicantDepartment","研发部");
         // startForm.put("leader","5");

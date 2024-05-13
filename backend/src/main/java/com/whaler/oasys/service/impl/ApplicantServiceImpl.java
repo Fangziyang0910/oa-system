@@ -217,6 +217,12 @@ implements ApplicantService {
         }
         List<TaskVo>taskVos=formList.stream().map(
             taskId->{
+                if(taskId.equals("endEvent")){
+                    return new TaskVo().setTaskId("null")
+                        .setTaskName("endEvent")
+                        .setDescription(pi.getDeleteReason())
+                        .setEndTime(pi.getEndTime().toString());
+                }
                 HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
                 String userName=(String)historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(task.getProcessInstanceId()).variableName(taskId)
