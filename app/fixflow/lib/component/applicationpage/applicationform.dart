@@ -20,7 +20,7 @@ class ApplicationForm extends StatefulWidget {
 }
 
 class _ApplicationFormState extends State<ApplicationForm>
-    with AutomaticKeepAliveClientMixin {
+     {
   late Future<List<Map<String, dynamic>>> _dataForm;
   final Map<String, dynamic> _formState = {};
   final Map<String, TextEditingController> _controllers = {};
@@ -159,7 +159,6 @@ class _ApplicationFormState extends State<ApplicationForm>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(_formName),
@@ -351,7 +350,9 @@ class _ApplicationFormState extends State<ApplicationForm>
         );
       }
     } else {
-      if (fieldType == 'integer') {
+      // Other input types based on fieldType
+    switch (fieldType) {
+      case 'integer':
         inputWidget = TextFormField(
           controller: _controllers[fieldid],
           decoration: InputDecoration(
@@ -363,7 +364,7 @@ class _ApplicationFormState extends State<ApplicationForm>
           keyboardType: TextInputType.number,
           onChanged: (value) {
             setState(() {
-              _formState[fieldid] = value;
+              _formState[fieldid] = int.tryParse(value);
             });
           },
           validator: (value) {
@@ -371,8 +372,7 @@ class _ApplicationFormState extends State<ApplicationForm>
               return '请输入' + fieldName!;
             }
             if (value != null && value.isNotEmpty) {
-              final isValid =
-                  int.tryParse(value) != null && int.parse(value) > 0;
+              final isValid = int.tryParse(value) != null && int.parse(value) > 0;
               if (!isValid) {
                 return '请输入正整数';
               }
@@ -380,7 +380,8 @@ class _ApplicationFormState extends State<ApplicationForm>
             return null;
           },
         );
-      } else if (fieldType == 'date') {
+        break;
+      case 'date':
         inputWidget = TextFormField(
           controller: _controllers[fieldid],
           decoration: InputDecoration(
@@ -417,7 +418,24 @@ class _ApplicationFormState extends State<ApplicationForm>
             return null;
           },
         );
-      } else {
+        break;
+      case 'boolean':
+        inputWidget = Row(
+          children: [
+            Expanded(child: Text('否', textAlign: TextAlign.end)),
+            Switch(
+              value: _formState[fieldid] ?? false,
+              onChanged: (bool value) {
+                setState(() {
+                  _formState[fieldid] = value;
+                });
+              },
+            ),
+            Expanded(child: Text('是', textAlign: TextAlign.start)),
+          ],
+        );
+        break;
+      default:
         inputWidget = TextFormField(
           controller: _controllers[fieldid],
           decoration: InputDecoration(
@@ -426,7 +444,6 @@ class _ApplicationFormState extends State<ApplicationForm>
             ),
             labelText: '',
           ),
-          keyboardType: TextInputType.text,
           onChanged: (value) {
             setState(() {
               _formState[fieldid] = value;
@@ -532,17 +549,7 @@ class _ApplicationFormState extends State<ApplicationForm>
     }
 
     final Map<String, dynamic> formData = {
-      "form": {
-        "applicantName": _formState['applicantName'],
-        "applicantDepartment": _formState['applicantDepartment'],
-        "applicantRole": _formState['applicantRole'],
-        "applicantEmail": _formState['applicantEmail'],
-        "applicantPhone": _formState['applicantPhone'],
-        "leaveDays": _formState['leaveDays'],
-        "leaveReason": _formState['leaveReason'],
-        "startTime": _formState['startTime'],
-        "endTime": _formState['endTime']
-      },
+      "form": _formState,  // Directly using the _formState map.
       "processInstanceId": processInstanceId
     };
 
@@ -603,6 +610,4 @@ class _ApplicationFormState extends State<ApplicationForm>
     return;
   }
 
-  @override
-  bool get wantKeepAlive => true;
 }
