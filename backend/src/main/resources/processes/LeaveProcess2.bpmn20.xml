@@ -3,8 +3,12 @@
   <process id="leaveProcess2" name="员工请假流程" isExecutable="true">
     <documentation>员工填写请假申请表单，由部门组长、主管审批后，行政部HR专员完成请假手续，开具请假证明。</documentation>
     <startEvent id="startEvent" name="流程开始" flowable:formFieldValidation="true"></startEvent>
-    <userTask id="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" name="组长审批" flowable:candidateUsers="${leader}" flowable:dueDate="PT5M" flowable:formKey="leaderApproval.form" flowable:formFieldValidation="true"></userTask>
-    <userTask id="sid-42317BF2-5C17-4873-B268-546EA39B4A94" name="主管审批" flowable:candidateUsers="${manager}" flowable:formKey="managerApproval.form" flowable:formFieldValidation="true"></userTask>
+    <userTask id="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" name="组长审批" flowable:candidateUsers="${leader}" flowable:dueDate="PT5M" flowable:formKey="leaderApproval.form" flowable:formFieldValidation="true">
+      <documentation>审批</documentation>
+    </userTask>
+    <userTask id="sid-42317BF2-5C17-4873-B268-546EA39B4A94" name="主管审批" flowable:candidateUsers="${manager}" flowable:formKey="managerApproval.form" flowable:formFieldValidation="true">
+      <documentation>审批</documentation>
+    </userTask>
     <endEvent id="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3" name="流程结束">
       <extensionElements>
         <flowable:executionListener event="end" delegateExpression="${EndExecutionListener}"></flowable:executionListener>
@@ -12,7 +16,9 @@
     </endEvent>
     <exclusiveGateway id="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009" name="组长决策"></exclusiveGateway>
     <exclusiveGateway id="sid-8A9C0A99-212E-483F-A1F2-0CDBB32A9F57" name="主管决策"></exclusiveGateway>
-    <userTask id="sid-7F8CAC39-66A1-4633-A166-C21599D7E1A0" name="请假登记" flowable:candidateUsers="20" flowable:formKey="leaveRegistration.form" flowable:formFieldValidation="true"></userTask>
+    <userTask id="sid-7F8CAC39-66A1-4633-A166-C21599D7E1A0" name="请假登记" flowable:candidateUsers="20" flowable:formKey="leaveRegistration.form" flowable:formFieldValidation="true">
+      <documentation>操作</documentation>
+    </userTask>
     <serviceTask id="sid-535C451C-74A6-4DB8-AD48-8FEA6345595A" name="向组长申请" flowable:delegateExpression="${SetLeaderDelegate}"></serviceTask>
     <serviceTask id="sid-FD3A944F-B206-4A1C-A2D1-006082E9C792" name="向主管申请" flowable:delegateExpression="${SetManagerDelegate}"></serviceTask>
     <sequenceFlow id="sid-5BC40896-C49E-48BA-91D5-DDA7C7EEEC18" sourceRef="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" targetRef="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009"></sequenceFlow>
@@ -51,7 +57,6 @@
         <timeDuration>PT30S</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
-    <sequenceFlow id="sid-35990C7F-F130-4DD8-91A6-22A426C33352" sourceRef="sid-E4A8B17A-0AB8-4E1F-A4C1-5923019CF759" targetRef="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC"></sequenceFlow>
     <boundaryEvent id="sid-99A7D5B2-2A86-4926-AD3B-45ECD283709A" name="自动审批" attachedToRef="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" cancelActivity="true">
       <timerEventDefinition>
         <timeDuration>PT3M</timeDuration>
@@ -66,7 +71,6 @@
     <sequenceFlow id="sid-C7DB66BB-F09D-443C-B1B2-8AE263E3CA4C" sourceRef="sid-65FCBA54-A388-4973-B1CB-0B0F7E028829" targetRef="sid-E4A8B17A-0AB8-4E1F-A4C1-5923019CF759"></sequenceFlow>
     <serviceTask id="sid-F78F3257-532E-4769-9B4B-38D066E94D86" name="超时提醒" flowable:delegateExpression="${TimeoutWarningDelegate}"></serviceTask>
     <sequenceFlow id="sid-8BA71E30-80DF-4F23-AE79-D0D7C87F6B52" sourceRef="sid-2DB00D46-E40C-411C-A541-CCABA32D0F36" targetRef="sid-F78F3257-532E-4769-9B4B-38D066E94D86"></sequenceFlow>
-    <sequenceFlow id="sid-613786A2-4AD1-4D22-83B4-4B6470D7A6FF" sourceRef="sid-F78F3257-532E-4769-9B4B-38D066E94D86" targetRef="sid-42317BF2-5C17-4873-B268-546EA39B4A94"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_leaveProcess">
     <bpmndi:BPMNPlane bpmnElement="leaveProcess" id="BPMNPlane_leaveProcess">
@@ -104,7 +108,7 @@
         <omgdc:Bounds height="31.0" width="31.0" x="578.732758752813" y="215.3007923902596"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-E4A8B17A-0AB8-4E1F-A4C1-5923019CF759" id="BPMNShape_sid-E4A8B17A-0AB8-4E1F-A4C1-5923019CF759">
-        <omgdc:Bounds height="66.00000020861626" width="88.00000017881393" x="206.9999969154597" y="36.999998509883916"></omgdc:Bounds>
+        <omgdc:Bounds height="66.00000020861626" width="88.00000017881393" x="239.99999642372137" y="36.99999795854097"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-65FCBA54-A388-4973-B1CB-0B0F7E028829" id="BPMNShape_sid-65FCBA54-A388-4973-B1CB-0B0F7E028829">
         <omgdc:Bounds height="31.0" width="31.0" x="341.1662262281673" y="135.76237930153036"></omgdc:Bounds>
@@ -142,8 +146,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-C7DB66BB-F09D-443C-B1B2-8AE263E3CA4C" id="BPMNEdge_sid-C7DB66BB-F09D-443C-B1B2-8AE263E3CA4C" flowable:sourceDockerX="16.0" flowable:sourceDockerY="16.0" flowable:targetDockerX="44.00000008940696" flowable:targetDockerY="33.00000010430813">
         <omgdi:waypoint x="357.1662262281673" y="135.76237930153036"></omgdi:waypoint>
-        <omgdi:waypoint x="357.1662262281673" y="69.99999861419204"></omgdi:waypoint>
-        <omgdi:waypoint x="294.94999709427094" y="69.99999861419204"></omgdi:waypoint>
+        <omgdi:waypoint x="357.1662262281673" y="69.9999980628491"></omgdi:waypoint>
+        <omgdi:waypoint x="327.9499966025209" y="69.9999980628491"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-5DC0F175-27F1-4A20-A595-113E50A5B6C3" id="BPMNEdge_sid-5DC0F175-27F1-4A20-A595-113E50A5B6C3" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="14.0" flowable:targetDockerY="14.000000000000002">
         <omgdi:waypoint x="726.6440085227772" y="170.49999797129607"></omgdi:waypoint>
@@ -161,20 +165,10 @@
         <omgdi:waypoint x="302.3359911070114" y="326.1440137039682"></omgdi:waypoint>
         <omgdi:waypoint x="376.1440013702203" y="326.1440137039682"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-35990C7F-F130-4DD8-91A6-22A426C33352" id="BPMNEdge_sid-35990C7F-F130-4DD8-91A6-22A426C33352" flowable:sourceDockerX="44.00000008940696" flowable:sourceDockerY="33.00000010430813" flowable:targetDockerX="50.0" flowable:targetDockerY="40.00000000000003">
-        <omgdi:waypoint x="250.99999700486666" y="102.94999871850018"></omgdi:waypoint>
-        <omgdi:waypoint x="250.99999700486666" y="121.0"></omgdi:waypoint>
-        <omgdi:waypoint x="306.1440114285037" y="121.0"></omgdi:waypoint>
-        <omgdi:waypoint x="306.1440114285037" y="149.9999989802829"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-8BA71E30-80DF-4F23-AE79-D0D7C87F6B52" id="BPMNEdge_sid-8BA71E30-80DF-4F23-AE79-D0D7C87F6B52" flowable:sourceDockerX="16.0" flowable:sourceDockerY="16.0" flowable:targetDockerX="43.50000009685755" flowable:targetDockerY="35.500000067055225">
         <omgdi:waypoint x="640.4730650188988" y="134.05559399165563"></omgdi:waypoint>
         <omgdi:waypoint x="640.4730650188988" y="80.49999939650297"></omgdi:waypoint>
         <omgdi:waypoint x="609.9499846070906" y="80.49999939650297"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-613786A2-4AD1-4D22-83B4-4B6470D7A6FF" id="BPMNEdge_sid-613786A2-4AD1-4D22-83B4-4B6470D7A6FF" flowable:sourceDockerX="43.50000009685755" flowable:sourceDockerY="35.500000067055225" flowable:targetDockerX="25.355973528774484" flowable:targetDockerY="40.99999880802824">
-        <omgdi:waypoint x="566.4999845102433" y="115.94999946355821"></omgdi:waypoint>
-        <omgdi:waypoint x="566.4999845102433" y="150.000000566123"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-80671A54-F9CD-4562-89B3-4CB458A2A78D" id="BPMNEdge_sid-80671A54-F9CD-4562-89B3-4CB458A2A78D" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.000000000000036" flowable:targetDockerX="14.0" flowable:targetDockerY="14.000000000000002">
         <omgdi:waypoint x="861.1440031036732" y="149.99999776482582"></omgdi:waypoint>

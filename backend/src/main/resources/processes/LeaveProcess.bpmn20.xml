@@ -3,12 +3,18 @@
   <process id="leaveProcess" name="员工请假流程" isExecutable="true">
     <documentation>员工填写请假申请表单，由部门组长、主管审批后，行政部HR专员完成请假手续，开具请假证明。</documentation>
     <startEvent id="startEvent" name="流程开始" flowable:formKey="leaveAsk.form" flowable:formFieldValidation="true"></startEvent>
-    <userTask id="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" name="组长审批" flowable:candidateUsers="${leader}" flowable:formKey="leaderApproval.form" flowable:formFieldValidation="true"></userTask>
-    <userTask id="sid-42317BF2-5C17-4873-B268-546EA39B4A94" name="主管审批" flowable:candidateUsers="${manager}" flowable:formKey="managerApproval.form" flowable:formFieldValidation="true"></userTask>
+    <userTask id="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" name="组长审批" flowable:candidateUsers="${leader}" flowable:formKey="leaderApproval.form" flowable:formFieldValidation="true">
+      <documentation>审批</documentation>
+    </userTask>
+    <userTask id="sid-42317BF2-5C17-4873-B268-546EA39B4A94" name="主管审批" flowable:candidateUsers="${manager}" flowable:formKey="managerApproval.form" flowable:formFieldValidation="true">
+      <documentation>审批</documentation>
+    </userTask>
     <endEvent id="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3" name="流程结束"></endEvent>
     <exclusiveGateway id="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009" name="组长决策"></exclusiveGateway>
     <exclusiveGateway id="sid-8A9C0A99-212E-483F-A1F2-0CDBB32A9F57" name="主管决策"></exclusiveGateway>
-    <userTask id="sid-7F8CAC39-66A1-4633-A166-C21599D7E1A0" name="请假登记" flowable:candidateUsers="20" flowable:formKey="leaveRegistration.form" flowable:formFieldValidation="true"></userTask>
+    <userTask id="sid-7F8CAC39-66A1-4633-A166-C21599D7E1A0" name="请假登记" flowable:candidateUsers="20" flowable:formKey="leaveRegistration.form" flowable:formFieldValidation="true">
+      <documentation>操作</documentation>
+    </userTask>
     <serviceTask id="sid-535C451C-74A6-4DB8-AD48-8FEA6345595A" name="向组长申请" flowable:delegateExpression="${SetLeaderDelegate}"></serviceTask>
     <serviceTask id="sid-FD3A944F-B206-4A1C-A2D1-006082E9C792" name="向主管申请" flowable:delegateExpression="${SetManagerDelegate}"></serviceTask>
     <sequenceFlow id="sid-5BC40896-C49E-48BA-91D5-DDA7C7EEEC18" sourceRef="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" targetRef="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009"></sequenceFlow>

@@ -88,6 +88,7 @@ implements OperatorService {
             .taskAssignee(Long.toString(userId))
             .taskCandidateUser(Long.toString(permissionId))
             .taskCandidateGroupIn(categoryIds).endOr()
+            .taskDescription("操作")
             .list();
 
         List<TaskVo>taskVos=operateTasks.stream()

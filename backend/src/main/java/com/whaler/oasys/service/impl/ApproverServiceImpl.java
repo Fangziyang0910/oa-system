@@ -88,6 +88,7 @@ implements ApproverService {
             .taskAssignee(Long.toString(userId))
             .taskCandidateUser(Long.toString(permissionId))
             .taskCandidateGroupIn(categoryIds).endOr()
+            .taskDescription("审批")
             .list();
 
         List<TaskVo>taskVos=approvalTasks.stream()
