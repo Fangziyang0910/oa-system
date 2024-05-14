@@ -360,6 +360,9 @@ implements ApplicantService {
         List<String>highLightedActivities=new ArrayList<>();
         Set<String>activitySet=new HashSet<>();
         for (TaskVo task : tasks) {
+            if (task.getTaskId().equals("null")) {
+                continue;
+            }
             HistoricTaskInstance taskInstance=historyService.createHistoricTaskInstanceQuery()
                 .taskId(task.getTaskId()).singleResult();
             highLightedActivities.add(taskInstance.getTaskDefinitionKey());

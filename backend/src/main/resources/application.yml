@@ -12,6 +12,11 @@ spring:
     password: rekqedyzwbjxdgfi
     port: 25
     default-encoding: UTF-8
+  rabbitmq:
+      host: 127.0.0.1
+      port: 5672
+      username: guest
+      password: guest
 
 mail:
   fromMail:
