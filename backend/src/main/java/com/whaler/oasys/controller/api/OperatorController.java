@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.whaler.oasys.model.exception.ApiException;
@@ -41,6 +42,35 @@ public class OperatorController {
     @GetMapping("/listOperatorTasksNotCompleted")
     public List<TaskVo> listOperatorTasksNotCompleted() {
         return operatorService.listOperatorTasks();
+    }
+
+    @ApiOperation("操作人查询任务池中的任务")
+    @GetMapping("/listOperatorCandidateTasks")
+    public List<TaskVo> listOperatorCandidateTasks() {
+        return operatorService.listOperatorCandidateTasks();
+    }
+
+    @ApiOperation("操作人申领任务")
+    @GetMapping("/claimCandidateTask/{taskId}")
+    public void claimCandidateTask(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        operatorService.claimCandidateTask(taskId);
+    }
+
+    @ApiOperation("操作人放弃申领任务")
+    @PostMapping("/unclaimCandidateTask")
+    public void unclaimCandidateTask(
+        @RequestParam(value = "taskId") String taskId,
+        @RequestParam(value = "userName") String userName
+    ) {
+        operatorService.unclaimCandidateTask(taskId, userName);
+    }
+
+    @ApiOperation("操作人查询申领的任务")
+    @GetMapping("/listOperatorAssignTasks")
+    public List<TaskVo> listOperatorAssignTasks() {
+        return operatorService.listOperatorAssignTasks();
     }
 
     @ApiOperation("操作人查询选中任务的申请工单")

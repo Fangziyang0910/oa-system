@@ -80,12 +80,13 @@ implements OperatorService {
     @Override
     public List<TaskVo> listOperatorTasks() {
         Long userId=UserContext.getCurrentUserId();
+        String userName=userService.selectByUserId(userId).getName();
         Long permissionId=userService.getById(UserContext.getCurrentUserId()).getPermissionId();
         List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
             .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
 
         List<Task>operateTasks=taskService.createTaskQuery().or()
-            .taskAssignee(Long.toString(userId))
+            .taskAssignee(userName)
             .taskCandidateUser(Long.toString(permissionId))
             .taskCandidateGroupIn(categoryIds).endOr()
             .taskDescription("操作")
@@ -110,6 +111,90 @@ implements OperatorService {
                 return taskVo;
             }).collect(Collectors.toList());
         return taskVos;
+    }
+
+    @Override
+    public List<TaskVo> listOperatorCandidateTasks() {
+        Long permissionId=userService.getById(UserContext.getCurrentUserId()).getPermissionId();
+        List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
+            .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
+
+        List<Task>operateTasks=taskService.createTaskQuery().or()
+            .taskCandidateUser(Long.toString(permissionId))
+            .taskCandidateGroupIn(categoryIds).endOr()
+            .taskDescription("操作")
+            .list();
+
+        List<TaskVo>taskVos=operateTasks.stream()
+            .map(task->{
+                TaskVo taskVo=new TaskVo();
+                taskVo.setTaskId(task.getId());
+                taskVo.setTaskName(task.getName());
+                taskVo.setExecutionId(task.getExecutionId());
+                String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+                String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+                taskVo.setStarterName(starter);
+                String processDefinitionName=repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
+                taskVo.setProcessDefinitionName(processDefinitionName);
+                taskVo.setDescription(task.getDescription());
+                if (task.getDueDate() != null) {
+                    taskVo.setDueTime(task.getDueDate().toString());   
+                }
+                return taskVo;
+            }).collect(Collectors.toList());
+        return taskVos;
+
+    }
+
+    @Override
+    public void claimCandidateTask(String taskId) {
+        String userName=userService.getById(UserContext.getCurrentUserId()).getName();
+        try{
+            taskService.claim(taskId, userName);
+        }catch(Exception e){
+            throw new ApiException("任务已被签收");
+        }
+    }
+
+    @Override
+    public void unclaimCandidateTask(String taskId, String userName) {
+        try{
+            taskService.setAssignee(taskId, userName);
+        }catch(Exception e){
+            throw new ApiException("任务不存在");
+        }
+    }
+    
+    @Override
+    public List<TaskVo> listOperatorAssignTasks() {
+        String userName=userService.selectByUserId(UserContext.getCurrentUserId()).getName();
+
+        List<Task>operateTasks=taskService.createTaskQuery()
+            .taskAssignee(userName)
+            .taskDescription("操作")
+            .list();
+
+        List<TaskVo>taskVos=operateTasks.stream()
+            .map(task->{
+                TaskVo taskVo=new TaskVo();
+                taskVo.setTaskId(task.getId());
+                taskVo.setTaskName(task.getName());
+                taskVo.setExecutionId(task.getExecutionId());
+                String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+                String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+                taskVo.setStarterName(starter);
+                String processDefinitionName=repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
+                taskVo.setProcessDefinitionName(processDefinitionName);
+                taskVo.setDescription(task.getDescription());
+                if (task.getDueDate() != null) {
+                    taskVo.setDueTime(task.getDueDate().toString());   
+                }
+                return taskVo;
+            }).collect(Collectors.toList());
+        return taskVos;
+
     }
 
     @Override

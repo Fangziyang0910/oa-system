@@ -11,6 +11,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
@@ -80,14 +81,99 @@ implements ApproverService {
     @Override
     public List<TaskVo> listApprovalTasks() {
         Long userId=UserContext.getCurrentUserId();
+        String userName=userService.selectByUserId(userId).getName();
         Long permissionId=userService.getById(UserContext.getCurrentUserId()).getPermissionId();
         List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
             .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
 
         List<Task>approvalTasks=taskService.createTaskQuery().or()
-            .taskAssignee(Long.toString(userId))
+            .taskAssignee(userName)
             .taskCandidateUser(Long.toString(permissionId))
             .taskCandidateGroupIn(categoryIds).endOr()
+            .taskDescription("审批")
+            .list();
+
+        List<TaskVo>taskVos=approvalTasks.stream()
+            .map(task->{
+                TaskVo taskVo=new TaskVo();
+                taskVo.setTaskId(task.getId());
+                taskVo.setTaskName(task.getName());
+                taskVo.setExecutionId(task.getExecutionId());
+                String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+                String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+                taskVo.setStarterName(starter);
+                String processDefinitionName=repositoryService.createProcessDefinitionQuery().processDefinitionId(
+                    task.getProcessDefinitionId()
+                ).singleResult().getName();
+                taskVo.setProcessDefinitionName(processDefinitionName);
+                taskVo.setDescription(task.getDescription());
+                if (task.getDueDate() != null) {
+                    taskVo.setDueTime(task.getDueDate().toString());   
+                }
+                return taskVo;
+            }).collect(Collectors.toList());
+        return taskVos;
+    }
+
+    @Override
+    public List<TaskVo> listApprovalCandidateTasks() {
+        Long permissionId=userService.getById(UserContext.getCurrentUserId()).getPermissionId();
+        List<String> categoryIds=categoryService.selectCategoryIdsByPermissionId(permissionId)
+            .stream().map(categoryId->Long.toString(categoryId)).collect(Collectors.toList());
+
+        List<Task>approvalTasks=taskService.createTaskQuery().or()
+            .taskCandidateUser(Long.toString(permissionId))
+            .taskCandidateGroupIn(categoryIds).endOr()
+            .taskDescription("审批")
+            .list();
+
+        List<TaskVo>taskVos=approvalTasks.stream()
+            .map(task->{
+                TaskVo taskVo=new TaskVo();
+                taskVo.setTaskId(task.getId());
+                taskVo.setTaskName(task.getName());
+                taskVo.setExecutionId(task.getExecutionId());
+                String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+                String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+                taskVo.setStarterName(starter);
+                String processDefinitionName=repositoryService.createProcessDefinitionQuery().processDefinitionId(
+                    task.getProcessDefinitionId()
+                ).singleResult().getName();
+                taskVo.setProcessDefinitionName(processDefinitionName);
+                taskVo.setDescription(task.getDescription());
+                if (task.getDueDate() != null) {
+                    taskVo.setDueTime(task.getDueDate().toString());   
+                }
+                return taskVo;
+            }).collect(Collectors.toList());
+        return taskVos;
+    }
+
+    @Override
+    public void claimCandidateTask(String taskId) {
+        String userName=userService.getById(UserContext.getCurrentUserId()).getName();
+        try{
+            taskService.claim(taskId, userName);
+        }catch(Exception e){
+            throw new ApiException("任务已经被申领");
+        }
+    }
+
+    @Override
+    public void unclaimCandidateTask(String taskId, String userName){
+        try{
+            taskService.setAssignee(taskId, userName);
+        }catch(Exception e){
+            throw new ApiException("任务不存在");
+        }
+    }
+
+    @Override
+    public List<TaskVo> listApprovalAssignTasks() {
+        String userName=userService.getById(UserContext.getCurrentUserId()).getName();
+
+        List<Task>approvalTasks=taskService.createTaskQuery()
+            .taskAssignee(userName)
             .taskDescription("审批")
             .list();
 

@@ -19,6 +19,14 @@ extends IService<ApproverEntity> {
 
     List<TaskVo> listApprovalTasks();
 
+    List<TaskVo> listApprovalCandidateTasks();
+
+    void claimCandidateTask(String taskId);
+
+    void unclaimCandidateTask(String taskId, String userName);
+
+    List<TaskVo> listApprovalAssignTasks();
+
     FormVo getStartForm(String taskId);
 
     String getTaskForm(String taskId);

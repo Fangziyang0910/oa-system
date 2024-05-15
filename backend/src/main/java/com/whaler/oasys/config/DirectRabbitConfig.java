@@ -8,6 +8,8 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +23,28 @@ public class DirectRabbitConfig {
     @Autowired
     private UserService userService;
 
-    public static final String DIRECT_EXCHANGE = "rabbitmq.direct.exchange";
+    public static final String RABBITMQ_DIRECT_EXCHANGE = "rabbitmq.direct.exchange";
+    public static final String RABBITMQ_TOPIC = "rabbitmq.topic.";
+    public static final String RABBITMQ_DIRECT_ROUTING = "rabbitmq.direct.routing.";
+
 
     @Bean
-    public List<Queue> rabbitmqDirectQueue() {
+    public CachingConnectionFactory connectionFactory() {
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
+        connectionFactory.setUsername("guest");
+        connectionFactory.setPassword("guest");
+        connectionFactory.setPort(5672);
+        return connectionFactory;
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin() {
+        return new RabbitAdmin(connectionFactory());
+    }
+
+    @Bean
+    public Queue rabbitmqDirectQueue() {
+        RabbitAdmin rabbitAdmin = rabbitAdmin();
         /**
          * 1、name:    队列名称
          * 2、durable: 是否持久化
@@ -34,30 +54,23 @@ public class DirectRabbitConfig {
         LambdaQueryWrapper<UserEntity>lambdaQueryWrapper=new LambdaQueryWrapper<>();
         List<UserEntity>userEntities= userService.getBaseMapper().selectList(lambdaQueryWrapper);
         List<String>userNames=userEntities.stream().map(UserEntity::getName).collect(Collectors.toList());
-        List<Queue>queues=new ArrayList<>();
         userNames.forEach(userName->{
-            queues.add(new Queue("rabbitmq.topic."+userName, true, false, false));
+            Queue queue=new Queue(DirectRabbitConfig.RABBITMQ_TOPIC+userName, true, false, false);
+            
+            Binding binding = BindingBuilder.bind(queue)
+                .to(rabbitmqDemoDirectExchange())
+                .with(RABBITMQ_DIRECT_ROUTING+userName);
+            rabbitAdmin.declareBinding(binding);
+            rabbitAdmin.declareQueue(queue);
         });
-        return queues;
+        return null;
     }
 
     @Bean
     public DirectExchange rabbitmqDemoDirectExchange() {
         //Direct交换机
-        return new DirectExchange(DirectRabbitConfig.DIRECT_EXCHANGE, true, false);
+        return new DirectExchange(DirectRabbitConfig.RABBITMQ_DIRECT_EXCHANGE, true, false);
     }
 
-    @Bean
-    public List<Binding> bindDirect() {
-        //链式写法，绑定交换机和队列，并设置匹配键
-        List<Binding> bindings=new ArrayList<>();
-        rabbitmqDirectQueue().forEach(queue->{
-            bindings.add(
-                BindingBuilder.bind(queue)
-                .to(rabbitmqDemoDirectExchange())
-                .with(queue.getName())
-            );
-        });
-        return bindings;
-    }
+
 }

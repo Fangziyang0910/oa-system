@@ -19,6 +19,14 @@ extends IService<OperatorEntity> {
 
     List<TaskVo> listOperatorTasks();
 
+    List<TaskVo> listOperatorCandidateTasks();
+
+    List<TaskVo> listOperatorAssignTasks();
+
+    void claimCandidateTask(String taskId);
+
+    void unclaimCandidateTask(String taskId, String userName);
+
     FormVo getStartForm(String taskId);
 
     String getTaskForm(String taskId);

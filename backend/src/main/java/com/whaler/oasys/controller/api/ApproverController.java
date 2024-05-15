@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.whaler.oasys.model.exception.ApiException;
@@ -37,13 +38,43 @@ public class ApproverController {
     @Autowired
     private ApplicantService applicantService;
 
-    @ApiOperation("申请人查询未完成的审批任务")
+    @ApiOperation("审批人查询未完成的审批任务")
     @GetMapping("/listApprovalTasksNotCompleted")
     public List<TaskVo> listApprovalTasksNotCompleted() {
         return approverService.listApprovalTasks();
     }
 
-    @ApiOperation("申请人查询选中任务的申请工单")
+    
+    @ApiOperation("审批人查询任务池中的任务")
+    @GetMapping("/listApprovalCandidateTasks")
+    public List<TaskVo> listApprovalCandidateTasks() {
+        return approverService.listApprovalCandidateTasks();
+    }
+
+    @ApiOperation("审批人申领任务")
+    @GetMapping("/claimCandidateTask/{taskId}")
+    public void claimCandidateTask(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        approverService.claimCandidateTask(taskId);
+    }
+
+    @ApiOperation("审批人放弃申领任务")
+    @PostMapping("/unclaimCandidateTask")
+    public void unclaimCandidateTask(
+        @RequestParam(value = "taskId") String taskId,
+        @RequestParam(value = "userName") String userName
+    ) {
+        approverService.unclaimCandidateTask(taskId, userName);
+    }
+
+    @ApiOperation("审批人查询申领的任务")
+    @GetMapping("/listApprovalAssignTasks")
+    public List<TaskVo> listApprovalAssignTasks() {
+        return approverService.listApprovalAssignTasks();
+    }
+
+    @ApiOperation("审批人查询选中任务的申请工单")
     @GetMapping("/getStartForm/{taskId}")
     public FormVo getStartForm(
         @PathVariable(value = "taskId") String taskId
@@ -51,7 +82,7 @@ public class ApproverController {
         return approverService.getStartForm(taskId);
     }
 
-    @ApiOperation("申请人查询审批工单模板")
+    @ApiOperation("审批人查询审批工单模板")
     @GetMapping("/getTaskForm/{taskId}")
     public String getTaskForm(
         @PathVariable(value = "taskId") String taskId
@@ -59,7 +90,7 @@ public class ApproverController {
         return approverService.getTaskForm(taskId);
     }
 
-    @ApiOperation("申请人提交审批工单")
+    @ApiOperation("审批人提交审批工单")
     @PostMapping("/completeApprovalTask")
     public void completeApprovalTask(
         @RequestBody @Validated FormParam formParam
@@ -67,7 +98,7 @@ public class ApproverController {
         approverService.completeApprovalTask(formParam.getTaskId(), formParam.getForm());
     }
     
-    @ApiOperation("申请人查询已完成的审批任务")
+    @ApiOperation("审批人查询已完成的审批任务")
     @GetMapping("/listApprovalTasksCompleted")
     public List<TaskVo> listApprovalTasksCompleted() {
         Long approverId = UserContext.getCurrentUserId();
@@ -78,7 +109,7 @@ public class ApproverController {
         return taskVos;
     }
 
-    @ApiOperation("申请人查询已完成的单个审批任务")
+    @ApiOperation("审批人查询已完成的单个审批任务")
     @GetMapping("/getTaskCompleted/{taskId}")
     public TaskVo getTaskCompleted(
         @PathVariable(value = "taskId") String taskId
@@ -86,7 +117,7 @@ public class ApproverController {
         return approverService.getHistoricalDetails(taskId);
     }
 
-    @ApiOperation("申请人查询已提交的任务表单")
+    @ApiOperation("审批人查询已提交的任务表单")
     @GetMapping("/getHistoricalForm/{taskId}")
     public FormVo getHistoricalForm(
         @PathVariable(value = "taskId") String taskId
@@ -95,7 +126,7 @@ public class ApproverController {
         return formVo;
     }
 
-    @ApiOperation("申请人查询任务的流程进度")
+    @ApiOperation("审批人查询任务的流程进度")
     @GetMapping("/getProcessProgress/{taskId}")
     public List<TaskVo> getProcessInstance(
         @PathVariable(value = "taskId") String taskId
