@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 
-import 'package:fixflow/component/applicationpage/historyForm.dart';
 import 'package:fixflow/component/error_snackbar.dart';
 import 'package:fixflow/config/api_url.dart';
 import 'package:fixflow/config/classDefinition.dart';
@@ -11,7 +10,6 @@ import 'package:fixflow/config/user_token_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:timeline_tile/timeline_tile.dart';
 
 class OperationDetailWidget extends StatefulWidget {
   final String taskId;
@@ -30,7 +28,6 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
   String _formName = '';
   Map<String, List<String>> _dropdownCache = {};
   late Future<List<Progress>> _progress;
-
 
   Future<List<myFormField>> fetchStartForm(String taskId) async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
@@ -66,7 +63,8 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
 
   Future<List<Progress>> _fetchProcessProgress() async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
-    final String url = ApiUrls.getOperationProcessProgress + '/' + widget.taskId;
+    final String url =
+        ApiUrls.getOperationProcessProgress + '/' + widget.taskId;
 
     try {
       final response = await http.get(
@@ -76,7 +74,6 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
           'Authorization': token ?? '',
         },
       );
-
       if (response.statusCode == 200) {
         final decodedResponse = utf8.decode(response.bodyBytes);
         final responseData = jsonDecode(decodedResponse);
@@ -114,17 +111,18 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
         final responseData = jsonDecode(decodedResponse);
         final int code = responseData['code'];
         if (code == 0) {
-          final dataString = responseData['data'];
-          final dataMap = jsonDecode(dataString);
-          final fieldsList = dataMap['fields'];
+          final data = responseData['data'];
+          final fieldsList = data['formFields'];
           final processForm = List<Map<String, dynamic>>.from(fieldsList);
 
           for (final field in processForm) {
-            _formState[field['id']] = null;
+            _formState[field['id']] = field['value'];
+            _controllers[field['id']] =
+                TextEditingController(text: field['value']);
           }
 
           setState(() {
-            _formName = dataMap['name'] ?? '';
+            _formName = data['formName'] ?? '';
           });
 
           return processForm;
@@ -196,11 +194,113 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
     _dataForm = _fetchDataForm();
   }
 
+  void _handleMenuItemClick(String value) {
+  switch (value) {
+    case 'unclaimTask':
+      // Show confirmation dialog for unclaim task
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('确认'),
+            content: Text('确定要放弃任务吗？'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                },
+                child: Text('取消'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final token = Provider.of<UserTokenProvider>(context, listen: false).token;
+                  final String url = '${ApiUrls.unclaimCandidateTask}/${widget.taskId}';
+                  // Add your unclaim task logic here
+                  print('Unclaim Task');
+                  try {
+                    final response = await http.get(
+                      Uri.parse(url),
+                      headers: {
+                        'Accept': 'application/json',
+                        'Authorization': token ?? '',
+                      },
+                    );
+
+                    if (response.statusCode == 200) {
+                      final decodedResponse = utf8.decode(response.bodyBytes);
+                      final responseData = jsonDecode(decodedResponse);
+                      final int code = responseData['code'];
+                      if (code == 0) {
+                        Navigator.of(context).pop(); // Dismiss the dialog
+                        Navigator.of(context).pop(); // Go back to the previous page
+                      } else {
+                        String message;
+                        switch (code) {
+                          case 1001:
+                            message = "您的登录状态已过期，请重新登陆";
+                            break;
+                          case 1002:
+                            message = "您没有相关权限";
+                            break;
+                          case 1003:
+                            message = "参数校验失败";
+                            break;
+                          case 1004:
+                            message = "接口异常";
+                            break;
+                          case 5000:
+                            message = "未知错误";
+                            break;
+                          default:
+                            message = "未知错误";
+                        }
+                        ErrorSnackbar.showSnackBar(context, message);
+                      }
+                    } else {
+                      ErrorSnackbar.showSnackBar(context, '放弃任务失败');
+                    }
+                  } catch (e) {
+                    ErrorSnackbar.showSnackBar(context, '请检查网络');
+                  }      
+                },
+                child: Text('确定'),
+              ),
+            ],
+          );
+        },
+      );
+      break;
+    case 'assistTask':
+      // Handle assist task action
+      print('Assist Task');
+      // Add your logic here
+      break;
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_formName),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: _handleMenuItemClick,
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'unclaimTask',
+                  child: Text('放弃任务'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'assistTask',
+                  child: Text('任务协助'),
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
@@ -267,10 +367,11 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
                       final progressList = snapshot.data!;
                       return Column(
                         children: progressList
-                            .map((progress) => _buildTimelineTile(
+                            .map((progress) => buildTimelineTile(
                                 progress,
                                 progress == progressList.first,
-                                progress == progressList.last))
+                                progress == progressList.last,
+                                context))
                             .toList(),
                       );
                     } else {
@@ -319,14 +420,29 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
                               .map((field) => _buildField(field))
                               .toList(),
                           SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity, // 让SizedBox占据整个屏幕的宽度
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _submitForm();
-                              },
-                              child: Text('提交表单'),
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.lightGreen,
+                                  ),
+                                  onPressed: () {
+                                    _saveForm();
+                                  },
+                                  child: Text('暂存表单'),
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _submitForm();
+                                  },
+                                  child: Text('提交表单'),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -339,66 +455,6 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
         ],
       ),
     );
-  }
-
-  Widget _buildTimelineTile(
-      Progress progress, bool isFirstItem, bool isLastItem) {
-    return TimelineTile(
-      alignment: TimelineAlign.manual,
-      lineXY: 0.1, // 定义线条和内容的相对位置
-      isFirst: isFirstItem,
-      isLast: isLastItem,
-      indicatorStyle: IndicatorStyle(
-        width: 20,
-        color: Colors.blue,
-        padding: EdgeInsets.all(6),
-      ),
-      endChild: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(progress.taskName,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4),
-                  Text(parseDateFormat(progress.endTime),
-                      style: TextStyle(fontSize: 14, color: Colors.grey)),
-                  SizedBox(height: 4),
-                  Text("执行人：" + (progress.assigneeName ?? '未指定'),
-                      style: TextStyle(fontSize: 14)),
-                ],
-              ),
-            ),
-            PopupMenuButton<String>(
-              onSelected: (String value) {
-                _handleMenuItemClick(value, progress.taskId, context);
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'ViewForm',
-                  child: Text('查看表单'),
-                ),
-              ],
-              icon: Icon(Icons.more_vert),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _handleMenuItemClick(String value, String taskId, BuildContext context) {
-    if (value == 'ViewForm') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => FormPage(taskId: taskId)),
-      );
-    }
   }
 
   Widget _buildField(Map<String, dynamic> field) {
@@ -481,126 +537,127 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
       }
     } else {
       switch (fieldType) {
-      case 'integer':
-        inputWidget = TextFormField(
-          controller: _controllers[fieldid],
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
+        case 'integer':
+          inputWidget = TextFormField(
+            controller: _controllers[fieldid],
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              labelText: '',
             ),
-            labelText: '',
-          ),
-          keyboardType: TextInputType.number,
-          onChanged: (value) {
-            setState(() {
-              _formState[fieldid] = int.tryParse(value);
-            });
-          },
-          validator: (value) {
-            if (required && (value == null || value.isEmpty)) {
-              return '请输入' + fieldName!;
-            }
-            if (value != null && value.isNotEmpty) {
-              final isValid = int.tryParse(value) != null && int.parse(value) > 0;
-              if (!isValid) {
-                return '请输入正整数';
+            keyboardType: TextInputType.number,
+            onChanged: (value) {
+              setState(() {
+                _formState[fieldid] = int.tryParse(value);
+              });
+            },
+            validator: (value) {
+              if (required && (value == null || value.isEmpty)) {
+                return '请输入' + fieldName!;
               }
-            }
-            return null;
-          },
-        );
-        break;
-      case 'date':
-        inputWidget = TextFormField(
-          controller: _controllers[fieldid],
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            labelText: '',
-            suffixIcon: IconButton(
-              icon: Icon(Icons.calendar_today),
-              onPressed: () async {
-                final DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2100),
-                );
-                if (pickedDate != null) {
-                  setState(() {
-                    final formattedDate =
-                        '${pickedDate.year}-${pickedDate.month}-${pickedDate.day}';
-                    _controllers[fieldid]!.text = formattedDate;
-                    _formState[fieldid] = formattedDate;
-                  });
+              if (value != null && value.isNotEmpty) {
+                final isValid =
+                    int.tryParse(value) != null && int.parse(value) > 0;
+                if (!isValid) {
+                  return '请输入正整数';
                 }
-              },
+              }
+              return null;
+            },
+          );
+          break;
+        case 'date':
+          inputWidget = TextFormField(
+            controller: _controllers[fieldid],
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              labelText: '',
+              suffixIcon: IconButton(
+                icon: Icon(Icons.calendar_today),
+                onPressed: () async {
+                  final DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      final formattedDate =
+                          '${pickedDate.year}-${pickedDate.month}-${pickedDate.day}';
+                      _controllers[fieldid]!.text = formattedDate;
+                      _formState[fieldid] = formattedDate;
+                    });
+                  }
+                },
+              ),
             ),
-          ),
-          keyboardType: TextInputType.datetime,
-          readOnly: true,
-          validator: (value) {
-            if (required && (value == null || value.isEmpty)) {
-              return '请选择' + fieldName!;
-            }
-            return null;
-          },
-        );
-        break;
-      case 'boolean':
-        // Boolean dropdown input
-        inputWidget = DropdownButtonFormField<bool>(
-          value: _formState[fieldid],
-          onChanged: (value) {
-            setState(() {
-              _formState[fieldid] = value;
-            });
-          },
-          items: [
-            DropdownMenuItem<bool>(
-              value: true,
-              child: Text('是'),
+            keyboardType: TextInputType.datetime,
+            readOnly: true,
+            validator: (value) {
+              if (required && (value == null || value.isEmpty)) {
+                return '请选择' + fieldName!;
+              }
+              return null;
+            },
+          );
+          break;
+        case 'boolean':
+          // Boolean dropdown input
+          inputWidget = DropdownButtonFormField<bool>(
+            value: _formState[fieldid],
+            onChanged: (value) {
+              setState(() {
+                _formState[fieldid] = value;
+              });
+            },
+            items: [
+              DropdownMenuItem<bool>(
+                value: true,
+                child: Text('是'),
+              ),
+              DropdownMenuItem<bool>(
+                value: false,
+                child: Text('否'),
+              ),
+            ],
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
             ),
-            DropdownMenuItem<bool>(
-              value: false,
-              child: Text('否'),
+            validator: (value) {
+              if (required && value == null) {
+                return '请选择' + fieldName!;
+              }
+              return null;
+            },
+          );
+          break;
+        default:
+          inputWidget = TextFormField(
+            controller: _controllers[fieldid],
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              labelText: '',
             ),
-          ],
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-          ),
-          validator: (value) {
-            if (required && value == null) {
-              return '请选择' + fieldName!;
-            }
-            return null;
-          },
-        );
-        break;
-      default:
-        inputWidget = TextFormField(
-          controller: _controllers[fieldid],
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            labelText: '',
-          ),
-          onChanged: (value) {
-            setState(() {
-              _formState[fieldid] = value;
-            });
-          },
-          validator: (value) {
-            if (required && (value == null || value.isEmpty)) {
-              return '请输入' + fieldName!;
-            }
-            return null;
-          },
-        );
+            onChanged: (value) {
+              setState(() {
+                _formState[fieldid] = value;
+              });
+            },
+            validator: (value) {
+              if (required && (value == null || value.isEmpty)) {
+                return '请输入' + fieldName!;
+              }
+              return null;
+            },
+          );
       }
     }
 
@@ -635,7 +692,7 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
 
     final Map<String, dynamic> formData = {
-      "form": _formState,  // Directly using the _formState map.
+      "form": _formState, // Directly using the _formState map.
       "taskId": widget.taskId
     };
 
@@ -659,6 +716,63 @@ class _OperationDetailWidgetState extends State<OperationDetailWidget> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('提交成功')),
           );
+        } else {
+          String message;
+          switch (code) {
+            case 1001:
+              message = "您的登录状态已过期，请重新登陆";
+              break;
+            case 1002:
+              message = "您没有相关权限";
+              break;
+            case 1003:
+              message = "参数校验失败";
+              break;
+            case 1004:
+              message = "接口异常";
+              break;
+            case 5000:
+              message = "未知错误";
+              break;
+            default:
+              message = "未知错误";
+          }
+          ErrorSnackbar.showSnackBar(context, message);
+        }
+      } else {
+        ErrorSnackbar.showSnackBar(context, '无法提交表单');
+      }
+    } catch (e) {
+      ErrorSnackbar.showSnackBar(context, '请检查网络');
+    }
+    return;
+  }
+
+  void _saveForm() async {
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
+
+    final Map<String, dynamic> formData = {
+      "form": _formState, // Directly using the _formState map.
+      "taskId": widget.taskId
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(ApiUrls.saveOperatorTask),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': token ?? '',
+        },
+        body: jsonEncode(formData),
+      );
+
+      if (response.statusCode == 200) {
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        final responseData = jsonDecode(decodedResponse);
+        final int code = responseData['code'];
+        if (code == 0) {
+          ErrorSnackbar.showSnackBar(context, '成功暂存表单');
         } else {
           String message;
           switch (code) {

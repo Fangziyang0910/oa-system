@@ -61,37 +61,40 @@ class ProcessDefinition {
 class Progress {
   final String taskId;
   final String taskName;
-  final String executionId;
+  final String? executionId;
   final String? starterName;
+  final String? ownerName;
   final String? assigneeName;
   final String? processDefinitionName;
   final String? description;
   final String? dueTime;
-  final String endTime;
+  final String? endTime;
 
   Progress({
     required this.taskId,
     required this.taskName,
-    required this.executionId,
+    this.executionId,
     this.starterName,
+    this.ownerName,
     this.assigneeName,
     this.processDefinitionName,
     this.description,
     this.dueTime,
-    required this.endTime,
+    this.endTime,
   });
 
   factory Progress.fromJson(Map<String, dynamic> json) {
     return Progress(
       taskId: json['taskId'] as String,
       taskName: json['taskName'] as String,
-      executionId: json['executionId'] as String,
+      executionId: json['executionId'] as String?,
       starterName: json['starterName'] as String?,
+      ownerName: json['ownerName'] as String?,
       assigneeName: json['assigneeName'] as String?,
       processDefinitionName: json['processDefinitionName'] as String?,
       description: json['description'] as String?,
       dueTime: json['dueTime'] as String?,
-      endTime: json['endTime'] as String,
+      endTime: json['endTime'] as String?,
     );
   }
 }

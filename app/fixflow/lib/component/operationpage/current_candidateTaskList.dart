@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_interpolation_to_compose_strings
+
 import 'dart:convert';
 
 import 'package:fixflow/component/error_snackbar.dart';
@@ -8,16 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
-class CurrentOperationListWidget extends StatefulWidget {
-  const CurrentOperationListWidget({super.key});
+class CurrentCandidateTaskList extends StatefulWidget {
+  const CurrentCandidateTaskList({super.key});
 
   @override
-  State<CurrentOperationListWidget> createState() =>
-      _CurrentOperationListWidgetState();
+  State<CurrentCandidateTaskList> createState() => _CurrentCandidateTaskListState();
 }
 
-class _CurrentOperationListWidgetState
-    extends State<CurrentOperationListWidget> {
+class _CurrentCandidateTaskListState extends State<CurrentCandidateTaskList> {
   List<Map<String, dynamic>> _tasks = [];
   bool _isLoading = false;
   Future<void> _fetchData({bool refresh = false}) async {
@@ -35,7 +35,7 @@ class _CurrentOperationListWidgetState
 
     try {
       final response = await http.get(
-        Uri.parse(ApiUrls.listOperatorAssignTasks),
+        Uri.parse(ApiUrls.listOperatorCandidateTasks),
         headers: {
           'Accept': 'application/json',
           'Authorization': token,
@@ -105,6 +105,69 @@ class _CurrentOperationListWidgetState
     await _fetchData(refresh: true);
   }
 
+  Future<void> _claimTask(String taskId) async {
+    print('Task $taskId claimed');
+    final String claimUrl = ApiUrls.claimCandidateTask + '/' + taskId;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
+
+    try {
+      final response = await http.get(
+        Uri.parse(claimUrl),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': token ?? '',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decodedResponse = utf8.decode(response.bodyBytes);
+        final responseData = jsonDecode(decodedResponse);
+        final int code = responseData['code'];
+        if (code == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('任务申领成功'))
+          );
+          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OperationDetailWidget(
+                              taskId: taskId,
+                            ),
+                          ),
+                        );
+          
+        } else {
+          String message;
+          switch (code) {
+            case 1001:
+              message = "您的登录状态已过期，请重新登陆";
+              break;
+            case 1002:
+              message = "您没有相关权限";
+              break;
+            case 1003:
+              message = "参数校验失败";
+              break;
+            case 1004:
+              message = "接口异常";
+              break;
+            case 5000:
+              message = "未知错误";
+              break;
+            default:
+              message = "未知错误";
+          }
+          ErrorSnackbar.showSnackBar(context, message);
+        }
+      } else {
+        ErrorSnackbar.showSnackBar(context, '申领任务失败');
+      }
+    } catch (e) {
+      ErrorSnackbar.showSnackBar(context, '请检查网络');
+    }
+  
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,35 +182,22 @@ class _CurrentOperationListWidgetState
                   return Card(
                     margin: EdgeInsets.all(16.0),
                     child: ListTile(
-                      title: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              task['processDefinitionName'],
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Text(
-                            '发起人：' + task['starterName'],
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
+                      title: Text(
+                        '${task['starterName']}的${task['processDefinitionName']}',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       subtitle: Text(
-                        '当前任务阶段：' + task['taskName'],
+                        '当前任务阶段：${task['taskName']}',
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OperationDetailWidget(
-                              taskId: task['taskId'],
-                            ),
-                          ),
-                        );
-                      },
+                      trailing: ElevatedButton(
+                        onPressed: () async => await _claimTask(task['taskId']),
+                        child: Text('申领任务'),
+                      ),
+                      // Removed onTap
                     ),
                   );
                 },
