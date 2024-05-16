@@ -50,7 +50,7 @@ public class OperatorController {
         return operatorService.listOperatorCandidateTasks();
     }
 
-    @ApiOperation("操作人申领任务")
+    @ApiOperation("操作人申领任务池中的任务")
     @GetMapping("/claimCandidateTask/{taskId}")
     public void claimCandidateTask(
         @PathVariable(value = "taskId") String taskId
@@ -59,18 +59,34 @@ public class OperatorController {
     }
 
     @ApiOperation("操作人放弃申领任务")
-    @PostMapping("/unclaimCandidateTask")
+    @GetMapping("/unclaimCandidateTask/{taskId}")
     public void unclaimCandidateTask(
-        @RequestParam(value = "taskId") String taskId,
-        @RequestParam(value = "userName") String userName
+        @PathVariable(value = "taskId") String taskId
     ) {
-        operatorService.unclaimCandidateTask(taskId, userName);
+        operatorService.unclaimCandidateTask(taskId);
     }
 
-    @ApiOperation("操作人查询申领的任务")
+    @ApiOperation("操作人查询受理和被委托的任务")
     @GetMapping("/listOperatorAssignTasks")
     public List<TaskVo> listOperatorAssignTasks() {
         return operatorService.listOperatorAssignTasks();
+    }
+
+    @ApiOperation("操作人完成被委派的任务")
+    @PostMapping("/endAssignedTask")
+    public void assignTask(
+        @RequestParam(value = "taskId") String taskId,
+        @RequestParam(value = "userName") String userName
+    ) {
+       operatorService.assignTask(taskId, userName); 
+    }
+
+    @ApiOperation("操作人取消委派受理任务")
+    @GetMapping("/unassignTask/{taskId}")
+    public void unassignTask(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        operatorService.unassignTask(taskId);
     }
 
     @ApiOperation("操作人查询选中任务的申请工单")
@@ -81,13 +97,46 @@ public class OperatorController {
         return operatorService.getStartForm(taskId);
     }
 
-    @ApiOperation("操作人查询审批工单模板")
+    @ApiOperation("操作人查询缓存的任务工单")
+    @GetMapping("/getTaskFormData/{taskId}")
+    public FormVo getTaskFormData(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        return operatorService.getTaskFormData(taskId);
+    }
+
+    @ApiOperation("操作人查询工单模板")
     @GetMapping("/getTaskForm/{taskId}")
     public String getTaskForm(
         @PathVariable(value = "taskId") String taskId
     ) {
         return operatorService.getTaskForm(taskId);
     }
+
+    @ApiOperation("操作人缓存任务工单")
+    @PostMapping("/saveOperatorTask")
+    public void saveOperatorTask(
+        @RequestBody @Validated FormParam form
+    ) { 
+        operatorService.saveOperatorTask(form.getTaskId(), form.getForm());
+    }
+    
+    @ApiOperation("操作人结束委托任务")
+    @GetMapping("/endAssignedTask/{taskId}")
+    public void endAssignedTask(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        operatorService.endAssignedTask(taskId);
+    }
+
+    @ApiOperation("操作人结束受理任务")
+    @GetMapping("/completeOperatorOwnTask/{taskId}")
+    public void completeOperatorOwnTask(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        operatorService.completeOperatorOwnTask(taskId);
+    }
+    
 
     @ApiOperation("操作人提交审批工单")
     @PostMapping("/completeOperatorTask")
@@ -97,7 +146,7 @@ public class OperatorController {
         operatorService.completeOperatorTask(form.getTaskId(), form.getForm());
     }
 
-    @ApiOperation("操作人查询已完成的审批任务")
+    @ApiOperation("操作人查询已完成的受理任务")
     @GetMapping("/listOperatorTasksCompleted")
     public List<TaskVo> listOperatorTasksCompleted() {
         Long operatorId = UserContext.getCurrentUserId();

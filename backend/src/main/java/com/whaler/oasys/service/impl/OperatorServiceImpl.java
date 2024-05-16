@@ -34,8 +34,12 @@ import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.CategoryService;
 import com.whaler.oasys.service.OperatorService;
 import com.whaler.oasys.service.UserService;
+import com.whaler.oasys.tool.MyMesgSender;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class OperatorServiceImpl
 extends ServiceImpl<OperatorMapper,OperatorEntity>
 implements OperatorService {
@@ -53,6 +57,8 @@ implements OperatorService {
     private UserService userService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private MyMesgSender myMesgSender;
 
     @Override
     public int insertOperatorEntity(Long operatorId, String processinstanceId) {
@@ -101,6 +107,8 @@ implements OperatorService {
                 String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
                 String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
                 taskVo.setStarterName(starter);
+                taskVo.setOwnerName(task.getOwner());
+                taskVo.setAssigneeName(task.getAssignee());
                 String processDefinitionName=repositoryService.createProcessDefinitionQuery()
                     .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
                 taskVo.setProcessDefinitionName(processDefinitionName);
@@ -150,28 +158,35 @@ implements OperatorService {
     @Override
     public void claimCandidateTask(String taskId) {
         String userName=userService.getById(UserContext.getCurrentUserId()).getName();
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ApiException("任务不存在");
+        }
         try{
             taskService.claim(taskId, userName);
+            taskService.setOwner(taskId, userName);
         }catch(Exception e){
             throw new ApiException("任务已被签收");
         }
     }
 
     @Override
-    public void unclaimCandidateTask(String taskId, String userName) {
-        try{
-            taskService.setAssignee(taskId, userName);
-        }catch(Exception e){
+    public void unclaimCandidateTask(String taskId) {
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
             throw new ApiException("任务不存在");
         }
+        taskService.setAssignee(taskId, null);
+        taskService.setOwner(taskId, null);
     }
     
     @Override
     public List<TaskVo> listOperatorAssignTasks() {
         String userName=userService.selectByUserId(UserContext.getCurrentUserId()).getName();
 
-        List<Task>operateTasks=taskService.createTaskQuery()
-            .taskAssignee(userName)
+        List<Task>operateTasks=taskService.createTaskQuery().or()
+            .taskOwner(userName)
+            .taskAssignee(userName).endOr()
             .taskDescription("操作")
             .list();
 
@@ -181,6 +196,8 @@ implements OperatorService {
                 taskVo.setTaskId(task.getId());
                 taskVo.setTaskName(task.getName());
                 taskVo.setExecutionId(task.getExecutionId());
+                taskVo.setOwnerName(task.getOwner());
+                taskVo.setAssigneeName(task.getAssignee());
                 String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
                 String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
                 taskVo.setStarterName(starter);
@@ -195,6 +212,27 @@ implements OperatorService {
             }).collect(Collectors.toList());
         return taskVos;
 
+    }
+
+    @Override
+    public void assignTask(String taskId, String name) {
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        if (!task.getOwner().equals(task.getAssignee())) {
+            throw new ApiException("任务禁止委派");
+        }
+        taskService.setAssignee(taskId, name);
+    }
+
+    @Override
+    public void unassignTask(String taskId) {
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        taskService.setAssignee(taskId, task.getOwner());
     }
 
     @Override
@@ -213,6 +251,33 @@ implements OperatorService {
         formVo.setFormKey(startFormInfo.getKey());
         formVo.setFormName(startFormInfo.getName());
         List<FormField>formFields=((SimpleFormModel)startFormInfo.getFormModel()).getFields();
+        List<FormFieldVo>formFieldVos=formFields.stream().map(formField -> 
+                new FormFieldVo()
+                .setId(formField.getId())
+                .setName(formField.getName())
+                .setType(formField.getType())
+                .setValue(formField.getValue())
+                .setReadOnly(formField.isReadOnly())
+                .setRequired(formField.isRequired())
+            ).collect(Collectors.toList());
+        formVo.setFormFields(formFieldVos);
+        return formVo;
+    }
+
+    @Override
+    public FormVo getTaskFormData(String taskId){
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        FormInfo taskFormInfo = taskService.getTaskFormModel(taskId);
+        if(taskFormInfo==null){
+            throw new ApiException("表单不存在");
+        }
+        FormVo formVo=new FormVo();
+        formVo.setFormKey(taskFormInfo.getKey());
+        formVo.setFormName(taskFormInfo.getName());
+        List<FormField>formFields=((SimpleFormModel)taskFormInfo.getFormModel()).getFields();
         List<FormFieldVo>formFieldVos=formFields.stream().map(formField -> 
                 new FormFieldVo()
                 .setId(formField.getId())
@@ -253,10 +318,51 @@ implements OperatorService {
     }
 
     @Override
+    public void saveOperatorTask(String taskId, Map<String, String> form) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ApiException("任务不存在");
+        }
+        formService.saveFormData(taskId, form);
+    }
+
+    @Override
+    public void endAssignedTask(String taskId){
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ApiException("任务不存在");
+        }
+        taskService.setAssignee(taskId, task.getOwner());
+        String msg=String.format(
+            "您委派的任务 %s 已经完成，请及时完成受理\n",
+            task.getId()
+        );
+        myMesgSender.sendMessage(task.getOwner(), msg);
+    }
+
+    @Override
+    public void completeOperatorOwnTask(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ApiException("任务不存在");
+        }
+
+        // 更新流程进度
+        String jsonString=(String)runtimeService.getVariable(task.getExecutionId(), "formList");
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        formList.add(taskId);
+        jsonString=JSON.toJSONString(formList);
+        runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
+
+        taskService.complete(taskId);
+        insertOperatorEntity(UserContext.getCurrentUserId(), taskId);
+    }
+
+    @Override
     public void completeOperatorTask(String taskId, Map<String, String> form) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
-            throw new RuntimeException("任务不存在");
+            throw new ApiException("任务不存在");
         }
         
         // 更新流程进度

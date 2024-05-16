@@ -23,13 +23,19 @@ extends IService<ApproverEntity> {
 
     void claimCandidateTask(String taskId);
 
-    void unclaimCandidateTask(String taskId, String userName);
+    void unclaimCandidateTask(String taskId);
 
     List<TaskVo> listApprovalAssignTasks();
 
     FormVo getStartForm(String taskId);
 
+    FormVo getTaskFormData(String taskId);
+
     String getTaskForm(String taskId);
+
+    void saveApprovalTask(String taskId, Map<String, String> form);
+
+    void completeApprovalOwnTask(String taskId);
 
     void completeApprovalTask(String taskId, Map<String, String> form);
 

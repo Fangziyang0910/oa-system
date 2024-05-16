@@ -34,6 +34,7 @@ import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.ApproverService;
 import com.whaler.oasys.service.CategoryService;
+import com.whaler.oasys.service.OperatorService;
 import com.whaler.oasys.service.UserService;
 
 @Service
@@ -54,6 +55,8 @@ implements ApproverService {
     private UserService userService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private OperatorService operatorService;
 
     @Override
     public int insertApproverEntity(Long approverId, String processinstanceId) {
@@ -160,12 +163,8 @@ implements ApproverService {
     }
 
     @Override
-    public void unclaimCandidateTask(String taskId, String userName){
-        try{
-            taskService.setAssignee(taskId, userName);
-        }catch(Exception e){
-            throw new ApiException("任务不存在");
-        }
+    public void unclaimCandidateTask(String taskId){
+        operatorService.unclaimCandidateTask(taskId);
     }
 
     @Override
@@ -229,6 +228,11 @@ implements ApproverService {
     }
 
     @Override
+    public FormVo getTaskFormData(String taskId){
+        return operatorService.getTaskFormData(taskId);
+    }
+
+    @Override
     public String getTaskForm(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
@@ -252,6 +256,29 @@ implements ApproverService {
             throw new ApiException("表单不存在");
         }
         return taskForm;
+    }
+
+    @Override
+    public void saveApprovalTask(String taskId, Map<String, String> form) {
+        operatorService.saveOperatorTask(taskId, form);
+    }
+
+    @Override
+    public void completeApprovalOwnTask(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new ApiException("任务不存在");
+        }
+
+        // 更新流程进度
+        String jsonString=(String)runtimeService.getVariable(task.getExecutionId(), "formList");
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        formList.add(taskId);
+        jsonString=JSON.toJSONString(formList);
+        runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
+
+        taskService.complete(taskId);
+        insertApproverEntity(UserContext.getCurrentUserId(), taskId);
     }
 
     @Override

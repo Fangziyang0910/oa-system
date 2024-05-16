@@ -25,11 +25,23 @@ extends IService<OperatorEntity> {
 
     void claimCandidateTask(String taskId);
 
-    void unclaimCandidateTask(String taskId, String userName);
+    void unclaimCandidateTask(String taskId);
+
+    void assignTask(String taskId, String name);
+
+    void unassignTask(String taskId);
 
     FormVo getStartForm(String taskId);
 
+    FormVo getTaskFormData(String taskId);
+
     String getTaskForm(String taskId);
+
+    void saveOperatorTask(String taskId, Map<String, String> form);
+
+    void endAssignedTask(String taskId);
+
+    void completeOperatorOwnTask(String taskId);
 
     void completeOperatorTask(String taskId, Map<String, String> form);
 
