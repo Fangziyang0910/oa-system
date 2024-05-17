@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fixflow/config/amqpService.dart';
+import 'package:fixflow/config/notificationService.dart';
 
 class UserTokenProvider extends ChangeNotifier {
   String? _token;
@@ -13,29 +14,28 @@ class UserTokenProvider extends ChangeNotifier {
   String? _password;
   AMQPService? _amqpService;
   Timer? _amqpTimer;
+  bool _isListening = false;
 
   String? get token => _token;
   bool get isValid => _isValid;
   String? get username => _username;
   String? get password => _password;
 
-  // Load the token, username, and password from SharedPreferences
+  final NotificationService notificationService = NotificationService();
+
+
   Future<void> loadToken() async {
-    final completer = Completer<void>();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
     _username = prefs.getString('username');
     _password = prefs.getString('password');
     if (_token != null) {
-      // Validate the token with the server
       _isValid = await _validateToken(_token!);
       if (_isValid) {
         startAMQP();
       }
-      notifyListeners();
     }
-    completer.complete();
-    return completer.future;
+    notifyListeners();
   }
 
   Future<bool> _validateToken(String token) async {
@@ -55,32 +55,30 @@ class UserTokenProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      // Assuming the token is not valid if there's an exception (e.g., no network)
       print('Token validation failed: $e');
       return false;
     }
   }
 
-  // Save the token, username, and password to SharedPreferences
   Future<void> setToken(String token, String username, String password) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = token;
     _username = username;
     _password = password;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
     await prefs.setString('username', username);
     await prefs.setString('password', password);
     _isValid = true;
+    print("Token, username and password set successfully");
     startAMQP();
     notifyListeners();
   }
 
-  // Clear the token, username, and password from SharedPreferences
   Future<void> clearToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = null;
     _username = null;
     _password = null;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('username');
     await prefs.remove('password');
@@ -89,18 +87,31 @@ class UserTokenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setAMQPService(AMQPService amqpService) {
-    _amqpService = amqpService;
-  }
-
   void startAMQP() {
-    _amqpTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+    if (_amqpService == null) {
+      _amqpService = AMQPService(notificationService, this);
+    }
+    if (_amqpTimer == null || !_amqpTimer!.isActive) {
+      _amqpTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+        _amqpService?.startListening();
+      });
+      print("AMQP timer started");
+    }
+    if (!_isListening) {
       _amqpService?.startListening();
-    });
+      _isListening = true;
+      print("AMQP consumer started");
+    } else {
+      print("AMQP consumer is already running");
+    }
   }
 
   void stopAMQP() {
     _amqpTimer?.cancel();
     _amqpTimer = null;
+    _amqpService?.stopListening();
+    _amqpService = null;
+    _isListening = false;
+    print("AMQP consumer stopped");
   }
 }

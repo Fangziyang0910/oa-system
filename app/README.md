@@ -112,4 +112,5 @@
 
 - 使用flutter_local_notifications依赖用于显示系统通知
 - 使用dart_amqp依赖用于处理AMQP协议
+- 完成了系统弹窗消息提醒，能接受到MQ队列的信息
   
