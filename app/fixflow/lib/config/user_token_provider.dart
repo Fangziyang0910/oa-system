@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fixflow/config/api_url.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -40,7 +41,7 @@ class UserTokenProvider extends ChangeNotifier {
   Future<bool> _validateToken(String token) async {
     try {
       final response = await http.get(
-        Uri.parse('YOUR_API_URL_TO_VALIDATE_TOKEN'),
+        Uri.parse(ApiUrls.tokenCheck),
         headers: {
           'Authorization': token,
           'Accept': 'application/json',
