@@ -6,7 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());  
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => UserTokenProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,18 +20,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        final provider = UserTokenProvider();
-        return provider;
-      },
-      child: MaterialApp(
-        title: 'FixFlow',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const InitialPage(),
+    return MaterialApp(
+      title: 'FixFlow',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      home: const InitialPage(),
     );
   }
 }

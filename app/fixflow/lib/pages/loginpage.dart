@@ -61,7 +61,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       if (code == 0) {
         final token = responseData['data']['token'];
         // Set token using UserTokenProvider
-        Provider.of<UserTokenProvider>(context, listen: false).setToken(token);
+        Provider.of<UserTokenProvider>(context, listen: false).setToken(token, username, password);
         // 将 responseData['data'] 存储到 SharedPreferences
         String userDataJson = jsonEncode(responseData['data']);
         await (await SharedPreferences.getInstance())
