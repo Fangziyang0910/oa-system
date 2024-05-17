@@ -50,10 +50,10 @@ class ApiUrls {
   /* -------------operator api ----------------*/
   //list OperatorTasksCompleted
   static const String listOperatorTasksCompleted = '$baseUrl/operator/listOperatorTasksCompleted';
-  //list OperatorTasksNotCompleted
-  static const String listOperatorTasksNotCompleted = '$baseUrl/operator/listOperatorTasksNotCompleted';
+  //list listOperatorAssignTasks
+  static const String listOperatorAssignTasks = '$baseUrl/operator/listOperatorAssignTasks';
   //get OperationForm
-  static const String getOperationForm = '$baseUrl/operator/getTaskForm';
+  static const String getOperationForm = '$baseUrl/operator/getTaskFormData';
   //get OperationStartForm
   static const String getOperationStartForm = '$baseUrl/operator/getStartForm';
   //get OperationProcessProgress
@@ -62,6 +62,13 @@ class ApiUrls {
   static const String completeOperatorTask = '$baseUrl/operator/completeOperatorTask';
   //get HistoricalOperationForm
   static const String getHistoricalOperationForm = '$baseUrl/operator/getHistoricalForm';
-
+  //list listOperatorCandidateTasks
+  static const String listOperatorCandidateTasks = '$baseUrl/operator/listOperatorCandidateTasks';
+  //claim CandidateTask
+  static const String claimCandidateTask = '$baseUrl/operator/claimCandidateTask';
+  //save OperatorTask
+  static const String saveOperatorTask = '$baseUrl/operator/saveOperatorTask';
+  //unclaim CandidateTask
+  static const String unclaimCandidateTask = '$baseUrl/operator/unclaimCandidateTask';
 
 }
