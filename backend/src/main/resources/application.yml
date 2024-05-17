@@ -59,3 +59,5 @@ management:
 
 swagger:
   enabled: true
+
+debug: true

@@ -72,6 +72,14 @@ public class OperatorController {
     public List<TaskVo> listOperatorAssignTasks() {
         return operatorService.listOperatorAssignTasks();
     }
+    
+    @ApiOperation("操作人查询未完成任务详情")
+    @GetMapping("/getTaskNotCompleted/{taskId}")
+    public TaskVo getTaskNotCompleted(
+        @PathVariable("taskId") String taskId
+    ) {
+        return operatorService.getTaskNotCompleted(taskId);
+    }
 
     @ApiOperation("操作人查询委派候选人")
     @GetMapping("/listOperatorCandidateUsers/{taskId}")

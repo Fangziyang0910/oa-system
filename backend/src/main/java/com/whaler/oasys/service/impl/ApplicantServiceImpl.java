@@ -328,8 +328,8 @@ implements ApplicantService {
         
         // 记录任务终止
         Execution execution =  runtimeService.createExecutionQuery()
-            .processInstanceId(pi.getId()).singleResult();
-        if (execution!=null) {
+            .processInstanceId(pi.getId()).list().get(0);
+        if (execution==null) {
             throw new ApiException("流程执行实例已经结束");
         }
         String jsonString=(String)runtimeService.getVariable(execution.getId(), "formList");

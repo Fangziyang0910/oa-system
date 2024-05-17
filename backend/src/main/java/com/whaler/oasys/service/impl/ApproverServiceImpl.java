@@ -168,6 +168,11 @@ implements ApproverService {
     }
 
     @Override
+    public TaskVo getTaskNotCompleted(String taskId){
+        return operatorService.getTaskNotCompleted(taskId);
+    }
+
+    @Override
     public List<TaskVo> listApprovalAssignTasks() {
         String userName=userService.getById(UserContext.getCurrentUserId()).getName();
 

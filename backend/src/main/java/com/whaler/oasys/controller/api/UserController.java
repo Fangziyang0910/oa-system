@@ -1,5 +1,7 @@
 package com.whaler.oasys.controller.api;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.whaler.oasys.model.enums.ResultCode;
@@ -18,6 +21,7 @@ import com.whaler.oasys.model.vo.UserVo;
 import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.UserService;
+import com.whaler.oasys.tool.MyMesgSender;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
@@ -31,6 +35,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtManager jwtManager;
+    @Autowired
+    private MyMesgSender myMesgSender;
 
     @ApiOperation("用户登录")
     @PostMapping("/login")
@@ -67,5 +73,15 @@ public class UserController {
             throw new ApiException(ResultCode.UNAUTHORIZED);
         }
         return "验证通过"; // 表示请求通过验证，可以继续处理
+    }
+
+    @ApiOperation("测试消息队列")
+    @PostMapping("/testMQ")
+    public void testMQ(
+        @RequestParam(value = "userName") String userName,
+        @RequestParam(value = "msgName") String msgName,
+        @RequestParam(value = "msgContent") String msgContent
+    ){
+        myMesgSender.sendMessage(userName,msgName,msgContent);
     }
 }

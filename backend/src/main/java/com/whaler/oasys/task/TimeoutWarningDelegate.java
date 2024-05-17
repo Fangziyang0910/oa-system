@@ -1,5 +1,7 @@
 package com.whaler.oasys.task;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.RuntimeService;
@@ -31,14 +33,23 @@ implements JavaDelegate {
         System.out.println("超时提醒");
         String processInstanceId = execution.getProcessInstanceId();
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Task task : tasks) {
             String userName = task.getAssignee();
             System.out.println("超时提醒给："+userName);
             if (userName==null) {
                 continue;
+            }    
+            String msgName="任务超时提醒";
+            String msgContent="";
+            Date date=task.getDueDate();
+            if (date==null) {
+                msgContent="任务 "+task.getName()+" 即将超时，请及时处理!";
+            }else{
+                String time= dateFormat.format(date);
+                msgContent="任务 "+task.getName()+" 将于 "+time+" ，请及时处理!";
             }
-            String msg="您的任务即将超时";
-            myMesgSender.sendMessage(userName,msg);
+            myMesgSender.sendMessage(userName,msgName,msgContent);
         }
     }
 }

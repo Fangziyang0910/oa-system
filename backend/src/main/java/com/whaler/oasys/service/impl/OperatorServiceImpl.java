@@ -239,6 +239,30 @@ implements OperatorService {
     }
 
     @Override
+    public TaskVo getTaskNotCompleted(String taskId){
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+        String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+        String processDefinitionName=repositoryService.createProcessDefinitionQuery()
+            .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
+        TaskVo taskVo=new TaskVo();
+        taskVo.setTaskId(taskId)
+            .setTaskName(task.getName())
+            .setExecutionId(task.getExecutionId())
+            .setStarterName(starter)
+            .setOwnerName(task.getOwner())
+            .setAssigneeName(task.getAssignee())
+            .setProcessDefinitionName(processDefinitionName)
+            .setDescription(task.getDescription())
+            .setDueTime(task.getDueDate().toString())
+            .setEndTime(null);
+        return taskVo;
+    }
+
+    @Override
     public List<String> listOperatorCandidateUsers(String taskId) {
         Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task==null) {
@@ -460,11 +484,12 @@ implements OperatorService {
         jsonString=JSON.toJSONString(formList);
         runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
 
-        String msg=String.format(
-            "您委派的任务 %s 已经完成，请及时完成受理\n",
-            task.getId()
+        String msgName="任务协作完成通知";
+        String msgContent=String.format(
+            "您委派的任务 %s 已经完成，请及时处理！\n",
+            task.getName()
         );
-        myMesgSender.sendMessage(task.getOwner(), msg);
+        myMesgSender.sendMessage(task.getOwner(), msgName, msgContent);
     }
 
     @Override

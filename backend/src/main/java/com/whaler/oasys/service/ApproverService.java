@@ -24,6 +24,8 @@ extends IService<ApproverEntity> {
     void claimCandidateTask(String taskId);
 
     void unclaimCandidateTask(String taskId);
+    
+    TaskVo getTaskNotCompleted(String taskId);
 
     List<TaskVo> listApprovalAssignTasks();
 

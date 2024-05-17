@@ -73,6 +73,14 @@ public class ApproverController {
     public List<TaskVo> listApprovalAssignTasks() {
         return approverService.listApprovalAssignTasks();
     }
+    
+    @ApiOperation("审批人查询未完成任务详情")
+    @GetMapping("/getTaskNotCompleted/{taskId}")
+    public TaskVo getTaskNotCompleted(
+        @PathVariable("taskId") String taskId
+    ) {
+        return approverService.getTaskNotCompleted(taskId);
+    }
 
     @ApiOperation("审批人查询选中任务的申请工单")
     @GetMapping("/getStartForm/{taskId}")

@@ -27,6 +27,8 @@ extends IService<OperatorEntity> {
 
     void unclaimCandidateTask(String taskId);
 
+    TaskVo getTaskNotCompleted(String taskId);
+
     List<String> listOperatorCandidateUsers(String taskId);
 
     void assignTask(String taskId, String name);
