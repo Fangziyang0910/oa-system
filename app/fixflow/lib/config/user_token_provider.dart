@@ -1,26 +1,37 @@
 import 'dart:async';
-
 import 'package:fixflow/config/api_url.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fixflow/config/amqpService.dart';
 
 class UserTokenProvider extends ChangeNotifier {
   String? _token;
   bool _isValid = false;
+  String? _username;
+  String? _password;
+  AMQPService? _amqpService;
+  Timer? _amqpTimer;
 
   String? get token => _token;
   bool get isValid => _isValid;
+  String? get username => _username;
+  String? get password => _password;
 
-  // Load the token from SharedPreferences
+  // Load the token, username, and password from SharedPreferences
   Future<void> loadToken() async {
     final completer = Completer<void>();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
+    _username = prefs.getString('username');
+    _password = prefs.getString('password');
     if (_token != null) {
       // Validate the token with the server
       _isValid = await _validateToken(_token!);
+      if (_isValid) {
+        startAMQP();
+      }
       notifyListeners();
     }
     completer.complete();
@@ -50,21 +61,46 @@ class UserTokenProvider extends ChangeNotifier {
     }
   }
 
-  // Save the token to SharedPreferences
-  Future<void> setToken(String token) async {
+  // Save the token, username, and password to SharedPreferences
+  Future<void> setToken(String token, String username, String password) async {
     _token = token;
+    _username = username;
+    _password = password;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
+    await prefs.setString('username', username);
+    await prefs.setString('password', password);
     _isValid = true;
+    startAMQP();
     notifyListeners();
   }
 
-  // Clear the token from SharedPreferences
+  // Clear the token, username, and password from SharedPreferences
   Future<void> clearToken() async {
     _token = null;
+    _username = null;
+    _password = null;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('username');
+    await prefs.remove('password');
     _isValid = false;
+    stopAMQP();
     notifyListeners();
+  }
+
+  void setAMQPService(AMQPService amqpService) {
+    _amqpService = amqpService;
+  }
+
+  void startAMQP() {
+    _amqpTimer = Timer.periodic(Duration(minutes: 1), (timer) {
+      _amqpService?.startListening();
+    });
+  }
+
+  void stopAMQP() {
+    _amqpTimer?.cancel();
+    _amqpTimer = null;
   }
 }
