@@ -48,6 +48,8 @@ public class FlowableConfig {
                     BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
                     myBpmnModelModifier.setBpmnModel(bpmnModel);
                 }
+
+
             }
         };
     }

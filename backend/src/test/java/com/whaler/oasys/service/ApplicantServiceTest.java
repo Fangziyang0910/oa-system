@@ -155,8 +155,8 @@ public class ApplicantServiceTest {
     @Test
     @Transactional
     public void testAbortProcessInstance() {
-        doOperatorTask();
-        // doManagerTask();
+        // doOperatorTask();
+        doManagerTask();
         UserContext.setCurrentUserId(1L);
         List<String>processInstances=applicantService.selectByApplicantId(1L).getProcessinstanceIds();
         log.info("processInstances:{}",processInstances);
@@ -166,6 +166,8 @@ public class ApplicantServiceTest {
         applicantService.abortProcessInstance(processInstances.get(0), "就是想要结束");
         processInstanceVo=applicantService.getProcessInstance(processInstances.get(0));
         log.info("processInstanceVo:{}",processInstanceVo);
+        List<TaskVo>taskVos=applicantService.getProcessInstanceProgress(processInstances.get(0));
+        log.info("taskVos:{}",taskVos);
     }
 
     @Test

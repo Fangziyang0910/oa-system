@@ -57,11 +57,11 @@ public class DirectRabbitConfig {
         userNames.forEach(userName->{
             Queue queue=new Queue(DirectRabbitConfig.RABBITMQ_TOPIC+userName, true, false, false);
             
+            rabbitAdmin.declareQueue(queue);
             Binding binding = BindingBuilder.bind(queue)
                 .to(rabbitmqDemoDirectExchange())
                 .with(RABBITMQ_DIRECT_ROUTING+userName);
             rabbitAdmin.declareBinding(binding);
-            rabbitAdmin.declareQueue(queue);
         });
         return null;
     }
