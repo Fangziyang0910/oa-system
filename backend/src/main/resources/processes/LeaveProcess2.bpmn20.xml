@@ -10,9 +10,9 @@
       <documentation>审批</documentation>
     </userTask>
     <endEvent id="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3" name="流程结束">
-      <extensionElements>
+      <!-- <extensionElements>
         <flowable:executionListener event="end" delegateExpression="${EndExecutionListener}"></flowable:executionListener>
-      </extensionElements>
+      </extensionElements> -->
     </endEvent>
     <exclusiveGateway id="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009" name="组长决策"></exclusiveGateway>
     <exclusiveGateway id="sid-8A9C0A99-212E-483F-A1F2-0CDBB32A9F57" name="主管决策"></exclusiveGateway>
@@ -24,10 +24,14 @@
     <sequenceFlow id="sid-5BC40896-C49E-48BA-91D5-DDA7C7EEEC18" sourceRef="sid-5292D449-435F-48C8-AB64-48A9E0B4D5EC" targetRef="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009"></sequenceFlow>
     <sequenceFlow id="sid-38766F13-1FA9-45DC-BAE2-18200ED97EBF" sourceRef="sid-FD3A944F-B206-4A1C-A2D1-006082E9C792" targetRef="sid-42317BF2-5C17-4873-B268-546EA39B4A94"></sequenceFlow>
     <sequenceFlow id="sid-A673501F-E561-4A93-AB05-B30BA93DAAD4" sourceRef="sid-42317BF2-5C17-4873-B268-546EA39B4A94" targetRef="sid-8A9C0A99-212E-483F-A1F2-0CDBB32A9F57"></sequenceFlow>
-    <sequenceFlow id="sid-80671A54-F9CD-4562-89B3-4CB458A2A78D" sourceRef="sid-7F8CAC39-66A1-4633-A166-C21599D7E1A0" targetRef="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3"></sequenceFlow>
+    <sequenceFlow id="sid-80671A54-F9CD-4562-89B3-4CB458A2A78D" sourceRef="sid-7F8CAC39-66A1-4633-A166-C21599D7E1A0" targetRef="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3">
+      <extensionElements>
+        <flowable:executionListener event="take" delegateExpression="${EndExecutionListener}"></flowable:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <sequenceFlow id="sid-D88CBC23-692C-4EB3-A7CB-B089815E802A" name="不同意" sourceRef="sid-3811AC53-B3F1-4CC3-B107-A04459AD8009" targetRef="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3">
       <extensionElements>
-        <flowable:executionListener event="start" delegateExpression="${EndExecutionListener}"></flowable:executionListener>
+        <flowable:executionListener event="take" delegateExpression="${AbortExecutionListener}"></flowable:executionListener>
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isLeaderApproval!=true}]]></conditionExpression>
     </sequenceFlow>
@@ -36,7 +40,7 @@
     </sequenceFlow>
     <sequenceFlow id="sid-5DC0F175-27F1-4A20-A595-113E50A5B6C3" name="不同意" sourceRef="sid-8A9C0A99-212E-483F-A1F2-0CDBB32A9F57" targetRef="sid-AEA99013-E615-4A18-AEEA-A37E604E4DE3">
       <extensionElements>
-        <flowable:executionListener event="end" delegateExpression="${EndExecutionListener}"></flowable:executionListener>
+        <flowable:executionListener event="take" delegateExpression="${AbortExecutionListener}"></flowable:executionListener>
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isManagerApproval!=true}]]></conditionExpression>
     </sequenceFlow>

@@ -1,5 +1,6 @@
 package com.whaler.oasys.controller.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,8 +73,16 @@ public class OperatorController {
         return operatorService.listOperatorAssignTasks();
     }
 
-    @ApiOperation("操作人完成被委派的任务")
-    @PostMapping("/endAssignedTask")
+    @ApiOperation("操作人查询委派候选人")
+    @GetMapping("/listOperatorCandidateUsers/{taskId}")
+    public List<String> listOperatorCandidateUsers(
+        @PathVariable(value = "taskId") String taskId
+    ) {
+        return operatorService.listOperatorCandidateUsers(taskId);
+    }
+
+    @ApiOperation("操作人委派受理任务")
+    @PostMapping("/assignTask")
     public void assignTask(
         @RequestParam(value = "taskId") String taskId,
         @RequestParam(value = "userName") String userName
@@ -151,9 +160,14 @@ public class OperatorController {
     public List<TaskVo> listOperatorTasksCompleted() {
         Long operatorId = UserContext.getCurrentUserId();
         OperatorVo operatorVo = operatorService.selectByOperatorId(operatorId);
-        List<TaskVo>taskVos= operatorVo.getTaskIds().stream().map(taskId -> {
-            return operatorService.getHistoricalDetails(taskId);
-        }).collect(Collectors.toList());
+        List<TaskVo>taskVos= new ArrayList<>();
+        operatorVo.getTaskIds().forEach(taskId -> {
+            try{
+                taskVos.add(operatorService.getHistoricalDetails(taskId));
+            }catch(Exception e){
+                return;
+            }
+        });
         return taskVos;
     }
 

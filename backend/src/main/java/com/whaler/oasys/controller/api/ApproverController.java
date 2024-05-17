@@ -1,5 +1,6 @@
 package com.whaler.oasys.controller.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -126,9 +127,16 @@ public class ApproverController {
     public List<TaskVo> listApprovalTasksCompleted() {
         Long approverId = UserContext.getCurrentUserId();
         ApproverVo approverVo = approverService.selectByApproverId(approverId);
-        List<TaskVo> taskVos = approverVo.getTaskIds().stream()
-            .map(taskId->approverService.getHistoricalDetails(taskId))
-            .collect(Collectors.toList());
+        List<TaskVo> taskVos = new ArrayList<>();
+        approverVo.getTaskIds().forEach(
+            taskId->{
+                try{
+                    taskVos.add(approverService.getHistoricalDetails(taskId));
+                }catch(Exception e){
+                    return;
+                }
+            }
+        );
         return taskVos;
     }
 

@@ -28,11 +28,13 @@ implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution){
+        // 查询部门分组和主管分组的所有权限角色
         String applicantDepartment=(String)execution.getVariable("applicantDepartment");
         Long categoryId= categoryService.selectByCategoryName(applicantDepartment).getCategoryId();
         List<Long>permissionIds1=categoryService.selectByCategoryId(categoryId).getPermissionIds();
         List<Long>permissionIds2=categoryService.selectByCategoryId(11L).getPermissionIds();
 
+        // 求交集
         List<Long> leaders = CollectionUtils.intersection(permissionIds1, permissionIds2).stream().collect(Collectors.toList());
         String strLeaders=JSONArray.toJSON(leaders).toString();
         strLeaders=strLeaders.substring(1, strLeaders.length()-1);

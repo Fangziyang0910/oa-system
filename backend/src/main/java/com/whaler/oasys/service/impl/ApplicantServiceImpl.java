@@ -23,6 +23,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
@@ -93,9 +94,17 @@ implements ApplicantService {
     @Override
     public List<ProcessInstanceVo> listProcessInstances(Long applicantId) {
         ApplicantVo applicantVo = this.selectByApplicantId(applicantId);
-        List<ProcessInstanceVo> processInstanceVos = applicantVo.getProcessinstanceIds().stream()
-            .map(processInstanceId -> this.getProcessInstance(processInstanceId))
-            .collect(Collectors.toList());
+        List<ProcessInstanceVo> processInstanceVos = new ArrayList<>();
+        // 捕获错误
+        applicantVo.getProcessinstanceIds().forEach(
+            processInstanceId -> {
+                try{
+                    processInstanceVos.add(this.getProcessInstance(processInstanceId));
+                }catch(Exception e){
+                    ;
+                }
+            }
+        );
         return processInstanceVos;
     }
 
@@ -215,30 +224,37 @@ implements ApplicantService {
         if (formList==null) {
             throw new ApiException("formList 不存在");
         }
-        List<TaskVo>taskVos=formList.stream().map(
+        List<TaskVo>taskVos=new ArrayList<>();
+        formList.forEach(
             taskId->{
-                if(taskId.equals("endEvent")){
-                    return new TaskVo().setTaskId("null")
-                        .setTaskName("endEvent")
-                        .setDescription(pi.getDeleteReason())
-                        .setEndTime(pi.getEndTime().toString());
+                try{
+                    HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+                    if(task==null){
+                        taskVos.add(new TaskVo().setTaskId("null")
+                            .setTaskName(taskId)
+                            .setDescription(pi.getDeleteReason())
+                            .setEndTime(pi.getEndTime().toString())
+                        );
+                        return;
+                    }
+                    String userName=(String)historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(task.getProcessInstanceId()).variableName(taskId)
+                        .singleResult().getValue();
+                    TaskVo taskVo = new TaskVo().setTaskId(task.getId())
+                        .setTaskName(task.getName())
+                        .setExecutionId(task.getExecutionId())
+                        .setAssigneeName(userName)
+                        .setDescription(task.getDescription())
+                        .setEndTime(task.getEndTime().toString());
+                    if (task.getDueDate() != null) {
+                        taskVo.setDueTime(task.getDueDate().toString());
+                    }
+                    taskVos.add(taskVo);
+                }catch(Exception e){
+                    return;
                 }
-                HistoricTaskInstance task=historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-                String userName=(String)historyService.createHistoricVariableInstanceQuery()
-                    .processInstanceId(task.getProcessInstanceId()).variableName(taskId)
-                    .singleResult().getValue();
-                TaskVo taskVo = new TaskVo().setTaskId(task.getId())
-                    .setTaskName(task.getName())
-                    .setExecutionId(task.getExecutionId())
-                    .setAssigneeName(userName)
-                    .setDescription(task.getDescription())
-                    .setEndTime(task.getEndTime().toString());
-                if (task.getDueDate() != null) {
-                    taskVo.setDueTime(task.getDueDate().toString());
-                }
-                return taskVo;
             }
-        ).collect(Collectors.toList());
+        );
         return taskVos;
     }
 
@@ -309,6 +325,19 @@ implements ApplicantService {
         if(pi.getEndTime()!=null){
             throw new ApiException("流程实例已经结束");
         }
+        
+        // 记录任务终止
+        Execution execution =  runtimeService.createExecutionQuery()
+            .processInstanceId(pi.getId()).singleResult();
+        if (execution!=null) {
+            throw new ApiException("流程执行实例已经结束");
+        }
+        String jsonString=(String)runtimeService.getVariable(execution.getId(), "formList");
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        formList.add("流程终止："+reason);
+        jsonString=JSON.toJSONString(formList);
+        runtimeService.setVariable(execution.getId(), "formList", jsonString);
+        
         runtimeService.deleteProcessInstance(processInstanceId, reason);
     }
 
@@ -360,11 +389,11 @@ implements ApplicantService {
         List<String>highLightedActivities=new ArrayList<>();
         Set<String>activitySet=new HashSet<>();
         for (TaskVo task : tasks) {
-            if (task.getTaskId().equals("null")) {
-                continue;
-            }
             HistoricTaskInstance taskInstance=historyService.createHistoricTaskInstanceQuery()
                 .taskId(task.getTaskId()).singleResult();
+            if (taskInstance==null) {
+                continue;
+            }
             highLightedActivities.add(taskInstance.getTaskDefinitionKey());
             activitySet.add(taskInstance.getTaskDefinitionKey());
         }

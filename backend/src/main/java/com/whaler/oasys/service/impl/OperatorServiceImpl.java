@@ -1,8 +1,12 @@
 package com.whaler.oasys.service.impl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -22,10 +26,14 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.whaler.oasys.mapper.OperatorMapper;
 import com.whaler.oasys.model.entity.OperatorEntity;
+import com.whaler.oasys.model.entity.PermissionEntity;
+import com.whaler.oasys.model.entity.UserEntity;
 import com.whaler.oasys.model.exception.ApiException;
+import com.whaler.oasys.model.vo.CategoryVo;
 import com.whaler.oasys.model.vo.FormFieldVo;
 import com.whaler.oasys.model.vo.FormVo;
 import com.whaler.oasys.model.vo.OperatorVo;
@@ -33,9 +41,11 @@ import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.CategoryService;
 import com.whaler.oasys.service.OperatorService;
+import com.whaler.oasys.service.PermissionService;
 import com.whaler.oasys.service.UserService;
 import com.whaler.oasys.tool.MyMesgSender;
 
+import liquibase.pro.packaged.id;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -57,6 +67,8 @@ implements OperatorService {
     private UserService userService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private PermissionService permissionService;
     @Autowired
     private MyMesgSender myMesgSender;
 
@@ -176,6 +188,18 @@ implements OperatorService {
         if (task == null) {
             throw new ApiException("任务不存在");
         }
+        // 清空已填写的表单信息
+        FormInfo taskFormInfo = taskService.getTaskFormModel(taskId);
+        if(taskFormInfo==null){
+            throw new ApiException("表单不存在");
+        }
+        List<FormField>formFields=((SimpleFormModel)taskFormInfo.getFormModel()).getFields();
+        Map<String,String>nullMap=new HashMap<>();
+        formFields.forEach(formField->{
+            nullMap.put(formField.getId(), null);
+        });
+        formService.saveFormData(taskId, nullMap);
+
         taskService.setAssignee(taskId, null);
         taskService.setOwner(taskId, null);
     }
@@ -212,6 +236,102 @@ implements OperatorService {
             }).collect(Collectors.toList());
         return taskVos;
 
+    }
+
+    @Override
+    public List<String> listOperatorCandidateUsers(String taskId) {
+        Task task=taskService.createTaskQuery().taskId(taskId).singleResult();
+        if (task==null) {
+            throw new ApiException("任务不存在");
+        }
+        Set<String> userNames=new HashSet<>();
+        LambdaQueryWrapper<UserEntity>lambdaQueryWrapper=new LambdaQueryWrapper<>();
+        // 获取所有权限
+        List<Long>permissionIds=permissionService.list().stream()
+            .filter(permission->{
+                return permission.getIsOperator();
+        }).map(permission->permission.getId()).collect(Collectors.toList());
+        List<Long>candidateUsers=new ArrayList<>();
+        // 获取候选用户权限
+        permissionIds.forEach(
+            permissionId->{
+                Task tmp=taskService.createTaskQuery()
+                    .taskId(taskId)
+                    .taskCandidateUser(permissionId.toString()).singleResult();
+                if (tmp!=null) {
+                    candidateUsers.add(permissionId);
+                }
+            }
+        );
+        // 查询拥有候选用户权限的所有用户
+        candidateUsers.forEach(
+            candidateUser->{
+                lambdaQueryWrapper.eq(UserEntity::getPermissionId, candidateUser);
+                List<String>names=userService.getBaseMapper().selectList(lambdaQueryWrapper)
+                    .stream().map(userEntity->userEntity.getName()).collect(Collectors.toList());
+                names.forEach(name->userNames.add(name));
+                lambdaQueryWrapper.clear();
+            }
+        );
+
+        // 获取候选类别
+        List<Long>categoryIds=categoryService.list().stream()
+            .map(category->category.getId()).collect(Collectors.toList());
+        List<Long>candidateGroups=new ArrayList<>();
+        categoryIds.forEach(
+            categoryId->{
+                Task tmp=taskService.createTaskQuery()
+                    .taskId(taskId)
+                    .taskCategory(categoryId.toString()).singleResult();
+                if (tmp!=null) {
+                    candidateGroups.add(categoryId);
+                }
+            }
+        );
+        // 查询符合候选类别的所有用户权限
+        candidateGroups.forEach(
+            candidateGroup->{
+                List<Long>ids=categoryService.selectCategoryIdsByPermissionId(candidateGroup);
+                // 查找符合用户权限的所有用户
+                ids.forEach(
+                    id->{
+                        lambdaQueryWrapper.eq(UserEntity::getPermissionId, id);
+                        List<String>names=userService.getBaseMapper().selectList(lambdaQueryWrapper)
+                            .stream().map(userEntity->userEntity.getName()).collect(Collectors.toList());
+                        names.forEach(name->userNames.add(name));
+                        lambdaQueryWrapper.clear();
+                    }
+                );
+            }
+        );
+        // 如果没有设置候选，返回本部门用户
+        if (userNames.size()==0) {
+            // 获得部门名称
+            String department=userService.selectByUserId(UserContext.getCurrentUserId()).getDepartment();
+            LambdaQueryWrapper<PermissionEntity>lambdaQueryWrapper2=new LambdaQueryWrapper<>();
+            lambdaQueryWrapper2.eq(PermissionEntity::getDepartment, department)
+                .eq(PermissionEntity::getIsOperator, true);
+            // 查询该部门所有用户权限
+            List<Long> ids=permissionService.getBaseMapper().selectList(lambdaQueryWrapper2)
+                .stream().map(permissionEntity->permissionEntity.getId()).collect(Collectors.toList());
+            lambdaQueryWrapper2.clear();
+            // 查询符合用户权限的所有用户
+            ids.forEach(
+                id->{
+                    lambdaQueryWrapper.eq(UserEntity::getPermissionId, id);
+                    List<String>names=userService.getBaseMapper().selectList(lambdaQueryWrapper)
+                        .stream().map(userEntity->userEntity.getName()).collect(Collectors.toList());
+                    names.forEach(name->userNames.add(name));
+                    lambdaQueryWrapper.clear();
+                }
+            );
+        }
+        // 删除本人
+        String myName=userService.selectByUserId(UserContext.getCurrentUserId()).getName();
+        if (userNames.contains(myName)) {
+            userNames.remove(myName);
+        }
+        return userNames.stream().collect(Collectors.toList());
     }
 
     @Override
@@ -333,6 +453,13 @@ implements OperatorService {
             throw new ApiException("任务不存在");
         }
         taskService.setAssignee(taskId, task.getOwner());
+        // 记录协作历史
+        String jsonString=(String)runtimeService.getVariable(task.getExecutionId(), "formList");
+        List<String>formList=JSON.parseArray(jsonString, String.class);
+        formList.add(task.getName()+"协作中");
+        jsonString=JSON.toJSONString(formList);
+        runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
+
         String msg=String.format(
             "您委派的任务 %s 已经完成，请及时完成受理\n",
             task.getId()
