@@ -16,17 +16,6 @@ class NotificationService {
     );
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-    final androidImplementation = flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-
-    if (androidImplementation != null) {
-      final bool? granted = await androidImplementation.requestPermission();
-      if (granted == false) {
-        // Handle permission denial here if needed
-      }
-    }
   }
 
   Future<void> showNotification(String title, String body) async {
@@ -39,8 +28,10 @@ class NotificationService {
       priority: Priority.high,
       showWhen: false,
     );
+
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
+
     await flutterLocalNotificationsPlugin.show(
       0, // Notification ID
       title,
