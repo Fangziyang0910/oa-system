@@ -107,6 +107,8 @@ class _CurrentOperationListWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = Provider.of<UserTokenProvider>(context).username ?? '';
+
     return Scaffold(
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -116,6 +118,8 @@ class _CurrentOperationListWidgetState
                 itemCount: _tasks.length,
                 itemBuilder: (context, index) {
                   final task = _tasks[index];
+                  final bool isOwner = task['ownerName'] == currentUser;
+
                   return Card(
                     margin: EdgeInsets.all(16.0),
                     child: ListTile(
@@ -138,6 +142,16 @@ class _CurrentOperationListWidgetState
                         '当前任务阶段：' + task['taskName'],
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
+                      trailing: isOwner
+                          ? null
+                          : Text(
+                              '协助',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       onTap: () {
                         Navigator.push(
                           context,

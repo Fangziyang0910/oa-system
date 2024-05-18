@@ -1,6 +1,7 @@
 // ignore_for_file: use_super_parameters, library_private_types_in_public_api, prefer_const_constructors
 
 import 'package:fixflow/component/approvalpage/current_approvallist.dart';
+import 'package:fixflow/component/approvalpage/current_candidateApprovalList.dart';
 import 'package:fixflow/component/approvalpage/history_approvallist.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,14 @@ class _ApprovalPageState extends State<ApprovalPage> {
   int _selectedIndex = 0; // 默认选中第一个选项
 
   // 选项名称
-  final List<String> _options = ['当前审批', '历史审批'];
+  final List<String> _options = ['我的审批', '历史审批', '审批申领'];
+
+  // 页面组件列表
+  final List<Widget> _pages = [
+    CurrentApprovalListWidget(),
+    HistoryApprovalListWidget(),
+    CurrentCandidateApprovalList(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +44,15 @@ class _ApprovalPageState extends State<ApprovalPage> {
               items: [
                 PopupMenuItem<int>(
                   value: 0,
-                  child: Text('当前审批'),
+                  child: Text('我的审批'),
                 ),
                 PopupMenuItem<int>(
                   value: 1,
                   child: Text('历史审批'),
+                ),
+                PopupMenuItem<int>(
+                  value: 2,
+                  child: Text('审批申领'),
                 ),
               ],
             ).then((value) {
@@ -53,7 +65,7 @@ class _ApprovalPageState extends State<ApprovalPage> {
           },
         ),
       ),
-      body: _selectedIndex == 0 ? CurrentApprovalListWidget() : HistoryApprovalListWidget(),
+      body: _pages[_selectedIndex],
     );
   }
 }

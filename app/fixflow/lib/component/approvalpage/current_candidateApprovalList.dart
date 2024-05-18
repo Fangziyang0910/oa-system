@@ -1,25 +1,25 @@
-// ignore_for_file: prefer_const_constructors, prefer_interpolation_to_compose_strings
-
 import 'dart:convert';
 
+import 'package:fixflow/component/approvalpage/taskDetail.dart';
 import 'package:fixflow/component/error_snackbar.dart';
-import 'package:fixflow/component/operationpage/operationDetail.dart';
 import 'package:fixflow/config/api_url.dart';
 import 'package:fixflow/config/user_token_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
-class CurrentCandidateTaskList extends StatefulWidget {
-  const CurrentCandidateTaskList({super.key});
+class CurrentCandidateApprovalList extends StatefulWidget {
+  const CurrentCandidateApprovalList({super.key});
 
   @override
-  State<CurrentCandidateTaskList> createState() => _CurrentCandidateTaskListState();
+  State<CurrentCandidateApprovalList> createState() => _CurrentCandidateApprovalListState();
 }
 
-class _CurrentCandidateTaskListState extends State<CurrentCandidateTaskList> {
+class _CurrentCandidateApprovalListState extends State<CurrentCandidateApprovalList> {
   List<Map<String, dynamic>> _tasks = [];
   bool _isLoading = false;
+
   Future<void> _fetchData({bool refresh = false}) async {
     if (!refresh) {
       setState(() {
@@ -35,7 +35,7 @@ class _CurrentCandidateTaskListState extends State<CurrentCandidateTaskList> {
 
     try {
       final response = await http.get(
-        Uri.parse(ApiUrls.listOperatorCandidateTasks),
+        Uri.parse(ApiUrls.listApprovalCandidateTasks),
         headers: {
           'Accept': 'application/json',
           'Authorization': token,
@@ -106,8 +106,7 @@ class _CurrentCandidateTaskListState extends State<CurrentCandidateTaskList> {
   }
 
   Future<void> _claimTask(String taskId) async {
-    print('Task $taskId claimed');
-    final String claimUrl = ApiUrls.claimCandidateTask + '/' + taskId;
+    final String claimUrl = ApiUrls.claimCandidateApprovalTask + '/' + taskId;
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
 
     try {
@@ -130,9 +129,8 @@ class _CurrentCandidateTaskListState extends State<CurrentCandidateTaskList> {
           Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => OperationDetailWidget(
+                            builder: (context) => TaskDetailWidget(
                               taskId: taskId,
-
                             ),
                           ),
                         );
@@ -196,7 +194,7 @@ class _CurrentCandidateTaskListState extends State<CurrentCandidateTaskList> {
                       ),
                       trailing: ElevatedButton(
                         onPressed: () async => await _claimTask(task['taskId']),
-                        child: Text('申领任务'),
+                        child: Text('申领审批'),
                       ),
                       // Removed onTap
                     ),

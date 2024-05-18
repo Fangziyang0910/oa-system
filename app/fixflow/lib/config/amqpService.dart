@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dart_amqp/dart_amqp.dart' as amqp;
 import 'package:fixflow/config/notificationService.dart';
 import 'package:fixflow/config/user_token_provider.dart';
@@ -48,7 +50,15 @@ class AMQPService {
         print("Consumer successfully started");
         consumer.listen((amqp.AmqpMessage message) {
           print(" [x] Received ${message.payloadAsString}");
-          notificationService.showNotification("New Message", message.payloadAsString);
+
+          try {
+            var decodedPayload = jsonDecode(message.payloadAsString);
+            String msgName = decodedPayload['msgName'];
+            String msgContent = decodedPayload['msgContent'];
+            notificationService.showNotification(msgName, msgContent);
+          } catch (e) {
+            print("Error parsing message payload: $e");
+          }
         }).onDone(() {
           _isListening = false;
           print("Consumer has stopped");
