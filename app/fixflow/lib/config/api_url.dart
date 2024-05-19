@@ -33,7 +33,7 @@ class ApiUrls {
 
   /* --------------approval api--------------  */
   //list ApprovalTasksNotCompleted
-  static const String listApprovalTasksNotCompleted = '$baseUrl/approver/listApprovalTasksNotCompleted';
+  static const String listApprovalTasksNotCompleted = '$baseUrl/approver/listApprovalAssignTasks';
   //list ApprovalTasksCompleted
   static const String listApprovalTasksCompleted = '$baseUrl/approver/listApprovalTasksCompleted';
   //get TaskStartForm
@@ -46,6 +46,11 @@ class ApiUrls {
   static const String completeApprovalTask = '$baseUrl/approver/completeApprovalTask';
   //get Histotical Form
   static const String getHistoricalTaskForm = '$baseUrl/approver/getHistoricalForm';
+  //list ApprovalCandidateTasks
+  static const String listApprovalCandidateTasks = '$baseUrl/approver/listApprovalCandidateTasks';
+  //claimCandidateTask
+  static const String claimCandidateApprovalTask = '$baseUrl/approver/claimCandidateTask';
+
 
   /* -------------operator api ----------------*/
   //list OperatorTasksCompleted
@@ -70,5 +75,24 @@ class ApiUrls {
   static const String saveOperatorTask = '$baseUrl/operator/saveOperatorTask';
   //unclaim CandidateTask
   static const String unclaimCandidateTask = '$baseUrl/operator/unclaimCandidateTask';
+  //list OperatorCandidateUsers
+  static const String listOperatorCandidateUsers = '$baseUrl/operator/listOperatorCandidateUsers';
+  //assignTask
+  static const String assignTask = '$baseUrl/operator/assignTask';
+  //get TaskNotCompleted
+  static const String getTaskNotCompleted = '$baseUrl/operator/getTaskNotCompleted';
+  //unassignTask
+  static const String unassignTask = '$baseUrl/operator/unassignTask';
+  //endAssignedTask
+  static const String endAssignedTask = '$baseUrl/operator/endAssignedTask';
+
+
+
+  
+
+  
+
+
+  
 
 }
