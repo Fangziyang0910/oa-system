@@ -1,6 +1,8 @@
 package com.whaler.oasys.service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ReportServiceTest {
     @Autowired
     private ReportService reportService;
+    @Autowired
+    private ScheduleService scheduleService;
 
     @Test
     @Transactional
@@ -35,8 +39,9 @@ public class ReportServiceTest {
         report.put("1", 1);
         report.put("2", 2);
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
-        String createTime=ft.format(calendar.getTime());
+        // SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
+        LocalDate createTime=calendar.getTime().toInstant()
+            .atZone(ZoneId.systemDefault()).toLocalDate();
         String title=createTime+"日报";
         String type="日报";
         ReportEntity reportEntity=new ReportEntity()
@@ -50,5 +55,15 @@ public class ReportServiceTest {
                 new LambdaQueryWrapper<ReportEntity>()
             )
         );
+    }
+
+    @Test
+    public void testDailyScheduledTask(){
+        scheduleService.dailyScheduledTask();
+    }
+
+    @Test
+    public void testWeeklyScheduledTask(){
+        scheduleService.weeklyScheduledTask();
     }
 }

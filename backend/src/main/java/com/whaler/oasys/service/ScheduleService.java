@@ -5,5 +5,7 @@ public interface ScheduleService {
 
     void weeklyScheduledTask();
 
+    void adminBoardScheduledTask();
+
     void dueWarningTask();
 }

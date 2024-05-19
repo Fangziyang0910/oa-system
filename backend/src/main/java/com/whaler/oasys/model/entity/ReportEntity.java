@@ -1,5 +1,7 @@
 package com.whaler.oasys.model.entity;
 
+import java.time.LocalDate;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import lombok.Data;
@@ -14,6 +16,6 @@ public class ReportEntity
 extends BaseEntity {
     private String title;
     private String content;
-    private String createTime;
+    private LocalDate createTime;
     private String type;
 }

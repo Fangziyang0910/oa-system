@@ -244,22 +244,28 @@ implements OperatorService {
         if (task==null) {
             throw new ApiException("任务不存在");
         }
-        String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
-        String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
-        String processDefinitionName=repositoryService.createProcessDefinitionQuery()
-            .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
-        TaskVo taskVo=new TaskVo();
-        taskVo.setTaskId(taskId)
-            .setTaskName(task.getName())
-            .setExecutionId(task.getExecutionId())
-            .setStarterName(starter)
-            .setOwnerName(task.getOwner())
-            .setAssigneeName(task.getAssignee())
-            .setProcessDefinitionName(processDefinitionName)
-            .setDescription(task.getDescription())
-            .setDueTime(task.getDueDate().toString())
-            .setEndTime(null);
-        return taskVo;
+        try{
+            String starterId=(String)runtimeService.getVariable(task.getExecutionId(), "starter");
+            String starter=userService.selectByUserId(Long.parseLong(starterId)).getName();
+            String processDefinitionName=repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(task.getProcessDefinitionId()).singleResult().getName();
+            TaskVo taskVo=new TaskVo();
+            taskVo.setTaskId(taskId)
+                .setTaskName(task.getName())
+                .setExecutionId(task.getExecutionId())
+                .setStarterName(starter)
+                .setOwnerName(task.getOwner())
+                .setAssigneeName(task.getAssignee())
+                .setProcessDefinitionName(processDefinitionName)
+                .setDescription(task.getDescription())
+                .setEndTime(null);
+            if (task.getDueDate()!=null) {
+                taskVo.setDueTime(task.getDueDate().toString());
+            }
+            return taskVo;
+        }catch(Exception e){
+            throw new ApiException("任务信息获取异常");
+        }
     }
 
     @Override
@@ -477,10 +483,11 @@ implements OperatorService {
             throw new ApiException("任务不存在");
         }
         taskService.setAssignee(taskId, task.getOwner());
+        String userName=userService.selectByUserId(UserContext.getCurrentUserId()).getName();
         // 记录协作历史
         String jsonString=(String)runtimeService.getVariable(task.getExecutionId(), "formList");
         List<String>formList=JSON.parseArray(jsonString, String.class);
-        formList.add(task.getName()+"协作中");
+        formList.add(task.getName()+"由 "+userName+" 协作中");
         jsonString=JSON.toJSONString(formList);
         runtimeService.setVariable(task.getExecutionId(), "formList", jsonString);
 
