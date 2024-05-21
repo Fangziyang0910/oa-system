@@ -1,6 +1,8 @@
 package com.whaler.oasys.service.impl;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ import com.whaler.oasys.model.param.AdministratorParam;
 import com.whaler.oasys.model.param.LoginParam;
 import com.whaler.oasys.model.vo.AdministratorVo;
 import com.whaler.oasys.model.vo.ProcessDefinitionVo;
+import com.whaler.oasys.model.vo.ReportVo;
 import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.service.AdministratorService;
 import com.whaler.oasys.service.ReportService;
@@ -122,5 +125,46 @@ implements AdministratorService {
         LambdaQueryWrapper<ReportEntity>lambdaQueryWrapper=new LambdaQueryWrapper<>();
         List<ReportEntity>reportEntities=reportService.getBaseMapper().selectList(lambdaQueryWrapper);
         return reportEntities;
+    }
+
+    @Override
+    public List<ReportVo> listWeeklyReports() {
+        LambdaQueryWrapper<ReportEntity>lambdaQueryWrapper=new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ReportEntity::getType, "周报");
+        List<ReportEntity>reportEntities=reportService.getBaseMapper()
+            .selectList(lambdaQueryWrapper);
+        List<ReportVo>reportVos=new ArrayList<>();
+        reportEntities.forEach(
+            reportEntity->{
+                ReportVo reportVo=new ReportVo();
+                LocalDate startTime=reportEntity.getCreateTime().minusDays(7);
+                reportVo.setReportId(Long.toString(reportEntity.getId()))
+                    .setStartTime(startTime)
+                    .setEndTime(reportEntity.getCreateTime());
+                reportVos.add(reportVo);
+            }
+        );
+        return reportVos;
+    }
+
+    @Override
+    public ReportEntity getWeeklyReport(String reportId){
+        ReportEntity reportEntity= reportService.getBaseMapper().selectById(Long.parseLong(reportId));
+        if (reportEntity==null) {
+            throw new ApiException("周报不存在");
+        }
+        return reportEntity;
+    }
+
+    @Override
+    public ReportEntity getDailyReport(LocalDate localDate) {
+        LambdaQueryWrapper<ReportEntity>lambdaQueryWrapper=new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ReportEntity::getType, "日报");
+        lambdaQueryWrapper.eq(ReportEntity::getCreateTime, localDate);
+        ReportEntity reportEntity=reportService.getBaseMapper().selectOne(lambdaQueryWrapper);
+        if (reportEntity==null) {
+            throw new ApiException("日报不存在");
+        }
+        return reportEntity;
     }
 }

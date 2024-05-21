@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.whaler.oasys.Main;
 import com.whaler.oasys.model.entity.ReportEntity;
 import com.whaler.oasys.model.entity.UserEntity;
 import com.whaler.oasys.service.CategoryService;
@@ -46,6 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ScheduleServiceImpl
 implements ScheduleService {
+    @Autowired
+    private Main main;
     @Autowired
     private HistoryService historyService;
     @Autowired
@@ -210,7 +213,9 @@ implements ScheduleService {
 
         String msg=JSON.toJSONString(report);
         myMesgSender.sendMessage("admin", "管理员面板", msg);
-
+        synchronized (Main.sharedData) {
+            Main.sharedData.put("msg", msg);
+        }
     }
 
 
