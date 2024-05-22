@@ -31,6 +31,7 @@ import com.whaler.oasys.security.JwtManager;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.AdministratorService;
 import com.whaler.oasys.service.ApplicantService;
+import com.whaler.oasys.service.ScheduleService;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
@@ -44,6 +45,8 @@ public class AdministratorController {
     private AdministratorService administratorService;
     @Autowired
     private ApplicantService applicantService;
+    @Autowired
+    private ScheduleService scheduleService;
     @Autowired
     private JwtManager jwtManager;
 
@@ -161,10 +164,14 @@ public class AdministratorController {
     }
 
     @ApiOperation("管理员查询日报详情")
-    @GetMapping("/getDailyReport/{localDate}")
+    @GetMapping("/getDailyReport/{date}")
     public ReportEntity getDailyReport(
-        @PathVariable(value = "localDate") LocalDate localDate
+        @PathVariable(value = "date") String date
     ) {
+        LocalDate localDate = LocalDate.parse(date);
+        if (localDate==null) {
+            throw new ApiException("日期格式错误");
+        }
         return administratorService.getDailyReport(localDate);
     }
 
@@ -179,5 +186,17 @@ public class AdministratorController {
             throw new ApiException("暂无数据");
         }
         return info;
+    }
+
+    @ApiOperation("测试生成日报")
+    @GetMapping("/generateDailyReport")
+    public void insertDailyReport() {
+        scheduleService.dailyScheduledTask();
+    }
+
+    @ApiOperation("测试生成周报")
+    @GetMapping("/generateWeeklyReport")
+    public void insertWeeklyReport() {
+        scheduleService.weeklyScheduledTask();
     }
 }

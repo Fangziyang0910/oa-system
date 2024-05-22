@@ -40,7 +40,6 @@ import com.whaler.oasys.service.ScheduleService;
 import com.whaler.oasys.service.UserService;
 import com.whaler.oasys.tool.MyMesgSender;
 
-import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -93,10 +92,14 @@ implements ScheduleService {
 
         List<Map<String,String>>subreports=new ArrayList<>();
         for(ProcessDefinition processDefinition:processDefinitions){
-            Map<String,String>subreport=getProcessInfo(processDefinition.getKey(), processDefinition.getName() ,start, end);
-            subreports.add(subreport);
+            try{
+                Map<String,String>subreport=getProcessInfo(processDefinition.getKey(), processDefinition.getName() ,start, end);
+                subreports.add(subreport);
+            }catch(Exception e){
+                continue;
+            }
         }
-        report.put("流程信息", subreports);
+        report.put("流程详细信息", subreports);
         
         // SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
         LocalDate createTime=end.getTime().toInstant()
@@ -109,7 +112,12 @@ implements ScheduleService {
             .setContent(JSON.toJSONString(report))
             .setCreateTime(createTime)
             .setType(type);
-        reportService.getBaseMapper().insert(reportEntity);
+
+        try{
+            reportService.getBaseMapper().insert(reportEntity);
+        }catch(Exception e){
+            ;
+        }
     }
 
     @Override
@@ -175,7 +183,7 @@ implements ScheduleService {
             Map<String,String>subreport=getProcessInfo(processDefinition.getKey(), processDefinition.getName() ,start, end);
             subreports.add(subreport);
         }
-        report.put("流程信息", subreports);
+        report.put("流程详细信息", subreports);
         
         // SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
         LocalDate createTime=end.getTime().toInstant()
@@ -187,8 +195,12 @@ implements ScheduleService {
             .setContent(JSON.toJSONString(report))
             .setCreateTime(createTime)
             .setType(type);
-        reportService.getBaseMapper().insert(reportEntity);
 
+        try{
+            reportService.getBaseMapper().insert(reportEntity);
+        }catch(Exception e){
+            ;
+        }
     }
 
     /**
@@ -196,8 +208,39 @@ implements ScheduleService {
      * 通过@Scheduled注解配置，任务将每隔5分钟执行一次  。
      */
     @Override
-    @Scheduled(cron = "*/5 * * * * ?")
+    @Scheduled(cron = "*/1 * * * * ?")
     public void adminBoardScheduledTask(){
+        List<ProcessDefinition>processDefinitions=repositoryService.createProcessDefinitionQuery().list();
+        List<Map<String,String>> reports=new ArrayList<>();
+        processDefinitions.forEach(
+            processDefinition->{
+                try{
+                    String processDefinitionName=processDefinition.getName();
+                    String processDefinitionKey=processDefinition.getKey();
+                    Integer processInstances=runtimeService.createProcessInstanceQuery().processDefinitionKey(processDefinitionKey).list().size();
+                    Integer approvalTasks=taskService.createTaskQuery().taskDescription("审批").processDefinitionKey(processDefinitionKey).list().size();
+                    Integer operateTasks=taskService.createTaskQuery().taskDescription("操作").processDefinitionKey(processDefinitionKey).list().size();
+                    Integer duedTasks=taskService.createTaskQuery().taskDueBefore(
+                        Calendar.getInstance().getTime()
+                    ).processDefinitionKey(processDefinitionKey).list().size();
+            
+                    Map<String,String> subreport=new HashMap<>();
+                    subreport.put("流程名称", processDefinitionName);
+                    subreport.put("运行中的流程实例数量", processInstances.toString());
+                    subreport.put("未完成的审批任务数量", approvalTasks.toString());
+                    subreport.put("未完成的操作任务数量", operateTasks.toString());
+                    subreport.put("已经超时的任务数量", duedTasks.toString());
+   
+                    reports.add(subreport);
+                }catch(Exception e){
+                    return;
+                }
+            }
+        );
+
+        Map<String,Object>report=new HashMap<>();
+        report.put("流程详细信息", reports);
+        
         Integer processInstances=runtimeService.createProcessInstanceQuery().list().size();
         Integer approvalTasks=taskService.createTaskQuery().taskDescription("审批").list().size();
         Integer operateTasks=taskService.createTaskQuery().taskDescription("操作").list().size();
@@ -205,11 +248,13 @@ implements ScheduleService {
             Calendar.getInstance().getTime()
         ).list().size();
 
-        Map<String,String> report=new HashMap<>();
-        report.put("运行中的流程实例数量", processInstances.toString());
-        report.put("未完成的审批任务数量", approvalTasks.toString());
-        report.put("未完成的操作任务数量", operateTasks.toString());
-        report.put("已经超时的任务数量", duedTasks.toString());
+        Map<String,String> subreport=new HashMap<>();
+        subreport.put("运行中的流程实例数量", processInstances.toString());
+        subreport.put("未完成的审批任务数量", approvalTasks.toString());
+        subreport.put("未完成的操作任务数量", operateTasks.toString());
+        subreport.put("已经超时的任务数量", duedTasks.toString());
+
+        report.put("汇总信息", subreport);
 
         String msg=JSON.toJSONString(report);
         myMesgSender.sendMessage("admin", "管理员面板", msg);
