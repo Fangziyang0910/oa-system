@@ -1,6 +1,6 @@
 {
-    "key": "maintainerOperation.form",
-    "name": "运维人员操作回单",
+    "key": "maintainerInternalPlatform.form",
+    "name": "运维人员内部平台维护工单",
     "fields": [
         {
             "id": "maintainerName",
@@ -26,6 +26,20 @@
         {
             "id": "maintainerOperation",
             "name": "运维人员操作",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "developerOperation",
+            "name": "研发人员操作",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "testerOperation",
+            "name": "测试人员操作",
             "type": "string",
             "required": true,
             "placeholder": "empty"

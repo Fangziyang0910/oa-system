@@ -1,0 +1,27 @@
+{
+    "key": "officerRegistry.form",
+    "name": "行政助理登记表",
+    "fields": [
+        {
+            "id": "officerName",
+            "name": "助理姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "officerEmail",
+            "name": "助理邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "overtimeProver",
+            "name": "加班证明",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

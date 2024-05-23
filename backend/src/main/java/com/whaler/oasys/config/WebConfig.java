@@ -42,7 +42,7 @@ implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor())
         .addPathPatterns(
             "/user/**",
-            "/administrator/**",
+            "/admin/**",
             "/operator/**",
             "/approver/**",
             "/applicant/**"

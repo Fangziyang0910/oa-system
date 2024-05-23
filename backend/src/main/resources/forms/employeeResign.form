@@ -1,38 +1,38 @@
 {
-    "key": "testerOperation.form",
-    "name": "研发人员操作回单",
+    "key": "employeeResign.form",
+    "name": "员工辞职申请表",
     "fields": [
         {
-            "id": "testerName",
-            "name": "测试人员姓名",
+            "id": "applicantName",
+            "name": "员工姓名",
             "type": "string",
             "required": true,
             "placeholder": "empty"
         },
         {
-            "id": "testerRole",
-            "name": "测试人员职位",
+            "id": "applicantDepartment",
+            "name": "员工部门",
+            "type": "string",
+            "required": true,
+            "placeholder": "/permission/getDepartments"
+        },
+        {
+            "id": "applicantEmail",
+            "name": "员工邮箱",
             "type": "string",
             "required": true,
             "placeholder": "empty"
         },
         {
-            "id": "testerEmail",
-            "name": "测试人员邮箱",
-            "type": "string",
+            "id": "time",
+            "name": "离职日期",
+            "type": "date",
             "required": true,
             "placeholder": "empty"
         },
         {
-            "id": "testerOperation",
-            "name": "测试人员操作",
-            "type": "string",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
-            "id": "testerFeedback",
-            "name": "测试人员反馈",
+            "id": "reason",
+            "name": "离职理由",
             "type": "string",
             "required": true,
             "placeholder": "empty"

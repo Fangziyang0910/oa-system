@@ -1,0 +1,27 @@
+{
+    "key": "officerResign.form",
+    "name": "行政离职登记表",
+    "fields": [
+        {
+            "id": "officerName",
+            "name": "助理姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "officerEmail",
+            "name": "助理邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "resignInfo",
+            "name": "离职手续信息",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

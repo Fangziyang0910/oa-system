@@ -1,0 +1,34 @@
+{
+    "key": "officerApproval.form",
+    "name": "办公室主任审批表",
+    "fields": [
+        {
+            "id": "officerName",
+            "name": "主任姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "officerEmail",
+            "name": "主任邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "officerOpinion",
+            "name": "主任意见",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isOfficerApproval",
+            "name": "主任审批结果",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

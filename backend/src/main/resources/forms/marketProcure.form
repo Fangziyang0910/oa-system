@@ -1,0 +1,34 @@
+{
+    "key": "marketProcure.form",
+    "name": "市场部采购表",
+    "fields": [
+        {
+            "id": "marketName",
+            "name": "专员姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "marketEmail",
+            "name": "专员邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "providerDescription",
+            "name": "供应商信息",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "procurement",
+            "name": "采购内容",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

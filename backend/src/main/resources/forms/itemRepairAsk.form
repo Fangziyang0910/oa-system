@@ -1,6 +1,6 @@
 {
-    "key": "failureReport.form",
-    "name": "故障报表",
+    "key": "itemRepairAsk.form",
+    "name": "公司物品维修工单",
     "fields": [
         {
             "id": "applicantName",
@@ -17,13 +17,6 @@
             "placeholder": "/permission/getDepartments"
         },
         {
-            "id": "applicantRole",
-            "name": "员工职位",
-            "type": "string",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
             "id": "applicantEmail",
             "name": "员工邮箱",
             "type": "string",
@@ -31,38 +24,32 @@
             "placeholder": "empty"
         },
         {
-            "id": "applicantPhone",
-            "name": "员工电话",
+            "id": "itemArea",
+            "name": "办公区域",
             "type": "string",
             "required": true,
             "placeholder": "empty"
         },
         {
-            "id": "failureType",
-            "name": "故障类型",
+            "id": "itemType",
+            "name": "物品类别",
             "type": "string",
             "required": true,
             "placeholder": "empty"
         },
         {
-            "id": "failureService",
-            "name": "故障业务",
+            "id": "itemId",
+            "name": "物品编号",
             "type": "string",
             "required": true,
             "placeholder": "empty"
         },
         {
-            "id": "failureTime",
-            "name": "故障时间",
-            "type": "date",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
-            "id": "failureDescription",
+            "id": "repairDescription",
             "name": "故障描述",
             "type": "string",
-            "required": true
+            "required": true,
+            "placeholder": "empty"
         }
     ]
 }

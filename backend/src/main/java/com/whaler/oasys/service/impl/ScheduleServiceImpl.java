@@ -208,7 +208,7 @@ implements ScheduleService {
      * 通过@Scheduled注解配置，任务将每隔5分钟执行一次  。
      */
     @Override
-    @Scheduled(cron = "*/1 * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void adminBoardScheduledTask(){
         List<ProcessDefinition>processDefinitions=repositoryService.createProcessDefinitionQuery().list();
         List<Map<String,String>> reports=new ArrayList<>();

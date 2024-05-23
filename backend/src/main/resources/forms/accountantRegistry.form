@@ -1,0 +1,34 @@
+{
+    "key": "accountantRegistry.form",
+    "name": "会计登记表",
+    "fields": [
+        {
+            "id": "accountantName",
+            "name": "会计姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "accountantEmail",
+            "name": "会计邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "eventDescription",
+            "name": "事务描述",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "registryFeedback",
+            "name": "登记反馈",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

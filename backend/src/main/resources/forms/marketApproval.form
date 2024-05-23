@@ -1,0 +1,34 @@
+{
+    "key": "marketApproval.form",
+    "name": "市场部经理审批表",
+    "fields": [
+        {
+            "id": "marketName",
+            "name": "经理姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "marketEmail",
+            "name": "经理邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "marketOpinion",
+            "name": "市场部审批意见",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "isMarketApproval",
+            "name": "市场部审批结果",
+            "type": "boolean",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

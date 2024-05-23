@@ -1,6 +1,6 @@
 {
-    "key": "maintainerOperation.form",
-    "name": "运维人员操作回单",
+    "key": "maintainerItem.form",
+    "name": "运维人员办公物品维护工单",
     "fields": [
         {
             "id": "maintainerName",
@@ -26,13 +26,6 @@
         {
             "id": "maintainerOperation",
             "name": "运维人员操作",
-            "type": "string",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
-            "id": "maintainerFeedback",
-            "name": "运维人员反馈",
             "type": "string",
             "required": true,
             "placeholder": "empty"
