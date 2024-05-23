@@ -1,4 +1,8 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:fixflow/module/admininfopage.dart';
+import 'package:fixflow/module/operationalReportPage.dart';
+import 'package:fixflow/module/operationalStatusPage.dart';
 import 'package:fixflow/module/workflowPage.dart';
 import 'package:flutter/material.dart';
 
@@ -64,21 +68,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
 
 
-class OperationalStatusPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text('运维实况')), // Placeholder content for "Operational Status"
-    );
-  }
-}
 
-class OperationalReportPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text('运维报告')), // Placeholder content for "Operational Report"
-    );
-  }
-}
+
 

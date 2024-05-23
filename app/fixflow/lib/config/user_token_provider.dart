@@ -32,7 +32,7 @@ class UserTokenProvider extends ChangeNotifier {
     _password = prefs.getString('password');
     _isAdmin = prefs.getBool('isAdmin') ?? false;
     if (_token != null) {
-      _validateToken(_token!, _isAdmin);
+      await _validateToken(_token!, _isAdmin);
     }
     notifyListeners();
   }
