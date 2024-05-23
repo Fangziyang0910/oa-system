@@ -9,39 +9,38 @@ import 'package:fixflow/config/notificationService.dart';
 
 class UserTokenProvider extends ChangeNotifier {
   String? _token;
-  bool _isValid = false;
   String? _username;
   String? _password;
+  bool _isAdmin = false;
+  int _validationResult = 0; // 0: login, 1: user home, 2: admin home
   AMQPService? _amqpService;
   Timer? _amqpTimer;
   bool _isListening = false;
 
   String? get token => _token;
-  bool get isValid => _isValid;
   String? get username => _username;
   String? get password => _password;
+  bool get isAdmin => _isAdmin;
+  int get validationResult => _validationResult;
 
   final NotificationService notificationService = NotificationService();
-
 
   Future<void> loadToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
     _username = prefs.getString('username');
     _password = prefs.getString('password');
+    _isAdmin = prefs.getBool('isAdmin') ?? false;
     if (_token != null) {
-      _isValid = await _validateToken(_token!);
-      if (_isValid) {
-        startAMQP();
-      }
+      await _validateToken(_token!, _isAdmin);
     }
     notifyListeners();
   }
 
-  Future<bool> _validateToken(String token) async {
+  Future<void> _validateToken(String token, bool isAdmin) async {
     try {
       final response = await http.get(
-        Uri.parse(ApiUrls.tokenCheck),
+        Uri.parse(isAdmin ? ApiUrls.adminTokenCheck : ApiUrls.tokenCheck),
         headers: {
           'Authorization': token,
           'Accept': 'application/json',
@@ -50,26 +49,34 @@ class UserTokenProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        return responseData['code'] == 0;
+        _validationResult = responseData['code'] == 0 ? (isAdmin ? 2 : 1) : 0;
       } else {
-        return false;
+        _validationResult = 0;
       }
     } catch (e) {
       print('Token validation failed: $e');
-      return false;
+      _validationResult = 0;
+    } finally {
+      if (_validationResult == 1) {
+        startAMQP();
+      }
+      notifyListeners();
     }
   }
 
-  Future<void> setToken(String token, String username, String password) async {
+  Future<void> setToken(String token, String username, String password, bool isAdmin) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = token;
     _username = username;
     _password = password;
+    _isAdmin = isAdmin;
+    _validationResult = isAdmin ? 2 : 1;
     await prefs.setString('token', token);
     await prefs.setString('username', username);
     await prefs.setString('password', password);
-    _isValid = true;
-    print("Token, username and password set successfully");
+    await prefs.setBool('isAdmin', isAdmin);
+    await prefs.setInt('validationResult', _validationResult);
+    print("Token, username, password, and isAdmin set successfully");
     startAMQP();
     notifyListeners();
   }
@@ -79,10 +86,13 @@ class UserTokenProvider extends ChangeNotifier {
     _token = null;
     _username = null;
     _password = null;
+    _isAdmin = false;
+    _validationResult = 0;
     await prefs.remove('token');
     await prefs.remove('username');
     await prefs.remove('password');
-    _isValid = false;
+    await prefs.remove('isAdmin');
+    await prefs.setInt('validationResult', _validationResult);
     stopAMQP();
     notifyListeners();
   }

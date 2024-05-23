@@ -87,6 +87,27 @@ class ApiUrls {
   static const String endAssignedTask = '$baseUrl/operator/endAssignedTask';
 
 
+  /* -------------operator api ----------------*/
+  // admin login
+  static const String adminLogin = '$baseUrl/admin/login';
+  // adminToken check
+  static const String adminTokenCheck = '$baseUrl/admin/validateToken';
+  // admin listProcessDefinitions
+  static const String adminlistProcessDefinitions = '$baseUrl/admin/listProcessDefinitions';
+  // admin getProcessDiagram 
+  static const String admingetProcessDiagram = '$baseUrl/admin/getProcessDiagram';
+  // admin getInfo
+  static const String admingetInfo = '$baseUrl/admin/getInfo';
+  // admin getDailyReport
+  static const String getDailyReport = '$baseUrl/admin/getDailyReport';
+
+  
+  
+
+
+  
+
+
 
   
 
