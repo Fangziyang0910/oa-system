@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.FormService;
 import org.flowable.engine.TaskService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
@@ -32,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class OperatorServiceTest {
     @Autowired
     private TaskService taskService;
-    @Autowired
-    private FormService formService;
     @Autowired
     private OperatorService operatorService;
     @Autowired

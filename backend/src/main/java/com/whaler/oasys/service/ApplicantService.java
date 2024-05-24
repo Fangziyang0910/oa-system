@@ -112,7 +112,19 @@ extends IService<ApplicantEntity> {
      */
     void abortProcessInstance(String processInstanceId, String reason);
 
+    /**
+     * 获取指定流程定义键的原始流程图。
+     * 
+     * @param processDefinitionKey 流程定义的键，用于唯一标识一个流程定义。
+     * @return 返回一个InputStream对象，该对象包含指定流程定义的原始流程图数据。
+     */
     InputStream getOriginalProcessDiagram(String processDefinitionKey);
 
+    /**
+     * 获取指定流程实例的图表输入流。
+     * 
+     * @param processInstanceId 流程实例的ID，用于标识特定的流程实例。
+     * @return 返回一个InputStream对象，该对象包含指定流程实例的图表数据。
+     */
     InputStream getProcessInstanceDiagram(String processInstanceId);
 }
