@@ -17,10 +17,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
-    WorkflowManagementPage(), // Placeholder widget for "流程管理"
-    OperationalStatusPage(), // Placeholder widget for "运维实况"
-    OperationalReportPage(), // Placeholder widget for "运维报告"
-    AdminInfoPage(), // Placeholder widget for "个人中心"
+    WorkflowManagementPage(), // widget for "流程管理"
+    OperationalStatusPage(), // widget for "运维实况"
+    OperationalReportPage(), // widget for "运维报告"
+    AdminInfoPage(), // widget for "个人中心"
   ];
 
   void _onItemTapped(int index) {

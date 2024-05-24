@@ -1,3 +1,4 @@
+// Represents details of a process instance.
 class ProcessInstanceDetail {
   final String processInstanceId;
   final ProcessDefinition processDefinition;
@@ -15,6 +16,7 @@ class ProcessInstanceDetail {
     required this.progress,
   });
 
+  // Creates a [ProcessInstanceDetail] from a JSON [Map].
   factory ProcessInstanceDetail.fromJson(Map<String, dynamic> json) {
     return ProcessInstanceDetail(
       processInstanceId: json['processInstanceId'],
@@ -29,6 +31,7 @@ class ProcessInstanceDetail {
   }
 }
 
+// Represents a process definition.
 class ProcessDefinition {
   final String processDefinitionId;
   final String processDefinitionKey;
@@ -46,6 +49,7 @@ class ProcessDefinition {
     required this.processDefinitionVersion,
   });
 
+  // Creates a [ProcessDefinition] from a JSON [Map].
   factory ProcessDefinition.fromJson(Map<String, dynamic> json) {
     return ProcessDefinition(
       processDefinitionId: json['processDefinitionId'],
@@ -58,6 +62,7 @@ class ProcessDefinition {
   }
 }
 
+// Represents progress of a process.
 class Progress {
   final String taskId;
   final String taskName;
@@ -83,6 +88,7 @@ class Progress {
     this.endTime,
   });
 
+  // Creates a [Progress] from a JSON [Map].
   factory Progress.fromJson(Map<String, dynamic> json) {
     return Progress(
       taskId: json['taskId'] as String,
@@ -99,6 +105,7 @@ class Progress {
   }
 }
 
+// Represents a form field.
 class myFormField {
   final String id;
   final String name;
@@ -112,6 +119,7 @@ class myFormField {
     this.value,
   });
 
+  // Creates a [MyFormField] from a JSON [Map].
   factory myFormField.fromJson(Map<String, dynamic> json) {
     return myFormField(
       id: json['id'],

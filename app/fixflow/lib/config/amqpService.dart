@@ -4,6 +4,7 @@ import 'package:dart_amqp/dart_amqp.dart' as amqp;
 import 'package:fixflow/config/notificationService.dart';
 import 'package:fixflow/config/user_token_provider.dart';
 
+// Service class for handling AMQP (Advanced Message Queuing Protocol) communication.
 class AMQPService {
   final NotificationService notificationService;
   final UserTokenProvider userTokenProvider;
@@ -13,6 +14,7 @@ class AMQPService {
 
   AMQPService(this.notificationService, this.userTokenProvider);
 
+  // Starts listening for incoming messages from the AMQP server.
   void startListening() {
     if (_isListening) {
       print("AMQP consumer is already running");
@@ -70,6 +72,7 @@ class AMQPService {
     });
   }
 
+  // Stops listening for messages and closes the AMQP connection.
   void stopListening() {
     _consumer?.cancel().then((_) {
       _isListening = false;

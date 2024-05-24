@@ -22,9 +22,11 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
   @override
   void initState() {
     super.initState();
+    // Fetch operational status data when the widget is initialized
     _fetchOperationalStatus = _fetchData();
   }
 
+  // Fetch operational status data from the API
   Future<Map<String, dynamic>> _fetchData() async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     final String url = ApiUrls.admingetInfo;
@@ -56,13 +58,13 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       return {};
     }
   }
-
+  // Refresh data by re-fetching from the API
   Future<void> _refreshData() async {
     setState(() {
       _fetchOperationalStatus = _fetchData();
     });
   }
-
+  // Toggle overlay visibility for detailed process information
   void _toggleOverlay(BuildContext context, Offset position, double chartWidth, Map<String, dynamic> processInfo) {
     if (_isOverlayVisible) {
       _removeOverlay();
@@ -70,7 +72,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       _showOverlay(context, position, chartWidth, processInfo);
     }
   }
-
+  // Show overlay with detailed process information
   void _showOverlay(BuildContext context, Offset position, double chartWidth, Map<String, dynamic> processInfo) {
     _removeOverlay();
     _overlayEntry = OverlayEntry(
@@ -124,7 +126,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       _isOverlayVisible = true;
     });
   }
-
+  // Build row with label and value for process information
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -143,7 +145,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       ),
     );
   }
-
+  // Remove the overlay
   void _removeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
@@ -151,7 +153,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       _isOverlayVisible = false;
     });
   }
-
+  // Build summary information grid
   Widget _buildSummaryInfo(Map<String, dynamic> summaryInfo) {
     return GridView.count(
       crossAxisCount: 2,
@@ -358,6 +360,7 @@ class __AnimatedCounterState extends State<_AnimatedCounter> with SingleTickerPr
   @override
   void initState() {
     super.initState();
+    // Initialize animation controller and animation
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
