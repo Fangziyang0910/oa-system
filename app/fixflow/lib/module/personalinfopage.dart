@@ -17,6 +17,7 @@ class PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfoState extends State<PersonalInfo> {
+  // User information fields
   String _username = '';
   String _email = '';
   String _phone = '';
@@ -27,10 +28,11 @@ class _PersonalInfoState extends State<PersonalInfo> {
   @override
   void initState() {
     super.initState();
+    // Load user information on initialization
     _loadUserInfo();
   }
 
-  // 加载用户信息
+  // Load user information from shared preferences
   void _loadUserInfo() async {
     String? userDataJson = (await SharedPreferences.getInstance()).getString('userData');
     if (userDataJson != null) {
@@ -45,7 +47,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
       });
     }
   }
-  // 退出登录
+  // Logout and clear user information
   void _logout() async {
     // 清空存储在硬盘的用户信息
     await (await SharedPreferences.getInstance()).remove('userData');

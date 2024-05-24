@@ -15,12 +15,12 @@ class WorkflowManagementPage extends StatefulWidget {
 }
 
 class _WorkflowManagementPageState extends State<WorkflowManagementPage> {
-  late Future<List<Map<String, dynamic>>> _fetchProcessDefinitions;
-  bool _isLoading = true;
-  List<Map<String, dynamic>> _processDefinitions = [];
+  late Future<List<Map<String, dynamic>>> _fetchProcessDefinitions; // Future to fetch process definitions
+  bool _isLoading = true; // Loading state
+  List<Map<String, dynamic>> _processDefinitions = [];  // List of process definitions
 
   @override
-  void initState() {
+  void initState() {  // Initialize the fetch process
     super.initState();
     _fetchProcessDefinitions = _fetchData();
     _fetchProcessDefinitions.then((data) {
@@ -31,7 +31,7 @@ class _WorkflowManagementPageState extends State<WorkflowManagementPage> {
     });
   }
 
-  Future<List<Map<String, dynamic>>> _fetchData() async {
+  Future<List<Map<String, dynamic>>> _fetchData() async {  // Fetch data from API
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     try {
       final response = await http.get(
@@ -59,11 +59,12 @@ class _WorkflowManagementPageState extends State<WorkflowManagementPage> {
         return [];
       }
     } catch (e) {
+      // Show network error snackbar
       ErrorSnackbar.showSnackBar(context, '请检查网络');
       return [];
     }
   }
-
+  // Refresh data when pulled down
   Future<void> _refreshData() async {
     setState(() {
       _isLoading = true;
@@ -74,7 +75,7 @@ class _WorkflowManagementPageState extends State<WorkflowManagementPage> {
       _isLoading = false;
     });
   }
-
+  // Display error messages based on error codes
   void _showErrorMessage(BuildContext context, int code) {
     String message;
     switch (code) {

@@ -22,9 +22,11 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
   @override
   void initState() {
     super.initState();
+    // Fetch operational status data when the widget is initialized
     _fetchOperationalStatus = _fetchData();
   }
 
+  // Fetch operational status data from the API
   Future<Map<String, dynamic>> _fetchData() async {
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
     final String url = ApiUrls.admingetInfo;
@@ -56,13 +58,13 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       return {};
     }
   }
-
+  // Refresh data by re-fetching from the API
   Future<void> _refreshData() async {
     setState(() {
       _fetchOperationalStatus = _fetchData();
     });
   }
-
+  // Toggle overlay visibility for detailed process information
   void _toggleOverlay(BuildContext context, Offset position, double chartWidth, Map<String, dynamic> processInfo) {
     if (_isOverlayVisible) {
       _removeOverlay();
@@ -70,7 +72,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       _showOverlay(context, position, chartWidth, processInfo);
     }
   }
-
+  // Show overlay with detailed process information
   void _showOverlay(BuildContext context, Offset position, double chartWidth, Map<String, dynamic> processInfo) {
     _removeOverlay();
     _overlayEntry = OverlayEntry(
@@ -124,7 +126,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       _isOverlayVisible = true;
     });
   }
-
+  // Build row with label and value for process information
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -143,7 +145,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       ),
     );
   }
-
+  // Remove the overlay
   void _removeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
@@ -151,7 +153,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
       _isOverlayVisible = false;
     });
   }
-
+  // Build summary information grid
   Widget _buildSummaryInfo(Map<String, dynamic> summaryInfo) {
     return GridView.count(
       crossAxisCount: 2,
@@ -197,7 +199,7 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
               final summaryInfo = snapshot.data!['汇总信息'] as Map<String, dynamic>;
               final detailedInfo = (snapshot.data!['流程详细信息'] as List<dynamic>).cast<Map<String, dynamic>>();
 
-              List<PieChartSectionData> pieChartSections = detailedInfo
+              List<CustomPieChartSectionData> pieChartSections = detailedInfo
                   .asMap()
                   .map((index, processInfo) {
                     final processName = processInfo['流程名称'];
@@ -205,18 +207,19 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
                     final color = Colors.primaries[index % Colors.primaries.length];
                     return MapEntry(
                       index,
-                      PieChartSectionData(
+                      CustomPieChartSectionData(
                         value: runningInstances.toDouble(),
                         color: color,
                         radius: 100,
                         badgeWidget: _Badge(processName),
                         badgePositionPercentageOffset: 1.2,
-                        title: runningInstances.toString(), // Ensure title is shown as an integer
+                        title: runningInstances.toString(),
                         titleStyle: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
+                        processInfo: processInfo,
                       ),
                     );
                   })
@@ -224,64 +227,91 @@ class _OperationalStatusPageState extends State<OperationalStatusPage> with Tick
                   .toList();
 
               return SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSummaryInfo(summaryInfo),
-                      SizedBox(height: 32),
-                      Center(
-                        child: Text('各流程运行实例', style: Theme.of(context).textTheme.headline6),
-                      ),
-                      SizedBox(height: 16),
-                      AspectRatio(
-                        aspectRatio: 1,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return GestureDetector(
-                              onTap: () {
+  child: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSummaryInfo(summaryInfo),
+        SizedBox(height: 32),
+        Center(
+          child: Text('各流程运行实例', style: Theme.of(context).textTheme.headline6),
+        ),
+        SizedBox(height: 16),
+        AspectRatio(
+          aspectRatio: 1,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final hasData = detailedInfo.any((processInfo) => int.parse(processInfo['运行中的流程实例数量']) > 0);
+
+              return GestureDetector(
+                onTap: () {
+                  _removeOverlay();
+                },
+                child: hasData
+                    ? PieChart(
+                        PieChartData(
+                          sections: pieChartSections,
+                          sectionsSpace: 4,
+                          centerSpaceRadius: 40,
+                          borderData: FlBorderData(show: false),
+                          pieTouchData: PieTouchData(
+                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                              if (!event.isInterestedForInteractions || pieTouchResponse?.touchedSection == null) {
                                 _removeOverlay();
-                              },
-                              child: PieChart(
-                                PieChartData(
-                                  sections: pieChartSections,
-                                  sectionsSpace: 4,
-                                  centerSpaceRadius: 40,
-                                  borderData: FlBorderData(show: false),
-                                  pieTouchData: PieTouchData(
-                                    touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                                      if (!event.isInterestedForInteractions || pieTouchResponse?.touchedSection == null) {
-                                        _removeOverlay();
-                                        return;
-                                      }
-                                      final touchedIndex = pieTouchResponse!.touchedSection!.touchedSectionIndex;
-                                      if (touchedIndex < 0 || touchedIndex >= pieChartSections.length) {
-                                        _removeOverlay();
-                                        return;
-                                      }
-                                      final RenderBox renderBox = context.findRenderObject() as RenderBox;
-                                      final position = renderBox.localToGlobal(Offset.zero);
-                                      final processInfo = detailedInfo[touchedIndex];
-                                      _toggleOverlay(context, position, constraints.maxWidth, processInfo);
-                                    },
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                                return;
+                              }
+                              final touchedSection = pieTouchResponse!.touchedSection!.touchedSection;
+                              if (touchedSection is CustomPieChartSectionData) {
+                                final RenderBox renderBox = context.findRenderObject() as RenderBox;
+                                final position = renderBox.localToGlobal(Offset.zero);
+                                _toggleOverlay(context, position, constraints.maxWidth, touchedSection.processInfo);
+                              }
+                            },
+                          ),
                         ),
+                      )
+                    : Center(
+                        child: Text('暂无数据'),
                       ),
-                    ],
-                  ),
-                ),
               );
+            },
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
             }
           },
         ),
       ),
     );
   }
+}
+
+class CustomPieChartSectionData extends PieChartSectionData {
+  final Map<String, dynamic> processInfo;
+
+  CustomPieChartSectionData({
+    required double value,
+    required Color color,
+    required double radius,
+    required Widget badgeWidget,
+    required double badgePositionPercentageOffset,
+    required String title,
+    required TextStyle titleStyle,
+    required this.processInfo,
+  }) : super(
+          value: value,
+          color: color,
+          radius: radius,
+          badgeWidget: badgeWidget,
+          badgePositionPercentageOffset: badgePositionPercentageOffset,
+          title: title,
+          titleStyle: titleStyle,
+        );
 }
 
 class _Badge extends StatelessWidget {
@@ -299,8 +329,7 @@ class _Badge extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black26,
-            blurRadius: 2.0,
-          ),
+            blurRadius: 2.0),
         ],
       ),
       child: Text(
@@ -331,6 +360,7 @@ class __AnimatedCounterState extends State<_AnimatedCounter> with SingleTickerPr
   @override
   void initState() {
     super.initState();
+    // Initialize animation controller and animation
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,

@@ -1,6 +1,11 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'dart:convert';
+import 'package:fixflow/config/api_url.dart';
+import 'package:fixflow/config/user_token_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class WeeklyReport extends StatefulWidget {
   const WeeklyReport({super.key});
@@ -31,15 +36,15 @@ class _WeeklyReportState extends State<WeeklyReport> {
       _errorMessage = '';
     });
 
-    final String url = 'http://139.199.168.63:8080/admin/listWeeklyReports';
-    final String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxODAyNzQ1MDAwLCJpYXQiOjE3MTY0MzE0MDB9.DKJQpdlj82ps8P_taTBe8pUiCwkvAwm4QaQr2phJ5GtQoiEWeUVldRt5a1ELJ-o45wTEUVb97DwHUZZ3DEb0uQ';
+    final String url = ApiUrls.listWeeklyReports;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
 
     try {
       final response = await http.get(
         Uri.parse(url),
         headers: {
           'Accept': 'application/json',
-          'Authorization': token,
+          'Authorization': token ?? '',
         },
       );
 
@@ -94,15 +99,15 @@ class _WeeklyReportState extends State<WeeklyReport> {
       _reportDetails = null;
     });
 
-    final String url = 'http://139.199.168.63:8080/admin/getWeeklyReport/$reportId';
-    final String token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZXhwIjoxODAyNzQ1MDAwLCJpYXQiOjE3MTY0MzE0MDB9.DKJQpdlj82ps8P_taTBe8pUiCwkvAwm4QaQr2phJ5GtQoiEWeUVldRt5a1ELJ-o45wTEUVb97DwHUZZ3DEb0uQ';
+    final String url = ApiUrls.getWeeklyReport + '/' + reportId;
+    final token = Provider.of<UserTokenProvider>(context, listen: false).token;
 
     try {
       final response = await http.get(
         Uri.parse(url),
         headers: {
           'Accept': 'application/json',
-          'Authorization': token,
+          'Authorization': token ?? '',
         },
       );
 
@@ -143,7 +148,6 @@ class _WeeklyReportState extends State<WeeklyReport> {
     }
 
     final String createTime = _reportDetails!['createTime'];
-    final String title = _reportDetails!['title'];
     final Map<String, dynamic> contentData = jsonDecode(_reportDetails!['content']);
     final Map<String, dynamic> taskInfo = contentData['任务信息'];
     final List<dynamic> processDetails = contentData['流程详细信息'];

@@ -100,6 +100,14 @@ class ApiUrls {
   static const String admingetInfo = '$baseUrl/admin/getInfo';
   // admin getDailyReport
   static const String getDailyReport = '$baseUrl/admin/getDailyReport';
+  // admin listWeeklyReports
+  static const String listWeeklyReports = '$baseUrl/admin/listWeeklyReports';
+  // admin getWeeklyReport
+  static const String getWeeklyReport = '$baseUrl/admin/getWeeklyReport';
+
+
+
+
 
   
   

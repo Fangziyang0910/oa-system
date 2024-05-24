@@ -8,14 +8,14 @@ import 'package:fixflow/config/amqpService.dart';
 import 'package:fixflow/config/notificationService.dart';
 
 class UserTokenProvider extends ChangeNotifier {
-  String? _token;
-  String? _username;
-  String? _password;
-  bool _isAdmin = false;
+  String? _token; // Token for user authentication
+  String? _username; // Username for the logged-in user
+  String? _password; // Password for the logged-in user
+  bool _isAdmin = false; // Flag to indicate if the user is an admin
   int _validationResult = 0; // 0: login, 1: user home, 2: admin home
-  AMQPService? _amqpService;
-  Timer? _amqpTimer;
-  bool _isListening = false;
+  AMQPService? _amqpService; // Service for AMQP connection
+  Timer? _amqpTimer; // Timer to periodically start AMQP listening
+  bool _isListening = false; // Flag to indicate if AMQP is listening
 
   String? get token => _token;
   String? get username => _username;
@@ -23,8 +23,9 @@ class UserTokenProvider extends ChangeNotifier {
   bool get isAdmin => _isAdmin;
   int get validationResult => _validationResult;
 
-  final NotificationService notificationService = NotificationService();
+  final NotificationService notificationService = NotificationService(); // Notification service instance
 
+  // Load token and user information from SharedPreferences
   Future<void> loadToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
@@ -37,6 +38,7 @@ class UserTokenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Validate the token by making a request to the server
   Future<void> _validateToken(String token, bool isAdmin) async {
     try {
       final response = await http.get(
@@ -64,6 +66,7 @@ class UserTokenProvider extends ChangeNotifier {
     }
   }
 
+  // Set token and user information in SharedPreferences and start AMQP service
   Future<void> setToken(String token, String username, String password, bool isAdmin) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = token;
@@ -81,6 +84,7 @@ class UserTokenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear token and user information from SharedPreferences and stop AMQP service
   Future<void> clearToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = null;
@@ -97,6 +101,7 @@ class UserTokenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Start the AMQP service and timer for periodic listening
   void startAMQP() {
     if (_amqpService == null) {
       _amqpService = AMQPService(notificationService, this);
@@ -116,6 +121,7 @@ class UserTokenProvider extends ChangeNotifier {
     }
   }
 
+  // Stop the AMQP service and timer
   void stopAMQP() {
     _amqpTimer?.cancel();
     _amqpTimer = null;
