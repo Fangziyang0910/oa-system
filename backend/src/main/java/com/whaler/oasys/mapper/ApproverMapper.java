@@ -25,6 +25,13 @@ extends BaseMapper<ApproverEntity> {
         @Param("processinstanceId") String processinstanceId
     );
 
+    /**
+     * 删除审批实体
+     * 
+     * @param approverId 审批者ID，用于标识要删除的审批者的唯一ID。
+     * @param processinstanceId 流程实例ID，用于指定删除操作的上下文，即在哪个流程实例中进行删除。
+     * @return 返回删除操作影响的行数，通常为1表示成功删除一个实体，若为0则表示未找到相关实体。
+     */
     int deleteApproverEntity(
         @Param("approverId") Long approverId,
         @Param("processinstanceId") String processinstanceId

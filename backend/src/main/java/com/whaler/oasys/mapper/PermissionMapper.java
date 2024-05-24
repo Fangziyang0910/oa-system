@@ -31,9 +31,16 @@ extends BaseMapper<PermissionEntity> {
         @Param("isOperator") Boolean isOperator
     );
 
+    /**
+     * 根据部门和角色删除记录。
+     * 
+     * @param department 部门名称，用于指定要删除的记录所属的部门。
+     * @param role 角色名称，用于指定要删除的记录所拥有的角色。
+     * @return 返回删除的记录数。
+     */
     int deleteByDepartmentRole(
-        @Param("department")String department, 
-        @Param("role")String role
+        @Param("department") String department, 
+        @Param("role") String role
     );
 
     /**
@@ -76,5 +83,12 @@ extends BaseMapper<PermissionEntity> {
      */
     List<PermissionEntity> selectByIsOperator(Boolean isOperator);
 
+    /**
+     * 选择并返回所有部门的名称列表。
+     * <p>此方法不接受任何参数，它将查询数据库或其他数据源以获取所有部门的信息。
+     * 返回的结果将是一个包含所有部门名称的字符串列表。</p>
+     *
+     * @return List<String> 所有部门的名称列表。如果没有任何部门，返回一个空列表。
+     */
     List<String> selectAllDepartments();
 }
