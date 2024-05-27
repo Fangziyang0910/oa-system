@@ -391,9 +391,11 @@ implements ScheduleService {
             for(HistoricProcessInstance process:completedProcesses){
                 totalTime+=process.getDurationInMillis();
             }
+            totalTime/=completedProcesses.size();
+            totalTime/=1000;
             Duration duration = Duration.ofSeconds(totalTime);
-            String time = String.format("%d 小时 %d 分 %d 秒", 
-                duration.toHours(), duration.toMinutes(), duration.toMillis());
+            String time = String.format("%d 小时 %d 分", 
+                duration.toHours(), duration.toMinutes()%60);
             report.put("流程实例平均处理时间", time);
         }else{
             // 如果没有完成的流程实例，则报告中填充“无数据”
@@ -442,9 +444,11 @@ implements ScheduleService {
             for(HistoricTaskInstance completedTask:completedTasks){
                 totalTime+=completedTask.getDurationInMillis();
             }
+            totalTime/=completedTasks.size();
+            totalTime/=1000;
             Duration duration = Duration.ofSeconds(totalTime);
-            String time = String.format("%d 小时 %d 分 %d 秒", 
-                duration.toHours(), duration.toMinutes(), duration.toMillis());
+            String time = String.format("%d 小时 %d 分", 
+                duration.toHours(), duration.toMinutes()%60);
             report.put("任务平均处理时间", time);
         }else{
             report.put("任务平均处理时间", "无数据");
