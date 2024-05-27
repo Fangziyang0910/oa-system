@@ -1,0 +1,20 @@
+{
+    "key": "employeeWork.form",
+    "name": "员工工作交接表",
+    "fields": [
+        {
+            "id": "worker",
+            "name": "对接人",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "content",
+            "name": "工作内容",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

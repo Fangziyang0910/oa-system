@@ -5,12 +5,7 @@ class ErrorSnackbar {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        action: SnackBarAction(
-          label: '确定',
-          onPressed: () {
-            // 关闭SnackBar
-          },
-        ),
+        duration: Duration(seconds: 1), // 设置持续时间为2秒
       ),
     );
   }

@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.whaler.oasys.Main;
-import com.whaler.oasys.model.entity.ApproverEntity;
 import com.whaler.oasys.model.vo.ApproverVo;
 import com.whaler.oasys.model.vo.FormVo;
 import com.whaler.oasys.model.vo.ProcessInstanceVo;
@@ -33,10 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ApproverServiceTest {
     @Autowired
     private ApproverService approverService;
-    @Autowired
-    private RepositoryService repositoryService;
-    @Autowired
-    private RuntimeService runtimeService;
     @Autowired
     private ApplicantService applicantService;
 

@@ -1,0 +1,41 @@
+{
+    "key": "employeeOvertimeAsk.form",
+    "name": "员工加班申请表",
+    "fields": [
+        {
+            "id": "applicantName",
+            "name": "员工姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantDepartment",
+            "name": "员工部门",
+            "type": "string",
+            "required": true,
+            "placeholder": "/permission/getDepartments"
+        },
+        {
+            "id": "applicantEmail",
+            "name": "员工邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "time",
+            "name": "加班日期",
+            "type": "date",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "reason",
+            "name": "加班理由",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

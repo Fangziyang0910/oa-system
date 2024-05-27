@@ -1,0 +1,55 @@
+{
+    "key": "itemProcureAsk.form",
+    "name": "公司物品采购申请",
+    "fields": [
+        {
+            "id": "applicantName",
+            "name": "员工姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantDepartment",
+            "name": "员工部门",
+            "type": "string",
+            "required": true,
+            "placeholder": "/permission/getDepartments"
+        },
+        {
+            "id": "applicantEmail",
+            "name": "员工邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "itemArea",
+            "name": "办公区域",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "itemType",
+            "name": "物品类别",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "itemName",
+            "name": "物品名称",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "requireDescription",
+            "name": "需求描述",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}

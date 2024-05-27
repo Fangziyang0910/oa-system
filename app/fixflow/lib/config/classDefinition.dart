@@ -1,3 +1,4 @@
+// Represents details of a process instance.
 class ProcessInstanceDetail {
   final String processInstanceId;
   final ProcessDefinition processDefinition;
@@ -15,6 +16,7 @@ class ProcessInstanceDetail {
     required this.progress,
   });
 
+  // Creates a [ProcessInstanceDetail] from a JSON [Map].
   factory ProcessInstanceDetail.fromJson(Map<String, dynamic> json) {
     return ProcessInstanceDetail(
       processInstanceId: json['processInstanceId'],
@@ -29,6 +31,7 @@ class ProcessInstanceDetail {
   }
 }
 
+// Represents a process definition.
 class ProcessDefinition {
   final String processDefinitionId;
   final String processDefinitionKey;
@@ -46,6 +49,7 @@ class ProcessDefinition {
     required this.processDefinitionVersion,
   });
 
+  // Creates a [ProcessDefinition] from a JSON [Map].
   factory ProcessDefinition.fromJson(Map<String, dynamic> json) {
     return ProcessDefinition(
       processDefinitionId: json['processDefinitionId'],
@@ -58,44 +62,50 @@ class ProcessDefinition {
   }
 }
 
+// Represents progress of a process.
 class Progress {
   final String taskId;
   final String taskName;
-  final String executionId;
+  final String? executionId;
   final String? starterName;
+  final String? ownerName;
   final String? assigneeName;
   final String? processDefinitionName;
   final String? description;
   final String? dueTime;
-  final String endTime;
+  final String? endTime;
 
   Progress({
     required this.taskId,
     required this.taskName,
-    required this.executionId,
+    this.executionId,
     this.starterName,
+    this.ownerName,
     this.assigneeName,
     this.processDefinitionName,
     this.description,
     this.dueTime,
-    required this.endTime,
+    this.endTime,
   });
 
+  // Creates a [Progress] from a JSON [Map].
   factory Progress.fromJson(Map<String, dynamic> json) {
     return Progress(
       taskId: json['taskId'] as String,
       taskName: json['taskName'] as String,
-      executionId: json['executionId'] as String,
+      executionId: json['executionId'] as String?,
       starterName: json['starterName'] as String?,
+      ownerName: json['ownerName'] as String?,
       assigneeName: json['assigneeName'] as String?,
       processDefinitionName: json['processDefinitionName'] as String?,
       description: json['description'] as String?,
       dueTime: json['dueTime'] as String?,
-      endTime: json['endTime'] as String,
+      endTime: json['endTime'] as String?,
     );
   }
 }
 
+// Represents a form field.
 class myFormField {
   final String id;
   final String name;
@@ -109,6 +119,7 @@ class myFormField {
     this.value,
   });
 
+  // Creates a [MyFormField] from a JSON [Map].
   factory myFormField.fromJson(Map<String, dynamic> json) {
     return myFormField(
       id: json['id'],

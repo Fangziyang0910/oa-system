@@ -22,14 +22,11 @@ class _PDListDialogState extends State<PDListDialog> {
   @override
   void initState() {
     super.initState();
-    // 在初始化时请求服务器获取流程列表数据
     _fetchProcessDefinitions = _fetchData();
   }
 
   Future<List<Map<String, dynamic>>> _fetchData() async {
-    // 从Provider中获取token
     final token = Provider.of<UserTokenProvider>(context, listen: false).token;
-    // 发送请求获取流程列表数据
     try {
       final response = await http.get(
         Uri.parse(ApiUrls.listProcessDefinitions),
@@ -40,44 +37,17 @@ class _PDListDialogState extends State<PDListDialog> {
       );
 
       if (response.statusCode == 200) {
-        // 解码响应数据并处理中文乱码
         final decodedResponse = utf8.decode(response.bodyBytes);
         Map<String, dynamic> responseData = jsonDecode(decodedResponse);
-        // 解析响应数据
         final int code = responseData['code'];
         if (code == 0000) {
           final List<dynamic> dataList = responseData['data'];
-          // 将数据转换为List<Map<String, dynamic>>类型
-          final List<Map<String, dynamic>> processDefinitions =
-              List<Map<String, dynamic>>.from(dataList);
-          return processDefinitions;
+          return List<Map<String, dynamic>>.from(dataList);
         } else {
-          // 根据不同的code值显示不同的弹窗
-          String message;
-          switch (code) {
-            case 1001:
-              message = "您的登录状态已过期，请重新登陆";
-              break;
-            case 1002:
-              message = "您没有相关权限";
-              break;
-            case 1003:
-              message = "参数校验失败";
-              break;
-            case 1004:
-              message = "接口异常";
-              break;
-            case 5000:
-              message = "未知错误";
-              break;
-            default:
-              message = "未知错误";
-          }
-          ErrorSnackbar.showSnackBar(context, message);
+          _handleErrorCode(context, code);
           return [];
         }
       } else {
-        // 请求失败时返回空列表
         return [];
       }
     } catch (e) {
@@ -86,10 +56,31 @@ class _PDListDialogState extends State<PDListDialog> {
     }
   }
 
+  void _handleErrorCode(BuildContext context, int code) {
+    String message;
+    switch (code) {
+      case 1001:
+        message = "您的登录状态已过期，请重新登陆";
+        break;
+      case 1002:
+        message = "您没有相关权限";
+        break;
+      case 1003:
+        message = "参数校验失败";
+        break;
+      case 1004:
+        message = "接口异常";
+        break;
+      case 5000:
+      default:
+        message = "未知错误";
+    }
+    ErrorSnackbar.showSnackBar(context, message);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      // ClipRect 用于限制 Dialog 的形状和大小
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
@@ -103,8 +94,7 @@ class _PDListDialogState extends State<PDListDialog> {
           borderRadius: BorderRadius.circular(16.0),
         ),
         constraints: BoxConstraints(
-          maxWidth:
-              MediaQuery.of(context).size.width * 0.8, // Limit the max width
+          maxWidth: MediaQuery.of(context).size.width * 0.8,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -118,55 +108,52 @@ class _PDListDialogState extends State<PDListDialog> {
               ),
             ),
             SizedBox(height: 16.0),
-            // 使用 FutureBuilder 来异步获取流程定义数据
             FutureBuilder<List<Map<String, dynamic>>>(
               future: _fetchProcessDefinitions,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Text('Failed to load data: ${snapshot.error}');
                 } else {
-                  final List<Map<String, dynamic>> processDefinitions =
-                      snapshot.data ?? [];
-                  return ListView.builder(
-                    shrinkWrap: true, // 使用 shrinkWrap 使得 ListView 只包裹其子Widget
-                    itemCount: processDefinitions.length,
-                    itemBuilder: (context, index) {
-                      final processDefinition = processDefinitions[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ApplicationForm(
-                                processDefinitionKey:
-                                    processDefinition['processDefinitionKey'],
+                  final List<Map<String, dynamic>> processDefinitions = snapshot.data ?? [];
+                  return Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: processDefinitions.length,
+                      itemBuilder: (context, index) {
+                        final processDefinition = processDefinitions[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ApplicationForm(
+                                  processDefinitionKey: processDefinition['processDefinitionKey'],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        child: Card(
-                          child: Container(
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: ListTile(
-                              title: Text(
-                                processDefinition['processDefinitionName'] ??
-                                    'Unnamed Process',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                            );
+                          },
+                          child: Card(
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
-                              subtitle: Text(
-                                processDefinition['processDefinitionKey'] ??
-                                    'No Key',
+                              child: ListTile(
+                                title: Text(
+                                  processDefinition['processDefinitionName'] ?? 'Unnamed Process',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text(
+                                  processDefinition['processDefinitionKey'] ?? 'No Key',
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 }
               },
@@ -177,3 +164,4 @@ class _PDListDialogState extends State<PDListDialog> {
     );
   }
 }
+

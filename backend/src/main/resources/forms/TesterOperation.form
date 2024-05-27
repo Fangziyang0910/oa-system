@@ -3,13 +3,6 @@
     "name": "研发人员操作回单",
     "fields": [
         {
-            "id": "testerId",
-            "name": "测试人员账户Id",
-            "type": "string",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
             "id": "testerName",
             "name": "测试人员姓名",
             "type": "string",

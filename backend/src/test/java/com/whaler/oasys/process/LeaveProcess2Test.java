@@ -1,7 +1,6 @@
 package com.whaler.oasys.process;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -18,21 +17,15 @@ import com.whaler.oasys.model.vo.TaskVo;
 import com.whaler.oasys.security.UserContext;
 import com.whaler.oasys.service.ApplicantService;
 import com.whaler.oasys.service.ApproverService;
-import com.whaler.oasys.service.OperatorService;
-
-import lombok.extern.slf4j.Slf4j;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Main.class})
 @Rollback(true)
-@Slf4j
 public class LeaveProcess2Test {
     @Autowired
     private ApplicantService applicantService;
     @Autowired
     private ApproverService approverService;
-    @Autowired
-    private OperatorService operatorService;
 
     @Test
     @Transactional

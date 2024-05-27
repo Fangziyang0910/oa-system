@@ -21,8 +21,9 @@ public class TaskVo {
     private String taskId; // 任务ID
     private String taskName; // 任务名称
     private String executionId; // 执行ID
-    private String starterName; // 任务发起人
-    private String assigneeName; // 任务执行人
+    private String starterName; // 流程发起人
+    private String ownerName; // 任务受理人
+    private String assigneeName; // 任务委托人
     private String processDefinitionName; // 流程定义标识
     private String description; // 任务描述
     private String dueTime; // 任务到期时间

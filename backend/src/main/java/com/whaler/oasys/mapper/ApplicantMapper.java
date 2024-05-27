@@ -26,6 +26,13 @@ extends BaseMapper<ApplicantEntity> {
         @Param("processinstanceId") String processinstanceId
     );
 
+    /**
+     * 删除申请人实体。
+     * 
+     * @param applicantId 申请人的唯一标识符，类型为Long。
+     * @param processinstanceId 流程实例的唯一标识符，类型为String。
+     * @return 返回操作影响的行数，类型为int。通常，如果删除成功，返回值应为1。
+     */
     int deleteApplicantEntity(
         @Param("applicantId") Long applicantId,
         @Param("processinstanceId") String processinstanceId

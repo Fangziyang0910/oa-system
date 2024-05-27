@@ -49,6 +49,12 @@ extends BaseMapper<UserEntity> {
      */
     int deleteByName(String name);
 
+    /**
+     * 根据用户名获取用户权限实体。
+     * 
+     * @param name 用户名，用于查询对应的用户权限实体。
+     * @return 返回匹配的用户权限实体，如果没有找到则返回null。
+     */
     UserPermissionEntity selecUserPermissionEntityByName(String name);
 
 }

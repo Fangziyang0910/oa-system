@@ -3,13 +3,6 @@
     "name": "运维审批表",
     "fields": [
         {
-            "id": "approverId",
-            "name": "审核账户Id",
-            "type": "string",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
             "id": "approverName",
             "name": "审核姓名",
             "type": "string",

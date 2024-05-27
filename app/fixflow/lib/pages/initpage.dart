@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:fixflow/config/user_token_provider.dart';
+import 'package:fixflow/pages/adminHomePage.dart';
 import 'package:fixflow/pages/homepage.dart';
 import 'package:fixflow/pages/loginpage.dart';
 import 'package:flutter/material.dart';
@@ -40,13 +41,13 @@ class _InitialPageState extends State<InitialPage> {
     } else {
       return Consumer<UserTokenProvider>(
         builder: (context, userTokenProvider, child) {
-          // Check the validation of the token
-          if (userTokenProvider.isValid) {
-            // Token is valid, show the home page
-            return HomePage();
-          } else {
-            // Token is not valid, show the login page
-            return LoginWidget();
+          switch (userTokenProvider.validationResult) {
+            case 1:
+              return HomePage(); // 普通用户主页
+            case 2:
+              return AdminHomePage(); // 管理员主页
+            default:
+              return LoginWidget(); // 登录界面
           }
         },
       );

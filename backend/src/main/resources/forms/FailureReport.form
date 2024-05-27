@@ -3,13 +3,6 @@
     "name": "故障报表",
     "fields": [
         {
-            "id": "applicantId",
-            "name": "申请人账户Id",
-            "type": "string",
-            "required": true,
-            "placeholder": "empty"
-        },
-        {
             "id": "applicantName",
             "name": "员工姓名",
             "type": "string",
@@ -21,7 +14,7 @@
             "name": "员工部门",
             "type": "string",
             "required": true,
-            "placeholder": "empty"
+            "placeholder": "/permission/getDepartments"
         },
         {
             "id": "applicantRole",
@@ -47,7 +40,7 @@
         {
             "id": "failureType",
             "name": "故障类型",
-            "type": "integer",
+            "type": "string",
             "required": true,
             "placeholder": "empty"
         },

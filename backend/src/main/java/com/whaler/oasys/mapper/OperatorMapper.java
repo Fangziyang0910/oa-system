@@ -25,6 +25,14 @@ extends BaseMapper<OperatorEntity> {
         @Param("processinstanceId") String processinstanceId
     );
 
+    /**
+     * 删除操作员实体。
+     * 该方法用于根据操作员ID和流程实例ID删除相关操作员实体。
+     *
+     * @param operatorId 操作员的唯一标识符，类型为Long。
+     * @param processinstanceId 流程实例的唯一标识符，类型为String。
+     * @return 返回删除操作的影响行数，类型为int。
+     */
     int deleteOperatorEntity(
         @Param("operatorId") Long operatorId,
         @Param("processinstanceId") String processinstanceId

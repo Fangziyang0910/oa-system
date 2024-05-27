@@ -1,0 +1,41 @@
+{
+    "key": "employeeResign.form",
+    "name": "员工辞职申请表",
+    "fields": [
+        {
+            "id": "applicantName",
+            "name": "员工姓名",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "applicantDepartment",
+            "name": "员工部门",
+            "type": "string",
+            "required": true,
+            "placeholder": "/permission/getDepartments"
+        },
+        {
+            "id": "applicantEmail",
+            "name": "员工邮箱",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "time",
+            "name": "离职日期",
+            "type": "date",
+            "required": true,
+            "placeholder": "empty"
+        },
+        {
+            "id": "reason",
+            "name": "离职理由",
+            "type": "string",
+            "required": true,
+            "placeholder": "empty"
+        }
+    ]
+}
