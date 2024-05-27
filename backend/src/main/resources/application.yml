@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/db01?characterEncoding=utf-8&useSSL=false&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1:3306/oasys?characterEncoding=utf-8&useSSL=false&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=UTC
     username: root
-    password: tuduo888
+    password: root
   mail:
     host: smtp.qq.com
     username: 2842650960@qq.com
