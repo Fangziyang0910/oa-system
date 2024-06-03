@@ -127,13 +127,13 @@ implements ScheduleService {
             .setCreateTime(createTime)
             .setType(type);
 
-        try{
-            // 尝试将报告实体插入数据库
-            reportService.getBaseMapper().insert(reportEntity);
-        }catch(Exception e){
-            // 对异常情况做忽略处理
-            ;
-        }
+        // try{
+        //     // 尝试将报告实体插入数据库
+        reportService.getBaseMapper().insert(reportEntity);
+        // }catch(Exception e){
+        //     // 对异常情况做忽略处理
+        //     ;
+        // }
     }
 
     /**
@@ -237,13 +237,13 @@ implements ScheduleService {
             .setCreateTime(createTime)
             .setType(type);
 
-        try{
-            // 将报告实体插入数据库
-            reportService.getBaseMapper().insert(reportEntity);
-        }catch(Exception e){
-            // 异常处理，此处为空实现
-            ;
-        }
+        // try{
+        //     // 将报告实体插入数据库
+        reportService.getBaseMapper().insert(reportEntity);
+        // }catch(Exception e){
+        //     // 异常处理，此处为空实现
+        //     ;
+        // }
     }
 
     /**
