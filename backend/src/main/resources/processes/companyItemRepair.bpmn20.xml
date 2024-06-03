@@ -8,13 +8,13 @@
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
-    <userTask id="sid-C508EDDB-58F3-4E46-922A-F028BF1118F7" name="运维处理" flowable:assignee="11" flowable:dueDate="PT5M" flowable:formKey="maintainerItem.form" flowable:formFieldValidation="true">
+    <userTask id="sid-C508EDDB-58F3-4E46-922A-F028BF1118F7" name="运维处理" flowable:candidateUsers="11" flowable:dueDate="PT5M" flowable:formKey="maintainerItem.form" flowable:formFieldValidation="true">
       <documentation>操作</documentation>
       <extensionElements>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
-    <userTask id="sid-70140BBB-8CDA-442D-A936-1D7535124F55" name="运维反馈" flowable:assignee="11" flowable:dueDate="PT5M" flowable:formKey="maintainerFeedback.form" flowable:formFieldValidation="true">
+    <userTask id="sid-70140BBB-8CDA-442D-A936-1D7535124F55" name="运维反馈" flowable:candidateUsers="11" flowable:dueDate="PT5M" flowable:formKey="maintainerFeedback.form" flowable:formFieldValidation="true">
       <documentation>操作</documentation>
       <extensionElements>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
