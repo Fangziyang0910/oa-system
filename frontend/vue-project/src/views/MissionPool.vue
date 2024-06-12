@@ -56,10 +56,10 @@
         <el-main class="main-content">
           <el-card class="user-info-card">
             <el-table :data="paginatedTasks" style="width: 100%" @row-click="handleRowClick">
-              <el-table-column prop="taskName" label="任务名称"></el-table-column>
-              <el-table-column prop="description" label="描述"></el-table-column>
-              <el-table-column prop="dueTime" label="截止时间"></el-table-column>
-              <el-table-column prop="starterName" label="发起人"></el-table-column>
+              <el-table-column prop="taskName" label="任务名称" width="130"></el-table-column>
+              <el-table-column prop="description" label="描述" width="130"></el-table-column>
+              <el-table-column prop="dueTime" label="截止时间" width="230"></el-table-column>
+              <el-table-column prop="starterName" label="发起人" width="160"></el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
                   <el-button @click.stop="claimTask(scope.row.taskId)">申领</el-button>

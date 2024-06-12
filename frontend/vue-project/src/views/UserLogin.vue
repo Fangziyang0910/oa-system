@@ -97,6 +97,9 @@ export default {
             localStorage.setItem('token', data.data.token);
             localStorage.setItem('username', data.data.name);
             localStorage.setItem('isAdmin', 'true');
+            
+          localStorage.setItem('email', data.data.email);
+          localStorage.setItem('phone', data.data.phone);
 
             // 直接跳转到 ProcessManagement 页面
             this.$router.push({ name: 'ProcessManagement' });

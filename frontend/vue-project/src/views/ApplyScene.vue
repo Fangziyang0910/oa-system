@@ -1,6 +1,6 @@
 <template>
   <el-container class="full-height-container">
-    <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+    <el-aside width="200px" class="aside">
       <el-menu :default-openeds="['1']">
         <el-submenu index="1">
           <template slot="title"><i class="el-icon-message"></i>申请记录</template>
@@ -54,10 +54,10 @@
       </el-header>
 
       <el-main class="main-content">
-        <div class="process-diagram" v-if="processDiagram">
-          <img :src="processDiagram" alt="流程图">
-        </div>
         <el-form ref="form" :model="form" label-width="120px" class="user-info-card">
+          <div class="process-diagram" v-if="processDiagram">
+            <img :src="processDiagram" alt="流程图">
+          </div>
           <el-form-item label="流程定义">
             <el-select v-model="selectedProcessDefinition" placeholder="请选择流程">
               <el-option
@@ -99,10 +99,14 @@
   </el-container>
 </template>
 
-<style>
+<style scoped>
 .full-height-container {
   height: 100vh;
   display: flex;
+}
+
+.aside {
+  background-color: rgb(238, 241, 246);
 }
 
 .main-container {
@@ -112,15 +116,14 @@
 }
 
 .header {
-  text-align: right;
-  font-size: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 14px;
   background-color: #b3c0d1;
   color: #333;
   line-height: 60px;
-}
-
-.el-aside {
-  color: #333;
 }
 
 .main-content {
@@ -129,17 +132,20 @@
   align-items: flex-start;
   flex: 1;
   padding: 20px;
+  background-color: #f5f5f5;
 }
 
 .user-info-card {
-  width: 80%;
+  width: 100%;
+  max-width: 800px; /* 增加表单的长度 */
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+  background-color: #fff;
 }
 
 .process-diagram {
-  width: 50%;
+  width: 100%;
   text-align: center;
   margin-bottom: 20px;
   display: flex;
@@ -147,8 +153,16 @@
 }
 
 .process-diagram img {
-  width: 20%;
+  width: 100%;
   height: auto;
+}
+
+.dialog-footer {
+  text-align: right;
+}
+
+.el-button {
+  margin: 0 8px;
 }
 </style>
 
@@ -270,54 +284,50 @@ export default {
         });
     },
     startProcessInstance() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Token not found. Please log in again.');
-    this.$router.push({ name: 'Login' });
-    return;
-  }
-
-  const selectedProcessDefinitionKey = this.selectedProcessDefinition;
-  if (!selectedProcessDefinitionKey) {
-    alert('Please select a process definition.');
-    return;
-  }
-
-  axios.get(
-    `http://139.199.168.63:8080/applicant/createProcessInstance/${selectedProcessDefinitionKey}`,
-    {
-      headers: {
-        Authorization: token,
-        Accept: 'application/json'
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Token not found. Please log in again.');
+        this.$router.push({ name: 'Login' });
+        return;
       }
-    }
-  )
-  .then(response => {
-    if (response.data.code === 0) {
-      const processInstanceId = response.data.data.processInstanceId;
-      this.submitStartForm(processInstanceId);
-    } else {
-      console.error('Error in response:', response.data);
-      alert(`启动流程失败: ${response.data.msg}`);
-    }
-  })
-  .catch(error => {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      console.error('Response error:', error.response.data);
-      alert(`启动流程失败: ${error.response.data.msg || 'Unknown error'}`);
-    } else if (error.request) {
-      // The request was made but no response was received
-      console.error('Request error:', error.request);
-      alert('启动流程失败: No response from server.');
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error('Error setting up request:', error.message);
-      alert(`启动流程失败: ${error.message}`);
-    }
-  });
-}
-,
+
+      const selectedProcessDefinitionKey = this.selectedProcessDefinition;
+      if (!selectedProcessDefinitionKey) {
+        alert('Please select a process definition.');
+        return;
+      }
+
+      axios.get(
+        `http://139.199.168.63:8080/applicant/createProcessInstance/${selectedProcessDefinitionKey}`,
+        {
+          headers: {
+            Authorization: token,
+            Accept: 'application/json'
+          }
+        }
+      )
+      .then(response => {
+        if (response.data.code === 0) {
+          const processInstanceId = response.data.data.processInstanceId;
+          this.submitStartForm(processInstanceId);
+        } else {
+          console.error('Error in response:', response.data);
+          alert(`启动流程失败: ${response.data.msg}`);
+        }
+      })
+      .catch(error => {
+        if (error.response) {
+          console.error('Response error:', error.response.data);
+          alert(`启动流程失败: ${error.response.data.msg || 'Unknown error'}`);
+        } else if (error.request) {
+          console.error('Request error:', error.request);
+          alert('启动流程失败: No response from server.');
+        } else {
+          console.error('Error setting up request:', error.message);
+          alert(`启动流程失败: ${error.message}`);
+        }
+      });
+    },
     submitStartForm(processInstanceId) {
       const token = localStorage.getItem('token');
       const formData = {

@@ -14,6 +14,7 @@ import OperateRecords from "../views/OperateRecords.vue"
 import ProcessManagement from "../views/ProcessManagement.vue"
 import OperationFacts from "../views/OperationFacts.vue"
 import OperationReport from "../views/OperationReport.vue"
+import AdminCenter from "../views/AdminCenter.vue"
 Vue.use(VueRouter)
 
 const routes = [
@@ -21,6 +22,11 @@ const routes = [
     path: '/currentApplication',
     name: 'CurrentApplication',
     component: CurrentApplication
+  },
+  {
+    path: '/adminCenter',
+    name: 'AdminCenter',
+    component: AdminCenter
   },
   {
     path: '/operationReport',

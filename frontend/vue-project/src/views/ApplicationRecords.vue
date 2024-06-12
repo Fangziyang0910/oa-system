@@ -61,11 +61,11 @@
         <el-card class="user-info-card">
           <h2>历史申请记录</h2>
           <el-table :data="paginatedData" @row-click="handleRowClick">
-            <el-table-column prop="processInstanceId" label="流程实例ID"></el-table-column>
-            <el-table-column prop="processDefinition.processDefinitionName" label="流程名称"></el-table-column>
-            <el-table-column prop="startTime" label="开始时间"></el-table-column>
-            <el-table-column prop="endTime" label="结束时间"></el-table-column>
-            <el-table-column prop="abortReason" label="终止原因"></el-table-column>
+            <el-table-column prop="processInstanceId" label="流程实例ID" width="180"></el-table-column>
+            <el-table-column prop="processDefinition.processDefinitionName" label="流程名称" width="180"></el-table-column>
+            <el-table-column prop="startTime" label="开始时间" width="180"></el-table-column>
+            <el-table-column prop="endTime" label="结束时间" width="180"></el-table-column>
+            <el-table-column prop="abortReason" label="终止原因" width="180"></el-table-column>
           </el-table>
           <el-pagination
             background

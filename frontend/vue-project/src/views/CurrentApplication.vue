@@ -57,10 +57,10 @@
         <el-card class="user-info-card">
           <h2>当前申请记录</h2>
           <el-table :data="paginatedData" style="width: 100%" @row-click="handleRowClick">
-            <el-table-column prop="processInstanceId" label="流程实例ID"></el-table-column>
-            <el-table-column prop="processDefinition.processDefinitionName" label="流程名称"></el-table-column>
-            <el-table-column prop="startTime" label="开始时间"></el-table-column>
-            <el-table-column prop="progress" label="当前进度">
+            <el-table-column prop="processInstanceId" label="流程实例ID" width="180"></el-table-column>
+            <el-table-column prop="processDefinition.processDefinitionName" label="流程名称" width="120"></el-table-column>
+            <el-table-column prop="startTime" label="开始时间" width="220" ></el-table-column>
+            <el-table-column prop="progress" label="当前进度" width="180">
               <template slot-scope="scope">
                 <div v-for="task in scope.row.progress" :key="task.taskId">
                   <p>{{ task.taskName }} - {{ task.assigneeName }}</p>

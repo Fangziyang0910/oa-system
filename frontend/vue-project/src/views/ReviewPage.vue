@@ -57,12 +57,12 @@
         <el-card class="user-info-card">
           <h2>未完成的审批任务</h2>
           <el-table :data="paginatedData" @row-click="handleRowClick">
-            <el-table-column prop="taskId" label="任务ID"></el-table-column>
+            <el-table-column prop="taskId" label="任务ID" width="170"></el-table-column>
             <el-table-column prop="taskName" label="任务名称"></el-table-column>
             <el-table-column prop="starterName" label="发起人"></el-table-column>
-            <el-table-column prop="processDefinitionName" label="流程名称"></el-table-column>
+            <el-table-column prop="processDefinitionName" label="流程名称" width="110"></el-table-column>
             <el-table-column prop="description" label="描述"></el-table-column>
-            <el-table-column prop="dueTime" label="到期时间"></el-table-column>
+            <el-table-column prop="dueTime" label="到期时间" width="230"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button type="primary" @click.stop="handleApprove(scope.row)">审批</el-button>
