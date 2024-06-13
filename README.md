@@ -19,37 +19,17 @@ PC机 1台：4C 8GB 内存 20GB硬盘
 
 # 项目进度
 
-## 可行性分析
+| 工作任务       | 开始日期 | 完成日期 | 所需资源 | 里程碑事件                         |
+| ------------------------ | ------------------ | ------------------ | ------------------ | -------------------------------------------- |
+| 需求分析       | 2024年4月1日       | 2024年4月7日       | 用户调研工具       | 需求说明书完成并通过用户确认                 |
+| 系统设计       | 2024年4月8日       | 2024年4月14日      | 设计工具           | 系统设计方案完成并通过内部评审               |
+| 编码实现       | 2024年4月15日      | 2024年5月25日      | 开发工具、IDE      | 前端和后端代码完成，并通过单元测试           |
+| 测试           | 2024年5月26日      | 2024年6月5日       | 测试工具           | 系统通过集成测试和用户验收测试               |
+| 文件编制       | 2024年6月5日       | 2024年6月15日      | 文档工具           | 所有文件编制完成并通过审批                   |
+| 用户培训       | 2024年6月16日      | 2024年6月25日      | 培训材料           | 用户培训完成，用户能够熟练操作系统           |
+| 软件安装和维护 | 2024年6月26日      | 2024年6月30日      | 安装工具           | 系统安装完成，系统正常运行，并提供必要的维护 |
 
-## 项目计划
-
-指定开发计划，确定项目的大小、范围、复杂程度，分配任务，安排进度，确定环境和工具
-
-## 需求分析
-
-完成《需求分析规格说明书》
-
-- 用例视图（用例图），逻辑视图（ER图/类图），进程视图（活动图/顺序图），实现视图（部件图），部署视图（部署图）
-
-- 参与者：各部门单位、各级审批单位、操作人员单位
-- 用例：
-    - 使用部门提交运维申请
-    - 各级部门审批申请
-    - 操作人员回复工单
-    - 操作人员分派工单
-        - 自动派单
-        - 管理员派单
-        - 执行人员抢单
-    - 操作人员查看统计报表
-    - 操作人员查看超时预警工单
-
-## 概要设计
-
-完成《概要设计文档》
-
-## 详细设计
-
-完成《详细设计说明书》
+## 项目结构
 
 ```
 backend
@@ -72,19 +52,23 @@ backend
     |   |   |       |   |   |__OperatorEntity.java
     |   |   |       |   |   |__AdministratorEntity.java
     |   |   |       |   |   |__UserPermissionEntity.java
-    |   |   |       |   |   |__GroupEntity.java
+    |   |   |       |   |   |__CategoryEntity.java
+    |   |   |       |   |   |__ReportEntity.java
     |   |   |       |   |__vo
     |   |   |       |   |   |__ResultVo.java
     |   |   |       |   |   |__UserVo.java
     |   |   |       |   |   |__ApplicantVo.java
     |   |   |       |   |   |__ApproverVo.java
     |   |   |       |   |   |__OperatorVo.java
-    |   |   |       |   |   |__GroupVo.java
+    |   |   |       |   |   |__CategoryVo.java
     |   |   |       |   |   |__ProcessDefinitionVo.java
     |   |   |       |   |   |__ProcessInstanceVo.java
     |   |   |       |   |   |__TaskVo.java
     |   |   |       |   |   |__FormVo.java
-    |   |   |       |   |   |__FormInfoVo.java
+    |   |   |       |   |   |__FormFieldVo.java
+    |   |   |       |   |   |__CategoryVo.java
+    |   |   |       |   |   |__MsgVo.java
+    |   |   |       |   |   |__ReportVo.java
     |   |   |       |   |__enums
     |   |   |       |   |   |__ResultCode.java
     |   |   |       |   |__exception
@@ -95,6 +79,13 @@ backend
     |   |   |       |   |__LoginInterceptor.java
     |   |   |       |   |__AuthInterceptor.java
     |   |   |       |__task
+    |   |   |       |   |__LeaveAskAssignDelegate.java
+    |   |   |       |   |__SetLeaderDelegate.java
+    |   |   |       |   |__SetManagerDelegate.java
+    |   |   |       |   |__TimeoutWarningDelegate.java
+    |   |   |       |   |__EndExecutionListener.java
+    |   |   |       |   |__AbortExecutionListener.java
+    |   |   |       |   |__TimeoutWarningListener.java
     |   |   |       |__mapper
     |   |   |       |   |__AdministratorMapper.java
     |   |   |       |   |__UserMapper.java
@@ -102,6 +93,7 @@ backend
     |   |   |       |   |__ApplicantMapper.java
     |   |   |       |   |__ApproverMapper.java
     |   |   |       |   |__OperatorMapper.java
+    |   |   |       |   |__CategoryMapper.java
     |   |   |       |__service
     |   |   |       |   |__impl
     |   |   |       |   |   |__AdministratorServiceImpl.java
@@ -110,32 +102,49 @@ backend
     |   |   |       |   |   |__ApplicantServiceImpl.java
     |   |   |       |   |   |__ApproverServiceImpl.java
     |   |   |       |   |   |__OperatorServiceImpl.java
-    |   |   |       |   |   |__IdmGroupService.java
+    |   |   |       |   |   |__CategoryServiceImpl.java
+    |   |   |       |   |   |__ReportServiceImpl.java
+    |   |   |       |   |   |__ScheduleServiceImpl.java
     |   |   |       |   |__AdministratorService.java
     |   |   |       |   |__UserService.java
     |   |   |       |   |__PermissionService.java
     |   |   |       |   |__ApplicantService.java
     |   |   |       |   |__ApproverService.java
     |   |   |       |   |__OperatorService.java
-    |   |   |       |   |__IdmGroupService.java
+    |   |   |       |   |__CategoryService.java
+    |   |   |       |   |__ReportService.java
+    |   |   |       |   |__ScheduleService.java
     |   |   |       |__controller
     |   |   |       |   |__api
+    |   |   |       |   |   |__UserContorller.java
+    |   |   |       |   |   |__AdministratorContorller.java
+    |   |   |       |   |   |__ApplicantContorller.java
+    |   |   |       |   |   |__ApprovalContorller.java
+    |   |   |       |   |   |__OperatorContorller.java
+    |   |   |       |   |   |__PermisssionContorller.java
     |   |   |       |   |__ResultControllerAdvice.java
     |   |   |       |   |__ExceptionControllerAdvice.java
+    |   |   |       |__controller
+    |   |   |       |   |__MyBpmnModelModifier.java
+    |   |   |       |   |__MyDefaultProcessDiagramCanvas.java
+    |   |   |       |   |__MyDefaultProcessDiagramGenerator.java
+    |   |   |       |   |__MyMsgSender.java
     |   |   |       |__Main.java
     |   |   |__resource
     |   |       |__mapper
+    |   |       |   |__AdministratorMapper.xml
+    |   |       |   |__UserMapper.xml
+    |   |       |   |__PermissionMapper.xml
     |   |       |   |__ApplicantMapper.xml
     |   |       |   |__ApproverMapper.xml
     |   |       |   |__OperatorMapper.xml
-    |   |       |   |__AdministratorMapper.xml
+    |   |       |   |__CategoryMapper.xml
     |   |       |__processes
     |   |       |   |__leaveProcess.bpmn20.xml
     |   |       |__forms
     |   |       |   |__leaveAsk.form
     |   |       |   |__leaderApproval.form
     |   |       |   |__managerApproval.form
-    |   |       |   |__.form
     |   |       |__application.yml
     |   |__test
     |       |__java.com.whaler.oasys
@@ -148,40 +157,110 @@ backend
     |__pom.xml
 ```
 
-## 编码
+## 配置信息
 
-确定开发语言，遵循代码规范、命名规范、注释规范
+- Nginx配置
 
- 
-- 详细设计和编码一起进行，先建立数据库表，确定了用户表，权限表，用户-权限表，申请人-流程实例表，审批人-任务表，执行人-任务表🆗
-    - 建立基本的管理系统，包括用户登录、会话信息保存、用户信息获取，entity类编码（mapper层存储结果，包括连表结果）🆗，mapper层及其单元测试🆗，vo类编码（一对多的实体关系，service层，返回结果）、param类（controller层，传入参数）🆗完成登录认证拦截器🆗，service层基础功能及其单元测试🆗，用户相关基础controller🆗，拦截配置、全局异常处理，mock模拟接口测试🆗
-    - 增加了角色组表，表示角色和角色组的多对多的关系🆗
-- 开发关键业务，明确需求并编写接口，测试挂载表单。先预设流程和表单，做好部署，根据需求编码数据结构和处理方法，
-    - 管理员上传部署流程和表单🆗，返回部署结果🆗
-    - 审批人查询所有任务（包括assign和candidate）🆗，获取开始表单🆗，获取任务表单🆗，完成任务🆗
-    - 操作人查询所有任务（包括assign和candidate）🆗，获取开始表单🆗，获取任务表单🆗，完成任务🆗，派单🆗
-    - 申请人查询流程模板🆗，选择流程创建实例🆗，查询工单模板🆗，提交工单🆗，查询流程进度🆗，获取流程状态🆗，获取回单🆗
-    - 每日、每周提供工单流转完成情况统计报表、超时预警工单，统计流程（完成的、未完成的、超时的），超时预警？发送邮件提醒候选人来处理
+  1. 安装Nginx
 
-## 测试
+     ```
+     sudo apt update
+     sudo apt install nginx
+     ```
 
-制定测试数据，完成《测试说明书》
+  2. 配置反向代理，编辑Nginx配置文件 /etc/nginx/sites-available/default
 
-## 接口文档API使用说明
-- 本项目使用 swagger 构建接口文档，前端测试环境搭建步骤如下
-    - 根据 `/backend/sql/oasys.sql` 创建数据库 `oasys`
-    - 在 idea 中导入项目，直接运行 `Main.java`
-    - 访问 `http://localhost:8080/swagger-ui.html`
-    - 注意，每次访问需要携带令牌，需要先登录获取令牌，然后在请求头 `Authorization` 手动添加令牌（令牌可以认为不会过期）
+     ```
+     server {
+         listen 80;
+         server_name example.com;
+     
+         location / {
+             proxy_pass http://localhost:8080;
+             proxy_set_header Host $host;
+             proxy_set_header X-Real-IP $remote_addr;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+             proxy_set_header X-Forwarded-Proto $scheme;
+         }
+     }
+     ```
 
-- 流程模板
-    - 员工请假流程
-    - 员工离职流程
-    - 员工调岗流程
-    - 产品软件故障
-    - 办公设备采购申请
-    - 办公设备维修申请
-    - 办公设备报废申请
-    - 内部平台故障申报
+  3. 启动Nginx服务
 
-⚠ 注意：请将 idea 的配置文件、前端的npm包加入到 .gitignore 中，不要提交到 git
+     ```
+     sudo systemctl start nginx
+     sudo systemctl enable nginx
+     ```
+
+- Spring应用程序部署
+
+  1. 运行Spring应用程序
+
+     ```
+     mvn springboot:run
+     ```
+
+  2. 打包Spring应用程序
+
+     ```
+     mvn clean package
+     ```
+
+  3. 部署Spring应用程序，使用以下命令启动应用程序：
+
+     ```
+     java -jar oa-sys.jar
+     ```
+
+- RabbitMQ配置
+
+  1. 安装RabbitMQ
+
+     ```
+     sudo apt-get install rabbitmq-server
+     ```
+
+  2. 在 application.properties 中配置RabbitMQ
+
+     ```
+     spring.rabbitmq.host=localhost
+     spring.rabbitmq.port=5672
+     spring.rabbitmq.username=guest
+     spring.rabbitmq.password=guest
+     ```
+
+  3. 启动RabbitMQ服务
+
+     ```
+     sudo systemctl start rabbitmq-server
+     sudo systemctl enable rabbitmq-server
+     ```
+
+- 系统防火墙配置
+
+  1. 开放必要端口
+
+     ```
+     sudo firewall-cmd --zone=public --add-port=allow 80/tcp  # Nginx
+     sudo firewall-cmd --zone=public --add-port=8080/tcp  # Spring应用程序
+     sudo firewall-cmd --zone=public --add-port=5672/tcp  # RabbitMQ
+     ```
+
+  2. 启动防火墙
+
+     ```
+     sudo firewall-cmd reload
+     ```
+
+## 项目文档
+```
+项目文档
+    |__1.可行性研究报告.doc
+    |__2.项目开发计划.doc
+    |__3.软件需求说明书.doc
+    |__4.概要设计说明书.doc
+    |__5.详细设计说明书.doc
+    |__6.测试分析报告.doc
+    |__7.用户手册.doc
+    |__8.项目开发总结报告.doc
+```
